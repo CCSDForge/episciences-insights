@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import { scaleLog } from 'd3-scale';
 import { Tooltip } from 'react-tooltip';
@@ -13,7 +13,6 @@ interface WorldMapProps {
 }
 
 export default function WorldMap({ data }: WorldMapProps) {
-  const [content, setContent] = useState("");
 
   const dataMap = useMemo(() => {
     const map: Record<string, number> = {};
@@ -71,12 +70,6 @@ export default function WorldMap({ data }: WorldMapProps) {
                   geography={geo}
                   data-tooltip-id="world-map-tooltip"
                   data-tooltip-content={`${name}: ${value} publications`}
-                  onMouseEnter={() => {
-                    setContent(`${name}: ${value} publications`);
-                  }}
-                  onMouseLeave={() => {
-                    setContent("");
-                  }}
                   fill={value > 0 ? colorScale(value) : "#f1f5f9"}
                   stroke="#cbd5e1"
                   strokeWidth={0.5}
