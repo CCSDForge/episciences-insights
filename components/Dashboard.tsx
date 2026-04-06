@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React from 'react';
 import { Publication } from '@/lib/types';
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { FlaskConical, Map as MapIcon, Table, Search, ChevronDown, Library, BookOpen, Globe, Wallet } from 'lucide-react';
 
@@ -13,186 +13,26 @@ import TopicTreeMap from './TopicTreeMap';
 import CollaborationWeb from './CollaborationWeb';
 import ResearchLineage from './ResearchLineage';
 import FunderSynergy from './FunderSynergy';
+import { DashboardProvider, useDashboard } from './DashboardContext';
 
 interface DashboardProps {
   initialData: Publication[];
 }
 
 export default function Dashboard({ initialData }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<'funder' | 'journal' | 'raw' | 'topics' | 'lineage'>('funder');
-  const [yearFilter, setYearFilter] = useState<string>('all');
-  const [funderFilter, setFunderFilter] = useState<string>('all');
-  const [journalFilter, setJournalFilter] = useState<string>('all');
-  const [funderLimit, setFunderLimit] = useState<50 | 100 | 500>(50);
-  const [institutionLimit, setInstitutionLimit] = useState<100 | 500 | 1000>(100);
-  const [topicLimit, setTopicLimit] = useState<100 | 500>(100);
-  const [topicDomainFilter, setTopicDomainFilter] = useState<string>('all');
-  
-  // Custom Dropdown State
-  const [isFunderOpen, setIsFunderOpen] = useState(false);
-  const [funderSearch, setFunderSearch] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  return (
+    <DashboardProvider initialData={initialData}>
+      <DashboardContent />
+    </DashboardProvider>
+  );
+}
 
-  // Close dropdown on click outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsFunderOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const filteredData = useMemo(() => {
-    return initialData.filter(p => {
-      const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
-      const funderMatch = funderFilter === 'all' || p.awards.some(a => a.funder === funderFilter);
-      const journalMatch = journalFilter === 'all' || p.journal.issn === journalFilter || p.journal.name === journalFilter;
-      return yearMatch && funderMatch && journalMatch;
-    });
-  }, [initialData, yearFilter, funderFilter, journalFilter]);
-
-  const stats = useMemo(() => {
-    const totalPubs = filteredData.length;
-    const totalSdgs = new Set(filteredData.flatMap(p => p.sdgs.map(s => s.id))).size;
-    const totalFunders = new Set(filteredData.flatMap(p => p.awards.map(a => a.funder))).size;
-    return { totalPubs, totalSdgs, totalFunders };
-  }, [filteredData]);
-
-  const sdgData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    filteredData.forEach(p => {
-      p.sdgs.forEach(s => {
-        counts[s.label] = (counts[s.label] || 0) + 1;
-      });
-    });
-    return Object.entries(counts)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [filteredData]);
-
-  const funderData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    filteredData.forEach(p => {
-      p.awards.forEach(a => {
-        counts[a.funder] = (counts[a.funder] || 0) + 1;
-      });
-    });
-    return Object.entries(counts)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, funderLimit);
-  }, [filteredData, funderLimit]);
-
-  const institutionData = useMemo(() => {
-    const counts: Record<string, { name: string, count: number, ror: string | null }> = {};
-    filteredData.forEach(p => {
-      p.authors.forEach(a => {
-        a.institutions.forEach(inst => {
-          const key = inst.ror || inst.name;
-          if (!counts[key]) {
-            counts[key] = { name: inst.name, count: 0, ror: inst.ror };
-          }
-          counts[key].count += 1;
-        });
-      });
-    });
-    return Object.values(counts)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, institutionLimit);
-  }, [filteredData, institutionLimit]);
-
-  const countryData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    filteredData.forEach(p => {
-      // Use a Set to ensure each country is only counted once per publication
-      const countriesInPub = new Set<string>();
-      p.authors.forEach(a => {
-        a.institutions.forEach(inst => {
-          if (inst.country) {
-            countriesInPub.add(inst.country.toUpperCase());
-          }
-        });
-      });
-      
-      countriesInPub.forEach(country => {
-        counts[country] = (counts[country] || 0) + 1;
-      });
-    });
-    return Object.entries(counts)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [filteredData]);
-
-  const topicData = useMemo(() => {
-    const counts: Record<string, { 
-      name: string, 
-      count: number, 
-      domain: string, 
-      field: string,
-      id: string 
-    }> = {};
-    
-    filteredData.forEach(p => {
-      if (p.primary_topic) {
-        const domain = p.primary_topic.domain || 'Unknown';
-        if (topicDomainFilter !== 'all' && domain !== topicDomainFilter) return;
-
-        const key = p.primary_topic.id;
-        if (!counts[key]) {
-          counts[key] = { 
-            name: p.primary_topic.name, 
-            count: 0, 
-            domain: domain,
-            field: p.primary_topic.field || 'Unknown',
-            id: p.primary_topic.id
-          };
-        }
-        counts[key].count += 1;
-      }
-    });
-    
-    return Object.values(counts)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, topicLimit);
-  }, [filteredData, topicLimit, topicDomainFilter]);
-
-  const topicDomains = useMemo(() => {
-    const domains = new Set<string>();
-    initialData.forEach(p => {
-      if (p.primary_topic?.domain) domains.add(p.primary_topic.domain);
-    });
-    return Array.from(domains).sort();
-  }, [initialData]);
-
-  const years = useMemo(() => Array.from(new Set(initialData.map(p => p.year.toString()))).sort().reverse(), [initialData]);
-  
-  const groupedFunders = useMemo(() => {
-    const uniqueFunders = Array.from(new Set(initialData.flatMap(p => p.awards.map(a => a.funder))))
-      .filter(Boolean)
-      .filter(f => f.toLowerCase().includes(funderSearch.toLowerCase()))
-      .sort((a, b) => a.localeCompare(b));
-      
-    const groups: Record<string, string[]> = {};
-    uniqueFunders.forEach(f => {
-      const letter = /^[A-Z]/.test(f[0].toUpperCase()) ? f[0].toUpperCase() : '#';
-      if (!groups[letter]) groups[letter] = [];
-      groups[letter].push(f);
-    });
-    return groups;
-  }, [initialData, funderSearch]);
-
-  const journals = useMemo(() => {
-    const unique = new Map();
-    initialData.forEach(p => {
-      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name) {
-        unique.set(p.journal.issn || name, name);
-      }
-    });
-    return Array.from(unique.entries()).sort((a, b) => a[1].localeCompare(b[1]));
-  }, [initialData]);
+function DashboardContent() {
+  const { state, actions, data, meta } = useDashboard();
+  const { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, topicDomainFilter, isFunderOpen, funderSearch } = state;
+  const { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, setFunderLimit, setInstitutionLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch } = actions;
+  const { filteredData, stats, sdgData, funderData, institutionData, countryData, topicData, topicDomains, years, groupedFunders, journals } = data;
+  const { dropdownRef } = meta;
 
   return (
     <div className="space-y-8">
@@ -203,9 +43,9 @@ export default function Dashboard({ initialData }: DashboardProps) {
             Publication Year
           </label>
           <div className="relative">
-            <select 
+            <select
               id="filter-year"
-              value={yearFilter} 
+              value={yearFilter}
               onChange={(e) => setYearFilter(e.target.value)}
               className="min-w-[140px] appearance-none rounded-xl border border-zinc-300 bg-white pl-4 pr-10 py-2.5 text-sm font-bold text-zinc-900 shadow-sm focus:ring-2 focus:ring-teal-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 outline-none w-full"
             >
@@ -215,15 +55,15 @@ export default function Dashboard({ initialData }: DashboardProps) {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
           </div>
         </div>
-        
+
         <div className="flex flex-col gap-3">
           <label htmlFor="filter-journal" className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Journal / Source
           </label>
           <div className="relative">
-            <select 
+            <select
               id="filter-journal"
-              value={journalFilter} 
+              value={journalFilter}
               onChange={(e) => setJournalFilter(e.target.value)}
               className="min-w-[240px] max-w-[300px] appearance-none rounded-xl border border-zinc-300 bg-white pl-4 pr-10 py-2.5 text-sm font-bold text-zinc-900 shadow-sm focus:ring-2 focus:ring-teal-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 outline-none w-full"
             >
@@ -266,7 +106,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
                   </div>
                 </div>
                 <ul role="listbox" className="max-h-[400px] overflow-y-auto py-2 text-sm scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-700">
-                  <li 
+                  <li
                     role="option"
                     aria-selected={funderFilter === 'all'}
                     onClick={() => { setFunderFilter('all'); setIsFunderOpen(false); setFunderSearch(''); }}
@@ -280,8 +120,8 @@ export default function Dashboard({ initialData }: DashboardProps) {
                         {letter}
                       </li>
                       {list.map(f => (
-                        <li 
-                          key={f} 
+                        <li
+                          key={f}
                           role="option"
                           aria-selected={funderFilter === f}
                           onClick={() => { setFunderFilter(f); setIsFunderOpen(false); setFunderSearch(''); }}
@@ -302,7 +142,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
         </div>
       </section>
 
-      {/* Global Dynamic KPIs - More space-efficient */}
+      {/* Global Dynamic KPIs */}
       <section aria-label="Key Performance Indicators" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-md ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
           <div className="flex items-center gap-3">
@@ -337,7 +177,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
 
       {/* Tabs with WAI-ARIA */}
       <nav role="tablist" aria-label="Dashboard Views" className="flex overflow-x-auto border-b border-zinc-200 dark:border-zinc-800 scrollbar-hide">
-        <button 
+        <button
           id="tab-funder"
           role="tab"
           aria-selected={activeTab === 'funder'}
@@ -347,7 +187,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
         >
           <FlaskConical size={18} /> Funder Impact
         </button>
-        <button 
+        <button
           id="tab-journal"
           role="tab"
           aria-selected={activeTab === 'journal'}
@@ -357,7 +197,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
         >
           <MapIcon size={18} /> Global Reach
         </button>
-        <button 
+        <button
           id="tab-raw"
           role="tab"
           aria-selected={activeTab === 'raw'}
@@ -367,7 +207,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
         >
           <Table size={18} /> Data Explorer
         </button>
-        <button 
+        <button
           id="tab-topics"
           role="tab"
           aria-selected={activeTab === 'topics'}
@@ -377,7 +217,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
         >
           <Library size={18} /> Research Landscape
         </button>
-        <button 
+        <button
           id="tab-lineage"
           role="tab"
           aria-selected={activeTab === 'lineage'}
@@ -399,13 +239,12 @@ export default function Dashboard({ initialData }: DashboardProps) {
                   <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Research Landscape</h3>
                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mt-2">Interactive Treemap of Domains & Fields</span>
                 </div>
-                
                 <div className="flex flex-wrap items-end gap-6">
                   <div className="flex flex-col gap-3">
                     <label htmlFor="topic-domain-select" className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                       Filter by Domain
                     </label>
-                    <select 
+                    <select
                       id="topic-domain-select"
                       value={topicDomainFilter}
                       onChange={(e) => setTopicDomainFilter(e.target.value)}
@@ -417,17 +256,17 @@ export default function Dashboard({ initialData }: DashboardProps) {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mb-12 h-[500px] min-h-[500px] w-full bg-zinc-50 dark:bg-zinc-950/50 rounded-3xl overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                <TopicTreeMap 
-                  data={filteredData.filter(p => topicDomainFilter === 'all' || p.primary_topic?.domain === topicDomainFilter)} 
+                <TopicTreeMap
+                  data={filteredData.filter(p => topicDomainFilter === 'all' || p.primary_topic?.domain === topicDomainFilter)}
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {topicData.map((topic, idx) => (
-                  <div 
-                    key={topic.id} 
+                  <div
+                    key={topic.id}
                     className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-5 ring-1 ring-zinc-200 transition-all hover:bg-white hover:shadow-xl hover:ring-indigo-200 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-indigo-900"
                   >
                     <div className="mb-4 flex items-start justify-between">
@@ -444,9 +283,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
                         <span className="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
                         {topic.field}
                       </p>
-                      <p className="text-[9px] font-medium text-zinc-400 italic truncate">
-                        {topic.domain}
-                      </p>
+                      <p className="text-[9px] font-medium text-zinc-400 italic truncate">{topic.domain}</p>
                     </div>
                   </div>
                 ))}
@@ -454,9 +291,9 @@ export default function Dashboard({ initialData }: DashboardProps) {
             </div>
           </section>
         )}
+
         {activeTab === 'funder' && (
           <section id="panel-funder" role="tabpanel" aria-labelledby="tab-funder" className="flex flex-col gap-10 animate-in fade-in duration-500">
-            {/* Card 1: SDG Impact Profile (Radar) */}
             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
               <div className="space-y-6">
                 <div>
@@ -469,7 +306,6 @@ export default function Dashboard({ initialData }: DashboardProps) {
               </div>
             </div>
 
-            {/* Card 2: SDG Distribution (Bar Chart) */}
             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
               <div className="space-y-6">
                 <div>
@@ -480,22 +316,16 @@ export default function Dashboard({ initialData }: DashboardProps) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={sdgData} layout="vertical" margin={{ left: 10, right: 30, top: 10, bottom: 10 }}>
                       <XAxis type="number" hide />
-                      <YAxis 
-                        dataKey="name" 
-                        type="category" 
-                        width={220} 
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        width={220}
                         tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
                         axisLine={false}
                         tickLine={false}
                       />
-                      <Tooltip 
-                        contentStyle={{ 
-                          borderRadius: '16px', 
-                          border: '1px solid #e5e7eb', 
-                          boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                          padding: '16px',
-                          backgroundColor: '#ffffff'
-                        }}
+                      <Tooltip
+                        contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '16px', backgroundColor: '#ffffff' }}
                         labelStyle={{ color: '#111827', fontWeight: '800', marginBottom: '8px', fontSize: '14px' }}
                         itemStyle={{ color: '#0D9488', fontWeight: '700' }}
                         cursor={{ fill: 'rgba(13, 148, 136, 0.05)' }}
@@ -507,34 +337,15 @@ export default function Dashboard({ initialData }: DashboardProps) {
               </div>
             </div>
 
-            {/* Card 3: Funder Synergy Web */}
             <FunderSynergy data={filteredData} />
-            
+
             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
               <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 font-heading">Volume by Research Funder</h3>
                 <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
-                  <button 
-                    onClick={() => setFunderLimit(50)}
-                    aria-label="Show top 50 funders"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-l-lg border-r border-zinc-200 dark:border-zinc-600 transition-all ${funderLimit === 50 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                  >
-                    Top 50
-                  </button>
-                  <button 
-                    onClick={() => setFunderLimit(100)}
-                    aria-label="Show top 100 funders"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-r border-zinc-200 dark:border-zinc-600 transition-all ${funderLimit === 100 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                  >
-                    Top 100
-                  </button>
-                  <button 
-                    onClick={() => setFunderLimit(500)}
-                    aria-label="Show top 500 funders"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-r-lg transition-all ${funderLimit === 500 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                  >
-                    Top 500
-                  </button>
+                  <button onClick={() => setFunderLimit(50)} aria-label="Show top 50 funders" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-l-lg border-r border-zinc-200 dark:border-zinc-600 transition-all ${funderLimit === 50 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 50</button>
+                  <button onClick={() => setFunderLimit(100)} aria-label="Show top 100 funders" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-r border-zinc-200 dark:border-zinc-600 transition-all ${funderLimit === 100 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 100</button>
+                  <button onClick={() => setFunderLimit(500)} aria-label="Show top 500 funders" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-r-lg transition-all ${funderLimit === 500 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 500</button>
                 </div>
               </div>
               <div className="overflow-y-auto overflow-x-hidden pr-2 border border-zinc-100 rounded-xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30" style={{ height: '600px' }}>
@@ -542,22 +353,16 @@ export default function Dashboard({ initialData }: DashboardProps) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={funderData} layout="vertical" margin={{ left: 20, right: 40, top: 20, bottom: 20 }}>
                       <XAxis type="number" hide />
-                      <YAxis 
-                        dataKey="name" 
-                        type="category" 
-                        width={260} 
-                        tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }} 
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        width={260}
+                        tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
                         axisLine={false}
                         tickLine={false}
                       />
-                      <Tooltip 
-                        contentStyle={{ 
-                          borderRadius: '16px', 
-                          border: '1px solid #e5e7eb', 
-                          boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                          padding: '16px',
-                          backgroundColor: '#ffffff'
-                        }}
+                      <Tooltip
+                        contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '16px', backgroundColor: '#ffffff' }}
                         labelStyle={{ color: '#111827', fontWeight: '800', marginBottom: '8px', fontSize: '14px' }}
                         itemStyle={{ color: '#0D9488', fontWeight: '700' }}
                         cursor={{ fill: 'rgba(13, 148, 136, 0.05)' }}
@@ -582,7 +387,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
                 <CollaborationWeb data={filteredData} />
               </div>
             </div>
-            
+
             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
               <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-zinc-100 pb-6 dark:border-zinc-800">
                 <div className="flex flex-col">
@@ -590,27 +395,9 @@ export default function Dashboard({ initialData }: DashboardProps) {
                   <span className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mt-2">Deduplicated by ROR identifier</span>
                 </div>
                 <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
-                  <button 
-                    onClick={() => setInstitutionLimit(100)}
-                    aria-label="Show top 100 institutions"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-l-lg border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 100 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                  >
-                    Top 100
-                  </button>
-                  <button 
-                    onClick={() => setInstitutionLimit(500)}
-                    aria-label="Show top 500 institutions"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 500 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                  >
-                    Top 500
-                  </button>
-                  <button 
-                    onClick={() => setInstitutionLimit(1000)}
-                    aria-label="Show top 1000 institutions"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-r-lg transition-all ${institutionLimit === 1000 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-                  >
-                    Top 1000
-                  </button>
+                  <button onClick={() => setInstitutionLimit(100)} aria-label="Show top 100 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-l-lg border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 100 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 100</button>
+                  <button onClick={() => setInstitutionLimit(500)} aria-label="Show top 500 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 500 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 500</button>
+                  <button onClick={() => setInstitutionLimit(1000)} aria-label="Show top 1000 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-r-lg transition-all ${institutionLimit === 1000 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 1000</button>
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-x-10 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
@@ -623,9 +410,9 @@ export default function Dashboard({ initialData }: DashboardProps) {
                       <div className="truncate">
                         <p className="truncate text-sm font-bold text-zinc-900 dark:text-zinc-100 font-sans" title={inst.name}>{inst.name}</p>
                         {inst.ror ? (
-                          <a 
-                            href={inst.ror.startsWith('http') ? inst.ror : `https://ror.org/${inst.ror}`} 
-                            target="_blank" 
+                          <a
+                            href={inst.ror.startsWith('http') ? inst.ror : `https://ror.org/${inst.ror}`}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-bold uppercase truncate hover:underline flex items-center gap-1"
                           >
@@ -676,9 +463,9 @@ export default function Dashboard({ initialData }: DashboardProps) {
                           </td>
                           <td className="px-6 py-5 text-zinc-600 dark:text-zinc-400 align-top text-xs font-semibold">{p.journal.name?.replace(/\s+/g, ' ').trim()}</td>
                           <td className="px-6 py-5 align-top whitespace-nowrap">
-                            <a 
-                              href={p.doi.startsWith('http') ? p.doi : `https://doi.org/${p.doi}`} 
-                              target="_blank" 
+                            <a
+                              href={p.doi.startsWith('http') ? p.doi : `https://doi.org/${p.doi}`}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-mono text-[10px] font-black bg-amber-50/50 dark:bg-amber-900/20 px-2 py-1 rounded-md transition-colors"
                             >
