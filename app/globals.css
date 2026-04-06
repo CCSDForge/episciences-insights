@@ -66,3 +66,24 @@ h1, h2, h3, h4, h5, h6 {
 .skip-link:focus {
   top: 0;
 }
+
+/* Scroll Utilities for Modern Tabs */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Fade effect for scrollable containers */
+.fade-scroll-x {
+  mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent);
+}
+
+/* Focus styles for keyboard navigation */
+[role="tab"]:focus-visible {
+  outline: 2px solid var(--primary-teal);
+  outline-offset: -4px;
+  border-radius: 9999px;
+}

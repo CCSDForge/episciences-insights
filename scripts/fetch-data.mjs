@@ -12,12 +12,21 @@ const API_KEY = process.env.OPENALEX_API_KEY;
 const CSV_PATH = path.resolve(process.env.DOI_CSV_PATH || './publications.csv');
 const OUTPUT_PATH = path.resolve(process.env.DATA_OUTPUT_PATH || './public/data/publications.json');
 const CACHE_DIR = path.resolve(process.env.CACHE_DIRECTORY || './.cache');
+const LOG_DIR = path.resolve('./logs');
 const CACHE_DURATION_MS = (parseInt(process.env.CACHE_DURATION_DAYS) || 30) * 24 * 60 * 60 * 1000;
 
 // Ensure directories exist
 if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
 const outputDir = path.dirname(OUTPUT_PATH);
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
+const NOT_FOUND_LOG = path.join(LOG_DIR, 'not-found.log');
+
+async function logNotFound(doi) {
+  const message = `${new Date().toISOString()} - 404 Not Found - ${doi}\n`;
+  fs.appendFileSync(NOT_FOUND_LOG, message);
+}
 
 function transform(data) {
   return {
@@ -25,7 +34,7 @@ function transform(data) {
     title: data.title,
     year: data.publication_year,
     journal: {
-      name: data.primary_location?.source?.display_name?.replace(/\s+/g, ' ').trim(),
+      name: data.primary_location?.source?.display_name?.replace(/[\x98\x9C]/g, '').replace(/\xA0/g, ' ').replace(/\s+/g, ' ').trim(),
       issn: data.primary_location?.source?.issn?.[0],
       id: data.primary_location?.source?.id
     },
@@ -98,7 +107,12 @@ async function getWorkData(doi) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(`[ERROR] API response not OK (${response.status}) for ${cleanDoi}`);
+      if (response.status === 404) {
+        console.error(`[404] DOI not found in OpenAlex: ${cleanDoi}`);
+        logNotFound(cleanDoi);
+      } else {
+        console.error(`[ERROR] API response not OK (${response.status}) for ${cleanDoi}`);
+      }
       // Do not cache errors
       return null;
     }

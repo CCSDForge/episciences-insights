@@ -5,7 +5,7 @@ import { Publication } from '@/lib/types';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { FlaskConical, Map as MapIcon, Table, Search, ChevronDown, Library, BookOpen, Globe, Wallet } from 'lucide-react';
+import { FlaskConical, Map as MapIcon, Search, ChevronDown, Library, BookOpen, Globe, Wallet, BarChart3 } from 'lucide-react';
 
 import WorldMap from './WorldMap';
 import SdgRadar from './SdgRadar';
@@ -13,15 +13,17 @@ import TopicTreeMap from './TopicTreeMap';
 import CollaborationWeb from './CollaborationWeb';
 import ResearchLineage from './ResearchLineage';
 import FunderSynergy from './FunderSynergy';
+import UsageAnalytics from './UsageAnalytics';
 import { DashboardProvider, useDashboard } from './DashboardContext';
 
 interface DashboardProps {
   initialData: Publication[];
+  usageSummary: any | null;
 }
 
-export default function Dashboard({ initialData }: DashboardProps) {
+export default function Dashboard({ initialData, usageSummary }: DashboardProps) {
   return (
-    <DashboardProvider initialData={initialData}>
+    <DashboardProvider initialData={initialData} usageSummary={usageSummary}>
       <DashboardContent />
     </DashboardProvider>
   );
@@ -31,8 +33,10 @@ function DashboardContent() {
   const { state, actions, data, meta } = useDashboard();
   const { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, topicDomainFilter, isFunderOpen, funderSearch } = state;
   const { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, setFunderLimit, setInstitutionLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch } = actions;
-  const { filteredData, stats, sdgData, funderData, institutionData, countryData, topicData, topicDomains, years, groupedFunders, journals } = data;
+  const { filteredData, usageSummary, stats, sdgData, funderData, institutionData, countryData, topicData, topicDomains, years, groupedFunders, journals } = data;
   const { dropdownRef } = meta;
+
+  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
   return (
     <div className="space-y-8">
@@ -151,7 +155,7 @@ function DashboardContent() {
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Publications</p>
           </div>
-          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-zinc-50">{stats.totalPubs.toLocaleString()}</p>
+          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-zinc-50">{formatNum(stats.totalPubs)}</p>
         </div>
 
         <div className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-md ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
@@ -161,7 +165,7 @@ function DashboardContent() {
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">SDGs Impacted</p>
           </div>
-          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-zinc-50">{stats.totalSdgs}</p>
+          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-zinc-50">{formatNum(stats.totalSdgs)}</p>
         </div>
 
         <div className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-md ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
@@ -171,66 +175,95 @@ function DashboardContent() {
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Funding Agencies</p>
           </div>
-          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-zinc-50">{stats.totalFunders}</p>
+          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-zinc-50">{formatNum(stats.totalFunders)}</p>
         </div>
       </section>
 
-      {/* Tabs with WAI-ARIA */}
-      <nav role="tablist" aria-label="Dashboard Views" className="flex overflow-x-auto border-b border-zinc-200 dark:border-zinc-800 scrollbar-hide">
-        <button
-          id="tab-funder"
-          role="tab"
-          aria-selected={activeTab === 'funder'}
-          aria-controls="panel-funder"
-          onClick={() => setActiveTab('funder')}
-          className={`flex shrink-0 items-center gap-2 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'funder' ? 'border-b-4 border-teal-600 text-teal-700 dark:text-teal-400 bg-teal-50/30 dark:bg-teal-900/10' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-        >
-          <FlaskConical size={18} /> Funder Impact
-        </button>
-        <button
-          id="tab-journal"
-          role="tab"
-          aria-selected={activeTab === 'journal'}
-          aria-controls="panel-journal"
-          onClick={() => setActiveTab('journal')}
-          className={`flex shrink-0 items-center gap-2 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'journal' ? 'border-b-4 border-blue-600 text-blue-700 dark:text-blue-400 bg-blue-50/30 dark:bg-blue-900/10' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-        >
-          <MapIcon size={18} /> Global Reach
-        </button>
-        <button
-          id="tab-raw"
-          role="tab"
-          aria-selected={activeTab === 'raw'}
-          aria-controls="panel-raw"
-          onClick={() => setActiveTab('raw')}
-          className={`flex shrink-0 items-center gap-2 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'raw' ? 'border-b-4 border-amber-600 text-amber-700 dark:text-amber-400 bg-amber-50/30 dark:bg-amber-900/10' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-        >
-          <Table size={18} /> Data Explorer
-        </button>
-        <button
-          id="tab-topics"
-          role="tab"
-          aria-selected={activeTab === 'topics'}
-          aria-controls="panel-topics"
-          onClick={() => setActiveTab('topics')}
-          className={`flex shrink-0 items-center gap-2 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'topics' ? 'border-b-4 border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-indigo-50/30 dark:bg-indigo-900/10' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-        >
-          <Library size={18} /> Research Landscape
-        </button>
-        <button
-          id="tab-lineage"
-          role="tab"
-          aria-selected={activeTab === 'lineage'}
-          aria-controls="panel-lineage"
-          onClick={() => setActiveTab('lineage')}
-          className={`flex shrink-0 items-center gap-2 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'lineage' ? 'border-b-4 border-fuchsia-600 text-fuchsia-700 dark:text-fuchsia-400 bg-fuchsia-50/30 dark:bg-fuchsia-900/10' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-        >
-          <Search size={18} /> Research Lineage
-        </button>
-      </nav>
+      {/* Modern Tabs with WAI-ARIA and Fading Scroll */}
+      <div className="sticky top-0 z-20 -mx-6 mb-8 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+        <div className="fade-scroll-x overflow-x-auto scrollbar-hide flex justify-center">
+          <nav role="tablist" aria-label="Dashboard Views" className="flex py-4 px-6 gap-2">
+            <button
+              id="tab-usage"
+              role="tab"
+              aria-selected={activeTab === 'usage'}
+              aria-controls="panel-usage"
+              onClick={() => setActiveTab('usage')}
+              className={`flex shrink-0 items-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.15em] transition-all rounded-full whitespace-nowrap ${
+                activeTab === 'usage'
+                  ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20'
+                  : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <BarChart3 size={16} /> Usage Analytics
+            </button>
+            <button
+              id="tab-funder"
+              role="tab"
+              aria-selected={activeTab === 'funder'}
+              aria-controls="panel-funder"
+              onClick={() => setActiveTab('funder')}
+              className={`flex shrink-0 items-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.15em] transition-all rounded-full whitespace-nowrap ${
+                activeTab === 'funder'
+                  ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20'
+                  : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <FlaskConical size={16} /> Funder Impact
+            </button>
+            <button
+              id="tab-journal"
+              role="tab"
+              aria-selected={activeTab === 'journal'}
+              aria-controls="panel-journal"
+              onClick={() => setActiveTab('journal')}
+              className={`flex shrink-0 items-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.15em] transition-all rounded-full whitespace-nowrap ${
+                activeTab === 'journal'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <MapIcon size={16} /> Global Reach
+            </button>
+            <button
+              id="tab-topics"
+              role="tab"
+              aria-selected={activeTab === 'topics'}
+              aria-controls="panel-topics"
+              onClick={() => setActiveTab('topics')}
+              className={`flex shrink-0 items-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.15em] transition-all rounded-full whitespace-nowrap ${
+                activeTab === 'topics'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <Library size={16} /> Research Landscape
+            </button>
+            <button
+              id="tab-lineage"
+              role="tab"
+              aria-selected={activeTab === 'lineage'}
+              aria-controls="panel-lineage"
+              onClick={() => setActiveTab('lineage')}
+              className={`flex shrink-0 items-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.15em] transition-all rounded-full whitespace-nowrap ${
+                activeTab === 'lineage'
+                  ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20'
+                  : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <Search size={16} /> Research Lineage
+            </button>
+          </nav>
+        </div>
+      </div>
 
       {/* Tab Panels */}
       <div className="min-h-[600px] focus:outline-none">
+        {activeTab === 'usage' && (
+          <section id="panel-usage" role="tabpanel" aria-labelledby="tab-usage" className="animate-in fade-in duration-500">
+            <UsageAnalytics />
+          </section>
+        )}
         {activeTab === 'topics' && (
           <section id="panel-topics" role="tabpanel" aria-labelledby="tab-topics" className="space-y-10 animate-in fade-in duration-500">
             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
@@ -272,7 +305,7 @@ function DashboardContent() {
                     <div className="mb-4 flex items-start justify-between">
                       <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-indigo-500 transition-colors">#{idx + 1}</span>
                       <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-black text-zinc-900 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-700">
-                        {topic.count} <span className="text-zinc-400 font-bold ml-0.5">pub.</span>
+                        {formatNum(topic.count)} <span className="text-zinc-400 font-bold ml-0.5">pub.</span>
                       </span>
                     </div>
                     <h4 className="mb-3 text-sm font-bold leading-snug text-zinc-900 dark:text-zinc-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 min-h-[2.5rem]">
@@ -395,9 +428,9 @@ function DashboardContent() {
                   <span className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mt-2">Deduplicated by ROR identifier</span>
                 </div>
                 <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
-                  <button onClick={() => setInstitutionLimit(100)} aria-label="Show top 100 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-l-lg border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 100 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 100</button>
-                  <button onClick={() => setInstitutionLimit(500)} aria-label="Show top 500 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 500 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 500</button>
-                  <button onClick={() => setInstitutionLimit(1000)} aria-label="Show top 1000 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-r-lg transition-all ${institutionLimit === 1000 ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 1000</button>
+                  <button onClick={() => setInstitutionLimit(100)} aria-label="Show top 100 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-l-lg border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 100 ? 'bg-white dark:bg-zinc-700 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 100</button>
+                  <button onClick={() => setInstitutionLimit(500)} aria-label="Show top 500 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-r border-zinc-200 dark:border-zinc-600 transition-all ${institutionLimit === 500 ? 'bg-white dark:bg-zinc-700 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 500</button>
+                  <button onClick={() => setInstitutionLimit(1000)} aria-label="Show top 1000 institutions" className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-r-lg transition-all ${institutionLimit === 1000 ? 'bg-white dark:bg-zinc-700 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}>Top 1000</button>
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-x-10 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
@@ -423,74 +456,9 @@ function DashboardContent() {
                         )}
                       </div>
                     </div>
-                    <span className="ml-2 flex-shrink-0 text-xs font-black text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 rounded-md font-sans">{inst.count}</span>
+                    <span className="ml-2 flex-shrink-0 text-xs font-black text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 rounded-md font-sans">{formatNum(inst.count)}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {activeTab === 'raw' && (
-          <section id="panel-raw" role="tabpanel" aria-labelledby="tab-raw" className="space-y-10 animate-in fade-in duration-500">
-            <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
-              <div className="mb-10 flex flex-col">
-                <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Data Explorer</h3>
-                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mt-2">Comprehensive dataset of publications and metadata</span>
-              </div>
-              <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm border-collapse font-sans">
-                    <thead className="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-zinc-700">
-                      <tr>
-                        <th className="px-6 py-4 font-black uppercase tracking-widest text-[10px]">Year</th>
-                        <th className="px-6 py-4 font-black uppercase tracking-widest text-[10px]">Publication Title</th>
-                        <th className="px-6 py-4 font-black uppercase tracking-widest text-[10px]">Authors</th>
-                        <th className="px-6 py-4 font-black uppercase tracking-widest text-[10px]">Journal</th>
-                        <th className="px-6 py-4 font-black uppercase tracking-widest text-[10px]">DOI Identifier</th>
-                        <th className="px-6 py-4 font-black uppercase tracking-widest text-[10px]">Funders</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                      {filteredData.slice(0, 100).map(p => (
-                        <tr key={p.doi} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors group">
-                          <td className="px-6 py-5 whitespace-nowrap align-top text-zinc-900 dark:text-zinc-100 font-medium">{p.year}</td>
-                          <td className="px-6 py-5 font-bold align-top min-w-[300px] leading-relaxed text-zinc-900 dark:text-zinc-50 italic">{p.title}</td>
-                          <td className="px-6 py-5 text-[11px] text-zinc-600 dark:text-zinc-400 align-top max-w-[220px]">
-                            <div className="line-clamp-3 leading-relaxed" title={p.authors.map(a => a.name).join(', ')}>
-                              {p.authors.map(a => a.name).join(', ')}
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 text-zinc-600 dark:text-zinc-400 align-top text-xs font-semibold">{p.journal.name?.replace(/\s+/g, ' ').trim()}</td>
-                          <td className="px-6 py-5 align-top whitespace-nowrap">
-                            <a
-                              href={p.doi.startsWith('http') ? p.doi : `https://doi.org/${p.doi}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-mono text-[10px] font-black bg-amber-50/50 dark:bg-amber-900/20 px-2 py-1 rounded-md transition-colors"
-                            >
-                              {p.doi.split('/').slice(-2).join('/')}
-                            </a>
-                          </td>
-                          <td className="px-6 py-5 text-[10px] align-top text-zinc-500 dark:text-zinc-400 min-w-[200px]">
-                            <div className="flex flex-col gap-2">
-                              {Array.from(new Set(p.awards.map(a => a.funder))).map((funder, idx) => (
-                                <div key={idx} className="leading-tight border-l-2 border-zinc-100 dark:border-zinc-800 pl-2 py-0.5">
-                                  {funder}
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {filteredData.length > 100 && (
-                  <div className="p-6 text-center text-xs font-bold uppercase tracking-[0.3em] text-zinc-400 bg-zinc-50/50 dark:bg-zinc-800/30">
-                    Visualizing first 100 of {filteredData.length.toLocaleString()} matching records
-                  </div>
-                )}
               </div>
             </div>
           </section>

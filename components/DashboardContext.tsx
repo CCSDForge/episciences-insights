@@ -3,7 +3,7 @@
 import React, { createContext, use, useState, useMemo, useRef, useEffect } from 'react';
 import { Publication } from '@/lib/types';
 
-type ActiveTab = 'funder' | 'journal' | 'raw' | 'topics' | 'lineage';
+type ActiveTab = 'funder' | 'journal' | 'raw' | 'topics' | 'lineage' | 'usage';
 
 interface DashboardState {
   activeTab: ActiveTab;
@@ -33,6 +33,7 @@ interface DashboardActions {
 
 interface DashboardData {
   filteredData: Publication[];
+  usageSummary: any | null;
   stats: { totalPubs: number; totalSdgs: number; totalFunders: number };
   sdgData: { name: string; value: number }[];
   funderData: { name: string; value: number }[];
@@ -66,11 +67,12 @@ export function useDashboard() {
 
 interface DashboardProviderProps {
   initialData: Publication[];
+  usageSummary: any | null;
   children: React.ReactNode;
 }
 
-export function DashboardProvider({ initialData, children }: DashboardProviderProps) {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('funder');
+export function DashboardProvider({ initialData, usageSummary, children }: DashboardProviderProps) {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('usage');
   const [yearFilter, setYearFilter] = useState('all');
   const [funderFilter, setFunderFilter] = useState('all');
   const [journalFilter, setJournalFilter] = useState('all');
@@ -197,7 +199,7 @@ export function DashboardProvider({ initialData, children }: DashboardProviderPr
     <DashboardContext value={{
       state: { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, topicLimit, topicDomainFilter, isFunderOpen, funderSearch },
       actions: { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, setFunderLimit, setInstitutionLimit, setTopicLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch },
-      data: { filteredData, stats, sdgData, funderData, institutionData, countryData, topicData, topicDomains, years, groupedFunders, journals },
+      data: { filteredData, usageSummary, stats, sdgData, funderData, institutionData, countryData, topicData, topicDomains, years, groupedFunders, journals },
       meta: { dropdownRef },
     }}>
       {children}

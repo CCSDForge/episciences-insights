@@ -1,3 +1,39 @@
+export type Metric = {
+  total: number;
+  by_year: Record<string, number>;
+};
+
+export type GeoEntry = {
+  continent: string;
+  downloads: number;
+  page_views: number;
+};
+
+export type GeoMap = Record<string, GeoEntry>;
+
+export type PaperKpi = {
+  doi: string;
+  paperid: number;
+  publication_date: string | null;
+  downloads: Metric;
+  page_views: Metric;
+  geo: GeoMap;
+};
+
+export type JournalKpi = {
+  rvid: number;
+  name: string;
+  papers_count: number;
+  papers: PaperKpi[];
+};
+
+export type KpiFile = {
+  generated_at: string;
+  total_papers: number;
+  total_journals: number;
+  journals: Record<string, JournalKpi>;
+};
+
 export type Institution = {
   name: string;
   ror: string | null;
