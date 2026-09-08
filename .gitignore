@@ -49,3 +49,9 @@ AGENTS.md
 CLAUDE.md
 GEMINI.md
 /logs/
+/.claude/
+/kpi_downloads.json
+
+# Generated data
+/public/data/*.json
+!/public/data/.gitkeep
