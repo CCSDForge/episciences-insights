@@ -1,9 +1,31 @@
 'use client';
 
-import React, { createContext, use, useState, useMemo, useRef, useEffect } from 'react';
-import { Publication } from '@/lib/types';
+import React, { createContext, use, useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { Publication, UsageSummary } from '@/lib/types';
+import { normalizeLicense } from '@/lib/licenses';
+import { getCountryName } from '@/lib/countryNames';
 
 type ActiveTab = 'funder' | 'journal' | 'raw' | 'topics' | 'lineage' | 'usage';
+
+// Near-universal on this corpus (Episciences itself, plus OpenAIRE's catch-all
+// for an instance with no resolvable host) — excluded from the repository
+// count so it reflects actual archival diversity, not a constant offset.
+const TRIVIAL_REPOSITORIES = new Set(['Episciences', 'Unknown Repository']);
+
+export interface TopCountryEntry {
+  code: string;
+  name: string;
+  value: number;
+  percentage: number;
+}
+
+export interface GlobalReachStats {
+  totalCountries: number;
+  totalInstitutions: number;
+  intlCollabCount: number;
+  intlCollabRate: number;
+  singleCountryCount: number;
+}
 
 interface DashboardState {
   activeTab: ActiveTab;
@@ -12,6 +34,7 @@ interface DashboardState {
   journalFilter: string;
   funderLimit: 50 | 100 | 500;
   institutionLimit: 100 | 500 | 1000;
+  countryLimit: 10 | 25 | 50;
   topicLimit: 100 | 500;
   topicDomainFilter: string;
   isFunderOpen: boolean;
@@ -23,8 +46,10 @@ interface DashboardActions {
   setYearFilter: (year: string) => void;
   setFunderFilter: (funder: string) => void;
   setJournalFilter: (journal: string) => void;
+  resetFilters: () => void;
   setFunderLimit: (limit: 50 | 100 | 500) => void;
   setInstitutionLimit: (limit: 100 | 500 | 1000) => void;
+  setCountryLimit: (limit: 10 | 25 | 50) => void;
   setTopicLimit: (limit: 100 | 500) => void;
   setTopicDomainFilter: (domain: string) => void;
   setIsFunderOpen: (open: boolean) => void;
@@ -33,17 +58,24 @@ interface DashboardActions {
 
 interface DashboardData {
   filteredData: Publication[];
-  usageSummary: any | null;
+  usageSummary: UsageSummary | null;
   stats: { totalPubs: number; totalSdgs: number; totalFunders: number };
   sdgData: { name: string; value: number }[];
   funderData: { name: string; value: number }[];
   institutionData: { name: string; count: number; ror: string | null }[];
   countryData: { name: string; value: number }[];
+  topCountriesData: TopCountryEntry[];
+  globalReachStats: GlobalReachStats;
   topicData: { name: string; count: number; domain: string; field: string; id: string }[];
   topicDomains: string[];
   years: string[];
   groupedFunders: Record<string, string[]>;
   journals: [string, string][];
+  openScienceStats: {
+    totalLicenseMentions: number;
+    topLicenses: { name: string; count: number }[];
+    totalRepositories: number;
+  };
 }
 
 interface DashboardMeta {
@@ -67,7 +99,7 @@ export function useDashboard() {
 
 interface DashboardProviderProps {
   initialData: Publication[];
-  usageSummary: any | null;
+  usageSummary: UsageSummary | null;
   children: React.ReactNode;
 }
 
@@ -78,11 +110,18 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
   const [journalFilter, setJournalFilter] = useState('all');
   const [funderLimit, setFunderLimit] = useState<50 | 100 | 500>(50);
   const [institutionLimit, setInstitutionLimit] = useState<100 | 500 | 1000>(100);
+  const [countryLimit, setCountryLimit] = useState<10 | 25 | 50>(10);
   const [topicLimit, setTopicLimit] = useState<100 | 500>(100);
   const [topicDomainFilter, setTopicDomainFilter] = useState('all');
   const [isFunderOpen, setIsFunderOpen] = useState(false);
   const [funderSearch, setFunderSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const resetFilters = useCallback(() => {
+    setYearFilter('all');
+    setJournalFilter('all');
+    setFunderFilter('all');
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -96,10 +135,9 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
 
   const filteredData = useMemo(() => initialData.filter(p => {
     const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
-    const funderMatch = funderFilter === 'all' || p.awards.some(a => a.funder === funderFilter);
-    const journalMatch = journalFilter === 'all' || p.journal.issn === journalFilter || p.journal.name === journalFilter;
-    return yearMatch && funderMatch && journalMatch;
-  }), [initialData, yearFilter, funderFilter, journalFilter]);
+    const journalMatch = journalFilter === 'all' || p.journal.code === journalFilter || p.journal.issn === journalFilter || p.journal.name === journalFilter;
+    return yearMatch && journalMatch;
+  }), [initialData, yearFilter, journalFilter]);
 
   const stats = useMemo(() => ({
     totalPubs: filteredData.length,
@@ -136,16 +174,56 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
     return Object.values(counts).sort((a, b) => b.count - a.count).slice(0, institutionLimit);
   }, [filteredData, institutionLimit]);
 
-  const countryData = useMemo(() => {
+  const { countryData, topCountriesData, globalReachStats } = useMemo(() => {
     const counts: Record<string, number> = {};
+    const institutionKeys = new Set<string>();
+    let intlCollabCount = 0;
+    let singleCountryCount = 0;
+
     filteredData.forEach(p => {
       const countriesInPub = new Set<string>();
-      p.authors.forEach(a => a.institutions.forEach(inst => {
-        if (inst.country) countriesInPub.add(inst.country.toUpperCase());
-      }));
-      countriesInPub.forEach(country => { counts[country] = (counts[country] || 0) + 1; });
+      p.authors.forEach(a => {
+        a.institutions.forEach(inst => {
+          const key = inst.ror || inst.name;
+          if (key) institutionKeys.add(key);
+          if (inst.country) {
+            countriesInPub.add(inst.country.toUpperCase());
+          }
+        });
+      });
+
+      if (countriesInPub.size >= 2) {
+        intlCollabCount++;
+      } else if (countriesInPub.size === 1) {
+        singleCountryCount++;
+      }
+
+      countriesInPub.forEach(country => {
+        counts[country] = (counts[country] || 0) + 1;
+      });
     });
-    return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+
+    const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const totalPubs = filteredData.length || 1;
+
+    const countryData = sortedEntries.map(([name, value]) => ({ name, value }));
+
+    const topCountriesData: TopCountryEntry[] = sortedEntries.map(([code, value]) => ({
+      code,
+      name: getCountryName(code),
+      value,
+      percentage: Math.round((value / totalPubs) * 1000) / 10,
+    }));
+
+    const globalReachStats: GlobalReachStats = {
+      totalCountries: sortedEntries.length,
+      totalInstitutions: institutionKeys.size,
+      intlCollabCount,
+      intlCollabRate: Math.round((intlCollabCount / totalPubs) * 1000) / 10,
+      singleCountryCount,
+    };
+
+    return { countryData, topCountriesData, globalReachStats };
   }, [filteredData]);
 
   const topicData = useMemo(() => {
@@ -190,16 +268,47 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
     const unique = new Map<string, string>();
     initialData.forEach(p => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name) unique.set(p.journal.issn || name, name);
+      if (name) unique.set(p.journal.code || p.journal.issn || name, name);
     });
     return Array.from(unique.entries()).sort((a, b) => a[1].localeCompare(b[1]));
   }, [initialData]);
 
+  const openScienceStats = useMemo(() => {
+    const licenseCounts: Record<string, number> = {};
+    const repositories = new Set<string>();
+
+    filteredData.forEach(p => {
+      const os = p.open_science;
+      if (!os?.found_in_openaire) return;
+      (os.licenses || []).forEach(l => {
+        const name = normalizeLicense(l);
+        licenseCounts[name] = (licenseCounts[name] || 0) + 1;
+      });
+      (os.hosted_repositories || []).forEach(r => {
+        if (r && !TRIVIAL_REPOSITORIES.has(r)) repositories.add(r);
+      });
+    });
+
+    const sorted = Object.entries(licenseCounts).sort((a, b) => b[1] - a[1]);
+    const totalLicenseMentions = sorted.reduce((sum, [, count]) => sum + count, 0);
+
+    // Cap at 7 named segments + a folded remainder — the token ceiling for
+    // a categorical/ordinal chart before it stops being readable at a glance.
+    const TOP_N = 7;
+    const topLicenses = sorted.slice(0, TOP_N).map(([name, count]) => ({ name, count }));
+    const tailCount = sorted.slice(TOP_N).reduce((sum, [, count]) => sum + count, 0);
+    if (tailCount > 0) {
+      topLicenses.push({ name: `+${sorted.length - TOP_N} more licenses`, count: tailCount });
+    }
+
+    return { totalLicenseMentions, topLicenses, totalRepositories: repositories.size };
+  }, [filteredData]);
+
   return (
     <DashboardContext value={{
-      state: { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, topicLimit, topicDomainFilter, isFunderOpen, funderSearch },
-      actions: { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, setFunderLimit, setInstitutionLimit, setTopicLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch },
-      data: { filteredData, usageSummary, stats, sdgData, funderData, institutionData, countryData, topicData, topicDomains, years, groupedFunders, journals },
+      state: { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, countryLimit, topicLimit, topicDomainFilter, isFunderOpen, funderSearch },
+      actions: { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, resetFilters, setFunderLimit, setInstitutionLimit, setCountryLimit, setTopicLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch },
+      data: { filteredData, usageSummary, stats, sdgData, funderData, institutionData, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, groupedFunders, journals, openScienceStats },
       meta: { dropdownRef },
     }}>
       {children}
