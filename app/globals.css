@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #111827;
@@ -20,8 +22,15 @@
   --font-heading: var(--font-heading);
 }
 
+:root.dark {
+  --background: #09090b;
+  --foreground: #f9fafb;
+  --primary-blue: #60a5fa;
+  --primary-teal: #2dd4bf;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #09090b;
     --foreground: #f9fafb;
     --primary-blue: #60a5fa;
@@ -87,3 +96,32 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: -4px;
   border-radius: 9999px;
 }
+
+/* Sequential heatmap cell — magnitude encoded as a single-hue teal ramp.
+   Two custom properties (set inline per cell) so the same class works in
+   both color schemes without a JS theme toggle, consistent with the
+   prefers-color-scheme strategy used throughout this app. */
+.matrix-cell {
+  background-color: var(--cell-light);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) .matrix-cell {
+    background-color: var(--cell-dark);
+  }
+}
+.dark .matrix-cell {
+  background-color: var(--cell-dark);
+}
+
+/* Respect user preference for reduced motion (WCAG 2.1 / 2.2) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

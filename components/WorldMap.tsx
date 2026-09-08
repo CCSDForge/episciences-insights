@@ -4,6 +4,8 @@ import React, { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import { scaleLog } from 'd3-scale';
 import { Tooltip } from 'react-tooltip';
+import { ISO_NUMERIC_TO_ALPHA2 } from '@/lib/isoNumericToAlpha2';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 // Reliable TopoJSON source from world-atlas
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -12,9 +14,19 @@ interface WorldMapProps {
   data: { name: string; value: number }[]; // name is ISO country code (2 letters)
   legendLabel?: string;
   colorRange?: [string, string];
+  selectedCountry?: string | null;
+  onSelectCountry?: (code: string) => void;
 }
 
-export default function WorldMap({ data, legendLabel = "Geographical author distribution (Log scale)", colorRange = ["#dbeafe", "#2563eb"] }: WorldMapProps) {
+export default function WorldMap({
+  data,
+  legendLabel,
+  colorRange = ["#dbeafe", "#2563eb"],
+  selectedCountry,
+  onSelectCountry,
+}: WorldMapProps) {
+  const { t } = useTranslation();
+  const effectiveLegendLabel = legendLabel || t.dashboard.authorAffiliationsTitle;
 
   const dataMap = useMemo(() => {
     const map: Record<string, number> = {};
@@ -32,59 +44,12 @@ export default function WorldMap({ data, legendLabel = "Geographical author dist
     return scaleLog<string>()
       .domain([1, maxValue])
       .range(colorRange);
-  }, [maxValue]);
+  }, [maxValue, colorRange]);
 
-  const idToIso: Record<string, string> = {
-    // Europe
-    "008": "AL", "020": "AD", "040": "AT", "112": "BY", "056": "BE",
-    "070": "BA", "100": "BG", "191": "HR", "196": "CY", "203": "CZ",
-    "208": "DK", "233": "EE", "246": "FI", "250": "FR", "276": "DE",
-    "300": "GR", "348": "HU", "352": "IS", "372": "IE", "380": "IT",
-    "428": "LV", "438": "LI", "440": "LT", "442": "LU", "470": "MT",
-    "498": "MD", "492": "MC", "499": "ME", "528": "NL", "807": "MK",
-    "578": "NO", "616": "PL", "620": "PT", "642": "RO", "643": "RU",
-    "674": "SM", "688": "RS", "703": "SK", "705": "SI", "724": "ES",
-    "752": "SE", "756": "CH", "804": "UA", "826": "GB", "336": "VA",
-    "051": "AM", "031": "AZ", "268": "GE",
-    // Americas
-    "032": "AR", "084": "BZ", "068": "BO", "076": "BR", "124": "CA",
-    "152": "CL", "170": "CO", "188": "CR", "192": "CU", "214": "DO",
-    "218": "EC", "222": "SV", "320": "GT", "332": "HT", "340": "HN",
-    "484": "MX", "558": "NI", "591": "PA", "600": "PY", "604": "PE",
-    "630": "PR", "840": "US", "858": "UY", "862": "VE", "388": "JM",
-    "780": "TT", "044": "BS", "052": "BB", "308": "GD",
-    // Africa
-    "012": "DZ", "024": "AO", "204": "BJ", "072": "BW", "854": "BF",
-    "108": "BI", "120": "CM", "132": "CV", "140": "CF", "148": "TD",
-    "174": "KM", "178": "CG", "180": "CD", "262": "DJ", "818": "EG",
-    "226": "GQ", "232": "ER", "231": "ET", "266": "GA", "288": "GH",
-    "324": "GN", "624": "GW", "384": "CI", "404": "KE", "426": "LS",
-    "430": "LR", "434": "LY", "450": "MG", "454": "MW", "466": "ML",
-    "478": "MR", "480": "MU", "175": "YT", "504": "MA", "508": "MZ",
-    "516": "NA", "562": "NE", "566": "NG", "646": "RW", "678": "ST",
-    "686": "SN", "694": "SL", "706": "SO", "710": "ZA", "728": "SS",
-    "729": "SD", "748": "SZ", "834": "TZ", "768": "TG", "788": "TN",
-    "800": "UG", "894": "ZM", "716": "ZW",
-    // Asia
-    "004": "AF", "050": "BD", "064": "BT", "096": "BN", "116": "KH",
-    "156": "CN", "626": "TL", "356": "IN", "360": "ID", "364": "IR",
-    "368": "IQ", "376": "IL", "392": "JP", "400": "JO", "398": "KZ",
-    "408": "KP", "410": "KR", "414": "KW", "417": "KG", "418": "LA",
-    "422": "LB", "458": "MY", "462": "MV", "496": "MN", "104": "MM",
-    "524": "NP", "512": "OM", "586": "PK", "275": "PS", "608": "PH",
-    "634": "QA", "682": "SA", "702": "SG", "144": "LK", "760": "SY",
-    "158": "TW", "762": "TJ", "764": "TH", "795": "TM", "784": "AE",
-    "860": "UZ", "704": "VN", "887": "YE",
-    // Oceania
-    "036": "AU", "242": "FJ", "296": "KI", "584": "MH", "583": "FM",
-    "520": "NR", "554": "NZ", "585": "PW", "598": "PG", "090": "SB",
-    "776": "TO", "798": "TV", "548": "VU", "882": "WS",
-  };
-
-  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
 
   return (
-    <div className="h-full w-full relative">
+    <div className="h-full w-full relative" role="region" aria-label={effectiveLegendLabel}>
       <ComposableMap
         projectionConfig={{
           rotate: [-10, 0, 0],
@@ -95,27 +60,44 @@ export default function WorldMap({ data, legendLabel = "Geographical author dist
         style={{ width: "100%", height: "auto" }}
       >
         <Geographies geography={geoUrl}>
-          {({ geographies }: any) =>
-            geographies.map((geo: any) => {
+          {({ geographies }: { geographies: Array<{ properties: { ISO_A2?: string; iso_a2?: string; name: string }; id: string | number; rsmKey: string }> }) =>
+            geographies.map((geo) => {
               const { ISO_A2, iso_a2, name } = geo.properties;
               const numericId = geo.id?.toString().padStart(3, '0');
-              const countryCode = ISO_A2 || iso_a2 || (numericId ? idToIso[numericId] : null);
+              const countryCode = ISO_A2 || iso_a2 || (numericId ? ISO_NUMERIC_TO_ALPHA2[numericId] : null);
               const value = countryCode ? (dataMap[countryCode.toUpperCase()] || 0) : 0;
+              const isSelected = Boolean(countryCode && selectedCountry && countryCode.toUpperCase() === selectedCountry.toUpperCase());
               
               return (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
+                  role={value > 0 ? "button" : undefined}
+                  tabIndex={value > 0 ? 0 : -1}
+                  aria-label={`${name}: ${formatNum(value)} items${value > 0 ? ' (click or press Enter to view affiliations)' : ''}`}
+                  aria-pressed={value > 0 ? isSelected : undefined}
                   data-tooltip-id="world-map-tooltip"
-                  data-tooltip-content={`${name}: ${formatNum(value)} items`}
-                  fill={value > 0 ? colorScale(value) : "#f1f5f9"}
-                  stroke="#cbd5e1"
-                  strokeWidth={0.5}
+                  data-tooltip-content={`${name}: ${formatNum(value)} items${value > 0 ? ' (click to view affiliations)' : ''}`}
+                  onClick={() => {
+                    if (countryCode && onSelectCountry && value > 0) {
+                      onSelectCountry(countryCode.toUpperCase());
+                    }
+                  }}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && countryCode && onSelectCountry && value > 0) {
+                      e.preventDefault();
+                      onSelectCountry(countryCode.toUpperCase());
+                    }
+                  }}
+                  fill={isSelected ? '#1d4ed8' : value > 0 ? colorScale(value) : "#f1f5f9"}
+                  stroke={isSelected ? '#172554' : "#cbd5e1"}
+                  strokeWidth={isSelected ? 1.8 : 0.5}
                   style={{
                     default: { outline: "none" },
-                    hover: { fill: colorRange[1], outline: "none", cursor: "pointer" },
+                    hover: { fill: colorRange[1], outline: "none", cursor: value > 0 ? "pointer" : "default" },
                     pressed: { outline: "none" },
                   }}
+                  className="focus-visible:stroke-teal-500 focus-visible:stroke-2 focus-visible:outline-none"
                 />
               );
             })
@@ -137,12 +119,16 @@ export default function WorldMap({ data, legendLabel = "Geographical author dist
       />
 
       <div className="absolute bottom-4 right-4 flex flex-col items-end gap-1">
-        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-          <span>Min.</span>
-          <div className="h-2 w-24 rounded-full bg-gradient-to-r from-[#dbeafe] to-[#2563eb] border border-zinc-200" />
-          <span>Max.</span>
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+          <span>{t.common.min}</span>
+          <div
+            className="h-2.5 w-28 rounded-full border border-zinc-200 dark:border-zinc-700"
+            style={{ background: `linear-gradient(to right, ${colorRange[0]}, ${colorRange[1]})` }}
+            aria-hidden="true"
+          />
+          <span>{t.common.max}</span>
         </div>
-        <p className="text-[9px] text-zinc-400 italic font-sans">{legendLabel}</p>
+        <p className="text-xs text-zinc-600 dark:text-zinc-400 italic font-sans">{effectiveLegendLabel}</p>
       </div>
     </div>
   );

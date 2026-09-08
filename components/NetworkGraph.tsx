@@ -49,10 +49,21 @@ interface ProviderProps {
   children: React.ReactNode;
 }
 
+// Math.cos/Math.sin aren't guaranteed bit-identical across JS engines
+// (Node on the server vs V8-in-Chrome on the client can differ in the
+// last bit for some inputs), which previously caused React hydration
+// mismatches on every SSR'd circular layout (e.g. "238.1966011250105" vs
+// "238.19660112501052"). Rounding here, once, protects every consumer.
+function roundCoord(n: number) {
+  return Math.round(n * 10000) / 10000;
+}
+
 function Provider({ nodePositions, links, centerX, centerY, children }: ProviderProps) {
   const [hoveredLink, setHoveredLink] = useState<HoveredLink | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  const positionMap = Object.fromEntries(nodePositions.map(n => [n.id, n]));
+  const positionMap = Object.fromEntries(
+    nodePositions.map(n => [n.id, { ...n, x: roundCoord(n.x), y: roundCoord(n.y) }])
+  );
 
   return (
     <NetworkGraphContext value={{ hoveredLink, hoveredNode, setHoveredLink, setHoveredNode, positionMap, links, centerX, centerY }}>
@@ -66,9 +77,13 @@ function Provider({ nodePositions, links, centerX, centerY, children }: Provider
 interface CanvasProps {
   tooltipId: string;
   activeColor: string;
-  inactiveColor: string;
   activeNodeColor: string;
-  inactiveNodeColor: string;
+  /** Non-highlighted link stroke, by magnitude (few = light, many = dark) */
+  getLinkColor: (weight: number) => string;
+  /** Optional link stroke width by weight */
+  getLinkWidth?: (weight: number) => number;
+  /** Non-highlighted node fill, by magnitude (few = light, many = dark) */
+  getNodeColor: (count: number) => string;
   renderNodeLabel: (node: NetworkNode, isHighlighted: boolean) => React.ReactNode;
   getLinkTooltip: (src: NetworkNode, tgt: NetworkNode, weight: number) => string;
   getNodeTooltip: (node: NetworkNode) => string;
@@ -79,9 +94,10 @@ interface CanvasProps {
 function Canvas({
   tooltipId,
   activeColor,
-  inactiveColor,
   activeNodeColor,
-  inactiveNodeColor,
+  getLinkColor,
+  getLinkWidth,
+  getNodeColor,
   renderNodeLabel,
   getLinkTooltip,
   getNodeTooltip,
@@ -90,9 +106,18 @@ function Canvas({
   const { hoveredLink, hoveredNode, setHoveredLink, setHoveredNode, positionMap, links, centerX, centerY } = useNetworkGraph();
 
   const nodePositions = Object.values(positionMap);
+  const maxWeight = React.useMemo(() => Math.max(1, ...links.map(l => l.weight)), [links]);
+  const defaultGetLinkWidth = React.useMemo(() => (weight: number) => {
+    if (maxWeight <= 1) return 1.5;
+    const ratio = Math.log(weight + 1) / Math.log(maxWeight + 1);
+    return 1.5 + ratio * 4.5;
+  }, [maxWeight]);
+
+  const calcWidth = getLinkWidth ?? defaultGetLinkWidth;
+  const isAnyHovered = hoveredNode !== null || hoveredLink !== null;
 
   return (
-    <svg viewBox="0 0 800 600" className="w-full h-full preserve-3d">
+    <svg viewBox="0 0 800 600" className="w-full h-full">
       {background}
 
       {/* Arcs */}
@@ -103,7 +128,23 @@ function Canvas({
 
         const isHighlighted = hoveredLink?.src === link.source && hoveredLink?.tgt === link.target;
         const isNodeRelated = hoveredNode === link.source || hoveredNode === link.target;
+        const isEmphasized = isHighlighted || isNodeRelated;
         const d = `M ${src.x} ${src.y} Q ${centerX} ${centerY} ${tgt.x} ${tgt.y}`;
+
+        const baseWidth = calcWidth(link.weight);
+        const strokeWidth = isHighlighted
+          ? Math.max(6, baseWidth + 2.5)
+          : isNodeRelated
+          ? Math.max(3.5, baseWidth + 1.5)
+          : baseWidth;
+
+        const strokeOpacity = isHighlighted
+          ? 1
+          : isNodeRelated
+          ? 0.85
+          : isAnyHovered
+          ? 0.12
+          : 0.55;
 
         return (
           <g key={i}>
@@ -111,7 +152,7 @@ function Canvas({
               d={d}
               fill="none"
               stroke="transparent"
-              strokeWidth={20}
+              strokeWidth={Math.max(16, strokeWidth + 8)}
               className="cursor-pointer"
               onMouseEnter={() => setHoveredLink({ src: link.source, tgt: link.target, weight: link.weight })}
               onMouseLeave={() => setHoveredLink(null)}
@@ -121,16 +162,16 @@ function Canvas({
             <path
               d={d}
               fill="none"
-              stroke={isHighlighted || isNodeRelated ? activeColor : inactiveColor}
-              strokeWidth={isHighlighted ? 6 : Math.max(2, link.weight * 1.5)}
-              strokeOpacity={isHighlighted || isNodeRelated ? 0.9 : 0.2}
-              className="transition-all duration-500 pointer-events-none"
+              stroke={isEmphasized ? activeColor : getLinkColor(link.weight)}
+              strokeWidth={strokeWidth}
+              strokeOpacity={strokeOpacity}
+              className="transition-all duration-300 pointer-events-none"
             />
           </g>
         );
       })}
 
-      {/* Nodes */}
+      {/* Node Circles */}
       {nodePositions.map(node => {
         const isHighlighted = hoveredNode === node.id || hoveredLink?.src === node.id || hoveredLink?.tgt === node.id;
 
@@ -147,11 +188,20 @@ function Canvas({
               cx={node.x}
               cy={node.y}
               r={isHighlighted ? 14 : 10}
-              fill={isHighlighted ? activeNodeColor : inactiveNodeColor}
+              fill={isHighlighted ? activeNodeColor : getNodeColor((node.count as number) ?? 0)}
               stroke="white"
               strokeWidth="3"
-              className="transition-all duration-300"
+              className={`transition-all duration-300 ${isHighlighted ? '' : 'network-mark-node'}`}
             />
+          </g>
+        );
+      })}
+
+      {/* Node Labels (rendered on top of circles) */}
+      {nodePositions.map(node => {
+        const isHighlighted = hoveredNode === node.id || hoveredLink?.src === node.id || hoveredLink?.tgt === node.id;
+        return (
+          <g key={`label-${node.id}`} className="pointer-events-none">
             {renderNodeLabel(node, isHighlighted)}
           </g>
         );

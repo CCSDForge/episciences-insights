@@ -2,55 +2,64 @@
 
 import React, { useMemo } from 'react';
 import { Publication } from '@/lib/types';
-import { Treemap, ResponsiveContainer, Tooltip } from 'recharts';
+import { Treemap, Tooltip } from 'recharts';
+import ChartContainer from '@/components/ChartContainer';
+import { getDomainColor } from '@/lib/domainColors';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface TopicTreeMapProps {
   data: Publication[];
 }
 
-// Color palette for different domains
-const COLORS = [
-  '#4f46e5', // Indigo
-  '#0d9488', // Teal
-  '#7c3aed', // Violet
-  '#0891b2', // Cyan
-  '#2563eb', // Blue
-  '#db2777', // Pink
-  '#ea580c', // Orange
-];
+interface CustomizedContentProps {
+  depth?: number;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  name?: string;
+  color?: string;
+  [key: string]: unknown;
+}
 
-const CustomizedContent = (props: any) => {
-  const { depth, x, y, width, height, name, color } = props;
+const CustomizedContent = (props: CustomizedContentProps) => {
+  const { depth = 0, x = 0, y = 0, width = 0, height = 0, name = '', color = '#64748b' } = props;
+
+  const rx = Math.round(x);
+  const ry = Math.round(y);
+  const rw = Math.round(width);
+  const rh = Math.round(height);
 
   return (
     <g>
       <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
+        x={rx}
+        y={ry}
+        width={rw}
+        height={rh}
         fill={color || '#64748b'}
         stroke="#ffffff"
         strokeWidth={depth === 1 ? 4 : 0.5}
         fillOpacity={depth === 1 ? 0.9 : 0.7}
         className="transition-all duration-300 hover:fill-opacity-100 cursor-pointer dark:stroke-zinc-900"
       />
-      {width > 45 && height > 20 && (
+      {rw > 45 && rh > 20 && (
         <text
-          x={x + width / 2}
-          y={y + height / 2}
+          x={Math.round(rx + rw / 2)}
+          y={Math.round(ry + rh / 2)}
           textAnchor="middle"
+          dominantBaseline="central"
           fill="#ffffff"
-          fontSize={width < 120 ? 10 : 13}
+          fontSize={rw < 120 ? 10 : 12}
           fontWeight="600"
-          className="pointer-events-none select-none tracking-normal"
+          textRendering="geometricPrecision"
+          className="pointer-events-none select-none tracking-normal antialiased"
           style={{ 
-            fontFamily: 'var(--font-manrope), sans-serif',
-            filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.6))',
+            fontFamily: 'var(--font-manrope), system-ui, sans-serif',
             pointerEvents: 'none'
           }}
         >
-          {name.length > (width / 7) ? name.substring(0, Math.floor(width / 7) - 2) + '..' : name}
+          {name.length > (rw / 7) ? name.substring(0, Math.floor(rw / 7) - 2) + '..' : name}
         </text>
       )}
     </g>
@@ -58,6 +67,7 @@ const CustomizedContent = (props: any) => {
 };
 
 export default function TopicTreeMap({ data }: TopicTreeMapProps) {
+  const { t } = useTranslation();
   const treeData = useMemo(() => {
     const domains: Record<string, { name: string; children: Record<string, { name: string; size: number; domain: string }> }> = {};
 
@@ -84,12 +94,7 @@ export default function TopicTreeMap({ data }: TopicTreeMapProps) {
     const domainList = Object.values(domains);
 
     return domainList.map((d) => {
-      // Stable color selection based on name hash
-      let hash = 0;
-      for (let i = 0; i < d.name.length; i++) {
-        hash = d.name.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const color = COLORS[Math.abs(hash) % COLORS.length];
+      const color = getDomainColor(d.name);
 
       return {
         name: d.name,
@@ -109,32 +114,32 @@ export default function TopicTreeMap({ data }: TopicTreeMapProps) {
   if (treeData.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center text-zinc-400 italic bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-2 border-dashed border-zinc-200">
-        No topic data available for the current selection
+        {t.treemap.noData}
       </div>
     );
   }
 
   return (
-    <div className="h-full w-full p-2" role="region" aria-label="Scientific Landscape Treemap">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-full w-full p-2" role="region" aria-label={t.treemap.ariaLabel}>
+      <ChartContainer width="100%" height="100%">
         <Treemap
           data={treeData}
           dataKey="size"
           aspectRatio={16 / 9}
           stroke="#fff"
-          content={<CustomizedContent />}
+          content={CustomizedContent}
         >
           <Tooltip 
-            formatter={(value: any, name: any, props: any) => {
-              const domain = props.payload?.domain || 'Unknown Domain';
+            formatter={(value: unknown, name: unknown, props: { payload?: { domain?: string } }) => {
+              const domain = props.payload?.domain || t.treemap.unknownDomain;
               return [
                 <div key="tt" className="space-y-1 font-sans">
                   <p className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase">{domain}</p>
-                  <p className="text-sm font-bold text-white">{name}</p>
-                  <p className="text-teal-400 font-black">{value} Publications</p>
+                  <p className="text-sm font-bold text-white">{String(name || '')}</p>
+                  <p className="text-teal-400 font-black">{String(value || 0)} {t.common.publications}</p>
                 </div>,
                 null
-              ];
+              ] as [React.ReactNode, null];
             }}
             contentStyle={{ 
               borderRadius: '20px', 
@@ -145,7 +150,7 @@ export default function TopicTreeMap({ data }: TopicTreeMapProps) {
             }}
           />
         </Treemap>
-      </ResponsiveContainer>
+      </ChartContainer>
     </div>
   );
 }
