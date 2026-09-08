@@ -1,149 +1,132 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 
-// Load .env.local for development
+import { OpenAlexClient } from './openalex-client.mjs';
+import { OpenAlexFundersClient } from './openalex-funders-client.mjs';
+import { RorClient } from './ror-client.mjs';
+import { OpenAireTokenManager } from './openaire-token.mjs';
+import { OpenAireClient } from './openaire-client.mjs';
+import { EpisciencesClient } from './episciences-client.mjs';
+import { mergePublication } from './data-merger.mjs';
+import { enrichFunders } from './funder-enrichment.mjs';
+
 dotenv.config({ path: '.env.local' });
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const API_KEY = process.env.OPENALEX_API_KEY;
 const CSV_PATH = path.resolve(process.env.DOI_CSV_PATH || './publications.csv');
 const OUTPUT_PATH = path.resolve(process.env.DATA_OUTPUT_PATH || './public/data/publications.json');
+const FUNDERS_OUTPUT_PATH = path.resolve(path.dirname(OUTPUT_PATH), 'funders.json');
 const CACHE_DIR = path.resolve(process.env.CACHE_DIRECTORY || './.cache');
 const LOG_DIR = path.resolve('./logs');
-const CACHE_DURATION_MS = (parseInt(process.env.CACHE_DURATION_DAYS) || 30) * 24 * 60 * 60 * 1000;
+const CACHE_DURATION_DAYS = Number(process.env.CACHE_DURATION_DAYS) || 30;
 
-// Ensure directories exist
-if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
 if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
 const outputDir = path.dirname(OUTPUT_PATH);
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
 const NOT_FOUND_LOG = path.join(LOG_DIR, 'not-found.log');
 
-async function logNotFound(doi) {
-  const message = `${new Date().toISOString()} - 404 Not Found - ${doi}\n`;
-  fs.appendFileSync(NOT_FOUND_LOG, message);
-}
-
-function transform(data) {
-  return {
-    doi: data.doi,
-    title: data.title,
-    year: data.publication_year,
-    journal: {
-      name: data.primary_location?.source?.display_name?.replace(/[\x98\x9C]/g, '').replace(/\xA0/g, ' ').replace(/\s+/g, ' ').trim(),
-      issn: data.primary_location?.source?.issn?.[0],
-      id: data.primary_location?.source?.id
-    },
-    authors: data.authorships?.map(a => ({
-      name: a.author?.display_name,
-      orcid: a.author?.orcid || null,
-      institutions: a.institutions?.map(i => ({
-        name: i.display_name,
-        ror: i.ror || null,
-        country: i.country_code
-      })) || []
-    })) || [],
-    sdgs: data.sustainable_development_goals?.map(s => ({
-      label: s.display_name,
-      id: s.id,
-      score: s.score || 0
-    })) || [],
-    awards: (data.grants || data.awards || []).map(g => ({
-      name: g.funder_display_name || g.display_name,
-      id: g.award_id || g.funder_award_id,
-      funder: g.funder_display_name || g.funder
-    })),
-    primary_topic: data.primary_topic ? {
-      name: data.primary_topic.display_name,
-      id: data.primary_topic.id,
-      subfield: data.primary_topic.subfield?.display_name,
-      field: data.primary_topic.field?.display_name,
-      domain: data.primary_topic.domain?.display_name
-    } : null,
-    topics: data.topics?.map(t => ({
-      name: t.display_name,
-      id: t.id,
-      score: t.score || 0
-    })) || [],
-    referenced_works_count: data.referenced_works_count || 0,
-    referenced_works: data.referenced_works || [],
-    related_works: data.related_works || []
-  };
-}
-
-async function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function getWorkData(doi) {
-  // Ensure DOI doesn't have double https://doi.org/ prefix if already present in CSV
-  const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//, '');
-  const fileName = `${cleanDoi.replace(/[^a-z0-9]/gi, '_')}.json`;
-  const filePath = path.join(CACHE_DIR, fileName);
-
-  if (fs.existsSync(filePath)) {
-    const stats = fs.statSync(filePath);
-    if (Date.now() - stats.mtimeMs < CACHE_DURATION_MS) {
-      console.log(`[CACHE] ${cleanDoi}`);
-      try {
-        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      } catch (e) {
-        console.error(`[ERROR] Failed to parse cache for ${cleanDoi}`);
-      }
-    }
-  }
-
-  // OpenAlex works URL format: https://api.openalex.org/works/https://doi.org/{doi}
-  // The API key can be passed via header or query param. Let's stick to query param as in user's example.
-  const url = `https://api.openalex.org/works/https://doi.org/${cleanDoi}${API_KEY ? `?api_key=${API_KEY}` : ''}`;
-  
-  console.log(`[API] Fetching ${cleanDoi}...`);
-  await delay(200); // 200ms delay between requests
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      if (response.status === 404) {
-        console.error(`[404] DOI not found in OpenAlex: ${cleanDoi}`);
-        logNotFound(cleanDoi);
-      } else {
-        console.error(`[ERROR] API response not OK (${response.status}) for ${cleanDoi}`);
-      }
-      // Do not cache errors
-      return null;
-    }
-    const data = await response.json();
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    return data;
-  } catch (error) {
-    console.error(`[ERROR] Fetch failed for ${cleanDoi}:`, error.message);
-    return null;
-  }
+function logNotFound(doi) {
+  fs.appendFileSync(NOT_FOUND_LOG, `${new Date().toISOString()} - 404 Not Found - ${doi}\n`);
 }
 
 async function run() {
   if (!fs.existsSync(CSV_PATH)) {
     console.error(`[ERROR] CSV file not found: ${CSV_PATH}`);
+    process.exitCode = 1;
     return;
   }
+
+  const openAlexClient = new OpenAlexClient({
+    cacheDir: path.join(CACHE_DIR, 'openalex'),
+    cacheDays: CACHE_DURATION_DAYS,
+    onNotFound: logNotFound,
+  });
+  const tokenManager = new OpenAireTokenManager({ cacheDir: CACHE_DIR });
+  const openAireClient = new OpenAireClient(tokenManager, {
+    cacheDir: path.join(CACHE_DIR, 'openaire'),
+    cacheDays: CACHE_DURATION_DAYS,
+  });
+  const episciencesClient = new EpisciencesClient({
+    cacheDir: path.join(CACHE_DIR, 'episciences'),
+    exportCacheDays: CACHE_DURATION_DAYS,
+  });
+  const openAlexFundersClient = new OpenAlexFundersClient({
+    cacheDir: path.join(CACHE_DIR, 'openalex-funders'),
+    cacheDays: CACHE_DURATION_DAYS,
+  });
+  const rorClient = new RorClient({
+    cacheDir: path.join(CACHE_DIR, 'ror'),
+    cacheDays: CACHE_DURATION_DAYS,
+  });
+
+  if (tokenManager.isConfigured()) {
+    console.log('[OpenAIRE] Authenticated mode (registered service credentials found).');
+  } else {
+    console.log('[OpenAIRE] Anonymous mode (no OPENAIRE_CLIENT_ID/SECRET set).');
+  }
+
+  console.log('[Episciences] Resolving DOI -> docid map across all journals...');
+  let doiToDocid;
+  try {
+    doiToDocid = await episciencesClient.buildDoiToDocidMap();
+    console.log(`[Episciences] Resolved ${doiToDocid.size} DOIs across the platform.`);
+  } catch (err) {
+    console.error('[Episciences] Failed to build the DOI -> docid map, continuing without it:', err.message);
+    doiToDocid = new Map();
+  }
+
   const content = fs.readFileSync(CSV_PATH, 'utf-8');
-  const dois = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const dois = content.split('\n').map((l) => l.trim()).filter(Boolean);
   console.log(`Starting collection for ${dois.length} DOIs...`);
-  
+
   const results = [];
-  for (const doi of dois) {
-    const raw = await getWorkData(doi);
-    if (raw) {
-      results.push(transform(raw));
+  let notFoundInOpenAlex = 0;
+  let foundInOpenAire = 0;
+  let foundInEpisciences = 0;
+  let transientFailures = 0;
+
+  for (let i = 0; i < dois.length; i++) {
+    const doi = dois[i];
+    const progress = `[${i + 1}/${dois.length}]`;
+
+    const openAlexData = await openAlexClient.fetchByDoi(doi);
+    if (openAlexData === null) {
+      notFoundInOpenAlex++;
+      continue;
+    }
+    if (openAlexData === undefined) {
+      console.error(`${progress} [SKIP] Transient failure for ${doi}`);
+      transientFailures++;
+      continue;
+    }
+
+    const openAireResult = await openAireClient.fetchByDoi(doi);
+    if (openAireResult) foundInOpenAire++;
+
+    const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//i, '').trim().toLowerCase();
+    const docid = doiToDocid.get(cleanDoi);
+    const episciencesExport = docid !== undefined ? await episciencesClient.fetchExport(docid) : undefined;
+    if (episciencesExport) foundInEpisciences++;
+
+    results.push(mergePublication(openAlexData, openAireResult, episciencesExport));
+
+    if ((i + 1) % 100 === 0 || i === dois.length - 1) {
+      console.log(`${progress} processed — ${results.length} merged, ${notFoundInOpenAlex} not found (OpenAlex), ${foundInOpenAire} enriched (OpenAIRE), ${foundInEpisciences} enriched (Episciences)`);
     }
   }
-  
+
+  const funders = await enrichFunders(results, { openAlexFundersClient, rorClient });
+  fs.writeFileSync(FUNDERS_OUTPUT_PATH, JSON.stringify(funders, null, 2));
+
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(results, null, 2));
-  console.log(`Success! ${results.length} records written to ${OUTPUT_PATH}`);
+  console.log('---');
+  console.log(`Done. ${results.length} records written to ${OUTPUT_PATH}`);
+  console.log(`  Not found in OpenAlex  : ${notFoundInOpenAlex}`);
+  console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${((100 * foundInOpenAire) / results.length).toFixed(1)}%)`);
+  console.log(`  Enriched by Episciences: ${foundInEpisciences} (${((100 * foundInEpisciences) / results.length).toFixed(1)}%)`);
+  console.log(`  Transient failures     : ${transientFailures}`);
+  console.log(`  Funders resolved       : ${Object.keys(funders).length} written to ${FUNDERS_OUTPUT_PATH}`);
 }
 
 run();
