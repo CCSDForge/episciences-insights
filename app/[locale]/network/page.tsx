@@ -78,7 +78,7 @@ export default async function LocaleNetworkPage({ params }: { params: Promise<{ 
         </header>
 
         <main id="main-content">
-          <NetworkExplorer data={publications} funders={funders} />
+          <NetworkExplorer funders={funders} />
         </main>
       </div>
     </div>

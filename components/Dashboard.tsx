@@ -33,6 +33,7 @@ import TopicCoOccurrenceNetwork from './TopicCoOccurrenceNetwork';
 import { DashboardProvider, useDashboard } from './DashboardContext';
 import { getDomainColor } from '@/lib/domainColors';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { usePublications } from '@/lib/publications-client';
 
 const FunderGeographicFlowMap = dynamic(() => import('./FunderGeographicFlowMap'), {
   ssr: false,
@@ -40,14 +41,39 @@ const FunderGeographicFlowMap = dynamic(() => import('./FunderGeographicFlowMap'
 });
 
 interface DashboardProps {
-  initialData: Publication[];
+  initialData?: Publication[];
   usageSummary: UsageSummary | null;
   funders?: FundersFile;
 }
 
-export default function Dashboard({ initialData, usageSummary, funders = {} }: DashboardProps) {
+function DashboardSkeleton() {
   return (
-    <DashboardProvider initialData={initialData} usageSummary={usageSummary}>
+    <div className="space-y-8 animate-pulse" aria-busy="true" aria-label="Loading dashboard data">
+      <div className="h-16 rounded-2xl bg-zinc-200/60 dark:bg-zinc-800/60" />
+      <div className="flex gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-9 w-28 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-32 rounded-3xl bg-zinc-200/50 dark:bg-zinc-800/50" />
+        ))}
+      </div>
+      <div className="h-[460px] rounded-3xl bg-zinc-200/40 dark:bg-zinc-800/40" />
+    </div>
+  );
+}
+
+export default function Dashboard({ initialData, usageSummary, funders = {} }: DashboardProps) {
+  const { publications, loading } = usePublications(initialData);
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
+  return (
+    <DashboardProvider initialData={publications} usageSummary={usageSummary}>
       <DashboardContent funders={funders} />
     </DashboardProvider>
   );

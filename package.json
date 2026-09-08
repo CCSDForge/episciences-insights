@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/compress-data.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "collect": "node scripts/fetch-data.mjs",
-    "collect:links": "node scripts/collect-links.mjs"
+    "collect:links": "node scripts/collect-links.mjs",
+    "compress": "node scripts/compress-data.mjs"
   },
   "dependencies": {
     "@types/d3-force": "^3.0.10",

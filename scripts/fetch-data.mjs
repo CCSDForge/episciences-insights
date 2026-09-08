@@ -10,6 +10,7 @@ import { OpenAireClient } from './openaire-client.mjs';
 import { EpisciencesClient } from './episciences-client.mjs';
 import { mergePublication } from './data-merger.mjs';
 import { enrichFunders } from './funder-enrichment.mjs';
+import { compressData } from './compress-data.mjs';
 
 dotenv.config({ path: '.env.local' });
 
@@ -119,9 +120,10 @@ async function run() {
   const funders = await enrichFunders(results, { openAlexFundersClient, rorClient });
   fs.writeFileSync(FUNDERS_OUTPUT_PATH, JSON.stringify(funders, null, 2));
 
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(results, null, 2));
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(results));
   console.log('---');
-  console.log(`Done. ${results.length} records written to ${OUTPUT_PATH}`);
+  console.log(`Done. ${results.length} records written to ${OUTPUT_PATH} (minified)`);
+  compressData();
   console.log(`  Not found in OpenAlex  : ${notFoundInOpenAlex}`);
   console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${((100 * foundInOpenAire) / results.length).toFixed(1)}%)`);
   console.log(`  Enriched by Episciences: ${foundInEpisciences} (${((100 * foundInEpisciences) / results.length).toFixed(1)}%)`);

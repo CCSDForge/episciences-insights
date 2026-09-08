@@ -54,4 +54,6 @@ GEMINI.md
 
 # Generated data
 /public/data/*.json
+/public/data/*.gz
+/public/data/*.br
 !/public/data/.gitkeep

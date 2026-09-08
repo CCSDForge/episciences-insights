@@ -155,8 +155,7 @@ function transformOpenAlex(data) {
       score: t.score || 0,
     })) || [],
     referenced_works_count: data.referenced_works_count || 0,
-    referenced_works: data.referenced_works || [],
-    related_works: data.related_works || [],
+    related_works: (data.related_works || []).slice(0, 20),
   };
 }
 

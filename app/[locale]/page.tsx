@@ -83,7 +83,7 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
         />
 
         <main id="main-content">
-          <Dashboard initialData={publications} usageSummary={kpiSummary} funders={funders} />
+          <Dashboard usageSummary={kpiSummary} funders={funders} />
           <DataDisclaimer />
         </main>
 

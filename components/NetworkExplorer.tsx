@@ -6,6 +6,7 @@ import { ChevronDown, Grid3x3, Share2, Orbit } from 'lucide-react';
 import { Publication, FundersFile } from '@/lib/types';
 import { getCountryName } from '@/lib/countryNames';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { usePublications } from '@/lib/publications-client';
 import FunderCofundingMatrix from './FunderCofundingMatrix';
 import FunderCofundingNetwork from './FunderCofundingNetwork';
 import FunderCofundingClusterNetwork from './FunderCofundingClusterNetwork';
@@ -31,8 +32,20 @@ const FunderGeographicFlowMap = dynamic(() => import('./FunderGeographicFlowMap'
 });
 
 interface NetworkExplorerProps {
-  data: Publication[];
+  data?: Publication[];
   funders: FundersFile;
+}
+
+function NetworkExplorerSkeleton() {
+  return (
+    <div className="space-y-8 animate-pulse" aria-busy="true" aria-label="Loading network explorer data">
+      <div className="h-14 rounded-2xl bg-zinc-200/60 dark:bg-zinc-800/60 w-1/3" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="h-[460px] rounded-3xl bg-zinc-200/40 dark:bg-zinc-800/40" />
+        <div className="h-[460px] rounded-3xl bg-zinc-200/40 dark:bg-zinc-800/40" />
+      </div>
+    </div>
+  );
 }
 
 type FunderView = 'matrix' | 'network' | 'cluster';
@@ -66,7 +79,17 @@ function ViewToggle<T extends string>({ value, onChange, options }: { value: T; 
   );
 }
 
-export default function NetworkExplorer({ data, funders }: NetworkExplorerProps) {
+export default function NetworkExplorer({ data: initialData, funders }: NetworkExplorerProps) {
+  const { publications: data, loading } = usePublications(initialData);
+
+  if (loading) {
+    return <NetworkExplorerSkeleton />;
+  }
+
+  return <NetworkExplorerContent data={data} funders={funders} />;
+}
+
+function NetworkExplorerContent({ data, funders }: { data: Publication[]; funders: FundersFile }) {
   const { t, locale } = useTranslation();
   const [yearFilter, setYearFilter] = useState('all');
   const [journalFilter, setJournalFilter] = useState('all');
