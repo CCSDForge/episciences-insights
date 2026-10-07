@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getPublications, getFunders, getLastUpdated } from '@/lib/data';
+import { getPublications, getFunders, getLastUpdated, getVenueCitations } from '@/lib/data';
 import { getKpiSummary } from '@/lib/dashboardData';
 import Dashboard from '@/components/Dashboard';
 import PageHeader from '@/components/PageHeader';
@@ -57,6 +57,7 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
   const t = translations[validLocale];
 
   const [publications, funders] = await Promise.all([getPublications(), getFunders()]);
+  const venueCitations = getVenueCitations();
   const lastUpdated = getLastUpdated();
   const kpiSummary = await getKpiSummary(publications);
 
@@ -84,7 +85,7 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
         />
 
         <main id="main-content">
-          <Dashboard usageSummary={kpiSummary} funders={funders} />
+          <Dashboard usageSummary={kpiSummary} funders={funders} venueCitations={venueCitations} />
           <DataDisclaimer />
         </main>
 

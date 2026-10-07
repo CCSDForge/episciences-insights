@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Publication } from '@/lib/types';
-import { Link as LinkIcon, Network, History, ArrowRight, BookOpen } from 'lucide-react';
+import { Link as LinkIcon, Network, History, ArrowRight, BookOpen, Quote } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface ResearchLineageProps {
@@ -144,6 +144,19 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                         {getDoiUrl(selectedPaper.doi)}
                       </a>
                     </div>
+                    {selectedPaper.opencitations && selectedPaper.opencitations.citation_count > 0 && (
+                      <div className="flex items-center gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-700/50">
+                        <Quote size={14} className="shrink-0 text-violet-500" />
+                        <span className="font-bold text-violet-600 dark:text-violet-400">
+                          {selectedPaper.opencitations.citation_count} OpenCitations
+                        </span>
+                        {selectedPaper.opencitations.self_citations?.external_count !== undefined && (
+                          <span className="text-[10px] text-zinc-400">
+                            ({selectedPaper.opencitations.self_citations.external_count} ext.)
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 

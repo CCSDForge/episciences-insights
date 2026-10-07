@@ -2,17 +2,18 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Publication, UsageSummary, FundersFile } from '@/lib/types';
+import { Publication, UsageSummary, FundersFile, VenueCitationSummary } from '@/lib/types';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
 } from 'recharts';
 import ChartContainer from '@/components/ChartContainer';
-import { FlaskConical, Map as MapIcon, Search, ChevronDown, Library, Globe, BarChart3, Scale, Sigma, Waypoints, Route, Building2, Maximize2, Grid3x3, Share2, Orbit, RotateCcw, Info } from 'lucide-react';
+import { FlaskConical, Map as MapIcon, Search, ChevronDown, Library, Globe, BarChart3, Scale, Sigma, Waypoints, Route, Building2, Maximize2, Grid3x3, Share2, Orbit, RotateCcw, Info, History, Quote } from 'lucide-react';
 
 import WorldMap from './WorldMap';
 import SdgRadar from './SdgRadar';
 import TopicTreeMap from './TopicTreeMap';
 import ResearchLineage from './ResearchLineage';
+import CitationsAnalytics from './CitationsAnalytics';
 import UsageAnalytics from './UsageAnalytics';
 import LicenseSpectrum from './LicenseSpectrum';
 import FunderStoryline from './FunderStoryline';
@@ -44,6 +45,7 @@ interface DashboardProps {
   initialData?: Publication[];
   usageSummary: UsageSummary | null;
   funders?: FundersFile;
+  venueCitations?: Record<string, VenueCitationSummary>;
 }
 
 function DashboardSkeleton() {
@@ -65,7 +67,7 @@ function DashboardSkeleton() {
   );
 }
 
-export default function Dashboard({ initialData, usageSummary, funders = {} }: DashboardProps) {
+export default function Dashboard({ initialData, usageSummary, funders = {}, venueCitations = {} }: DashboardProps) {
   const { publications, loading } = usePublications(initialData);
 
   if (loading) {
@@ -74,12 +76,12 @@ export default function Dashboard({ initialData, usageSummary, funders = {} }: D
 
   return (
     <DashboardProvider initialData={publications} usageSummary={usageSummary}>
-      <DashboardContent funders={funders} />
+      <DashboardContent funders={funders} venueCitations={venueCitations} />
     </DashboardProvider>
   );
 }
 
-function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
+function DashboardContent({ funders = {}, venueCitations = {} }: { funders?: FundersFile; venueCitations?: Record<string, VenueCitationSummary> }) {
   const { t } = useTranslation();
   const { state, actions, data, meta } = useDashboard();
   const { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, countryLimit, topicDomainFilter, isFunderOpen, funderSearch } = state;
@@ -101,6 +103,9 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
   const [funderNetworkView, setFunderNetworkView] = React.useState<'network' | 'matrix' | 'cluster' | 'sankey' | 'flows'>('network');
   const [isFunderFullscreen, setIsFunderFullscreen] = React.useState(false);
 
+  // Lineage & Citations sub-navigation
+  const [lineageSubTab, setLineageSubTab] = React.useState<'lineage' | 'citations'>('lineage');
+
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
   const hasActiveFilters = yearFilter !== 'all' || journalFilter !== 'all';
 
@@ -120,7 +125,7 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
     { id: 'journal', label: t.tabs.reach, icon: <MapIcon size={16} aria-hidden="true" />, colorClass: 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' },
     { id: 'topics', label: t.tabs.topics, icon: <Library size={16} aria-hidden="true" />, colorClass: 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' },
     { id: 'funder', label: t.tabs.funders, icon: <FlaskConical size={16} aria-hidden="true" />, colorClass: 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' },
-    { id: 'lineage', label: t.lineage.title, icon: <Search size={16} aria-hidden="true" />, colorClass: 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20' },
+    { id: 'lineage', label: `${t.lineage.title} & ${t.citations.title}`, icon: <Search size={16} aria-hidden="true" />, colorClass: 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20' },
   ];
 
   const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -1299,26 +1304,60 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center justify-center p-1.5 rounded-lg bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300" aria-hidden="true">
-                      <Search size={16} />
+                      {lineageSubTab === 'lineage' ? <Search size={16} /> : <Quote size={16} />}
                     </span>
                     <h2 className="text-base font-black uppercase tracking-wider text-fuchsia-900 dark:text-fuchsia-200">
-                      {t.lineage.subtitle}
+                      {lineageSubTab === 'lineage' ? t.lineage.subtitle : t.citations.subtitle}
                     </h2>
                   </div>
                   <p className="text-sm text-zinc-600 dark:text-zinc-300 max-w-3xl leading-relaxed">
-                    {t.lineage.description}
+                    {lineageSubTab === 'lineage' ? t.lineage.description : t.citations.desc}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-fuchsia-800 dark:text-fuchsia-300 shrink-0 bg-fuchsia-100/60 dark:bg-fuchsia-950/50 px-3 py-1.5 rounded-xl border border-fuchsia-300/40 dark:border-fuchsia-700/50">
-                  <span>{t.lineage.source}</span>
+                  <span>{lineageSubTab === 'lineage' ? t.lineage.source : t.citations.source}</span>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
-              <h3 className="mb-8 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Research Lineage</h3>
-              <ResearchLineage data={filteredData} />
+            {/* Sub-navigation Tabs */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-4">
+              <div role="group" aria-label="Lineage & Citations sub-views" className="flex bg-zinc-100 dark:bg-zinc-800/80 p-1.5 rounded-2xl shadow-inner">
+                <button
+                  onClick={() => setLineageSubTab('lineage')}
+                  aria-pressed={lineageSubTab === 'lineage'}
+                  className={`flex items-center gap-2 px-5 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all ${
+                    lineageSubTab === 'lineage'
+                      ? 'bg-white dark:bg-zinc-700 text-fuchsia-700 dark:text-fuchsia-400 shadow-sm'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                  }`}
+                >
+                  <History size={15} aria-hidden="true" /> {t.citations.subTabFiliation}
+                </button>
+                <button
+                  onClick={() => setLineageSubTab('citations')}
+                  aria-pressed={lineageSubTab === 'citations'}
+                  className={`flex items-center gap-2 px-5 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all ${
+                    lineageSubTab === 'citations'
+                      ? 'bg-white dark:bg-zinc-700 text-fuchsia-700 dark:text-fuchsia-400 shadow-sm'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                  }`}
+                >
+                  <Quote size={15} aria-hidden="true" /> {t.citations.subTabImpact}
+                </button>
+              </div>
             </div>
+
+            {lineageSubTab === 'lineage' ? (
+              <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+                <h3 className="mb-8 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
+                  {t.lineage.title}
+                </h3>
+                <ResearchLineage data={filteredData} />
+              </div>
+            ) : (
+              <CitationsAnalytics data={filteredData} venueCitations={venueCitations} />
+            )}
           </section>
         )}
       </div>

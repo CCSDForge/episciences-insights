@@ -116,6 +116,36 @@ export interface Translations {
     selectPaperPrompt: string;
     selectedPublication: string;
   };
+  citations: {
+    title: string;
+    subtitle: string;
+    desc: string;
+    source: string;
+    kpiTotal: string;
+    kpiTotalDesc: string;
+    kpiCitedRate: string;
+    kpiCitedRateDesc: string;
+    kpiExternalRate: string;
+    kpiExternalRateDesc: string;
+    kpiMedianTimespan: string;
+    kpiMedianTimespanDesc: string;
+    months: string;
+    days: string;
+    years: string;
+    timelineTitle: string;
+    timelineSubtitle: string;
+    venuesTitle: string;
+    venuesSubtitle: string;
+    selfCitationBreakdown: string;
+    externalCitations: string;
+    journalSelf: string;
+    authorSelf: string;
+    topCitedTitle: string;
+    topCitedSubtitle: string;
+    noData: string;
+    subTabFiliation: string;
+    subTabImpact: string;
+  };
   network: {
     title: string;
     backBtn: string;
@@ -418,21 +448,21 @@ export const translations: Record<Locale, Translations> = {
       },
       "disclaimer": {
           "title": "Data Accuracy & Source Disclaimer",
-          "metricsP1": "The scientific metrics and connections visualized in this dashboard are powered by the OpenAlex API, the OpenAIRE Graph API, the Episciences API, the zbMATH Open API (https://api.zbmath.org/), and the ROR API (https://ror.org/). Please note that these datasets may not represent the exhaustive catalog of Episciences publications, indexing latencies may occur, and external source coverage of a given publication is not guaranteed: open science indicators and subject classifications are only available where matching records exist.",
-          "metricsP2": "Certain metadata (including research topics, SDG alignment, and related works) are generated using OpenAlex automated algorithms. Funding codes and acronyms, hosting repositories, license information, citation impact indicators, and research infrastructure affiliations are sourced from OpenAIRE Graph. Mathematics Subject Classifications (MSC 2020) are sourced from zbMATH Open. Research institution and funder identification, geocoding, and disambiguation are powered by the ROR (Research Organization Registry) API. Episciences is engaged in a permanent effort to refine, verify, and enrich these datasets to provide an increasingly accurate representation of our research impact.",
+          "metricsP1": "The scientific metrics and connections visualized in this dashboard are powered by the OpenAlex API, the OpenAIRE Graph API, the OpenCitations API (https://opencitations.net/), the Episciences API, the zbMATH Open API (https://api.zbmath.org/), and the ROR API (https://ror.org/). Please note that these datasets may not represent the exhaustive catalog of Episciences publications, indexing latencies may occur, and external source coverage of a given publication is not guaranteed: open science indicators and subject classifications are only available where matching records exist.",
+          "metricsP2": "Certain metadata (including research topics, SDG alignment, and related works) are generated using OpenAlex automated algorithms. Open citation counts, venue impact metrics, and citation timelines are sourced from the OpenCitations Index v2 API. Funding codes and acronyms, hosting repositories, license information, citation impact indicators, and research infrastructure affiliations are sourced from OpenAIRE Graph. Mathematics Subject Classifications (MSC 2020) are sourced from zbMATH Open. Research institution and funder identification, geocoding, and disambiguation are powered by the ROR (Research Organization Registry) API. Episciences is engaged in a permanent effort to refine, verify, and enrich these datasets to provide an increasingly accurate representation of our research impact.",
           "downloadsNoteTitle": "Download statistics",
           "downloadsNote": "are sourced exclusively from the Episciences platform and reflect downloads occurring directly on journal websites. They do not account for downloads from open repositories, where the same articles may also be freely available. Actual readership figures are therefore likely higher than those reported here."
       },
       "footer": {
           "license": "CC-BY 2026 Episciences Insights - Open Source (GPL v3)",
-          "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open, and ROR APIs",
+          "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, OpenCitations, Episciences, zbMATH Open, and ROR APIs",
           "lastUpdated": "Data last updated: {date}"
       },
       "lineage": {
           "title": "Research Lineage",
           "subtitle": "Research Lineage & Open Science Provenance",
           "description": "Provides article-level inspection connecting persistent identifiers (DOIs, RORs, ORCIDs). Verifies open repository hosting, linked open research artifacts (datasets and software via OpenAIRE Scholix), license validity, and citation impact.",
-          "source": "Source: Episciences, OpenAlex, OpenAIRE, zbMATH Open & ROR",
+          "source": "Source: Episciences, OpenAlex, OpenAIRE, OpenCitations, zbMATH Open & ROR",
           "heritage": "Scientific Heritage",
           "theResearchLineage": "The Research Lineage",
           "intro": "Every publication in Episciences is part of a global scientific lineage. We track the Lineage of these works by mapping the foundations they build upon (References) and the new frontiers they open (Related Works).",
@@ -448,6 +478,36 @@ export const translations: Record<Locale, Translations> = {
           "noRelated": "No related works mapped yet in OpenAlex for this recent paper.",
           "selectPaperPrompt": "Select a paper from the list to view its lineage",
           "selectedPublication": "Selected Publication"
+      },
+      "citations": {
+          "title": "Open Citations",
+          "subtitle": "Transparent Academic Impact powered by OpenCitations Index v2",
+          "desc": "Tracks academic citation impact, citation growth over time, and self-citation dynamics across diamond open access publications using open citation data.",
+          "source": "Source: OpenCitations Index v2 (I4OC)",
+          "kpiTotal": "Open Citations",
+          "kpiTotalDesc": "Total incoming citations tracked in OpenCitations Index",
+          "kpiCitedRate": "Cited Publications",
+          "kpiCitedRateDesc": "Proportion of publications with at least 1 tracked citation",
+          "kpiExternalRate": "External Citation Ratio",
+          "kpiExternalRateDesc": "Citations excluding author and journal self-citations",
+          "kpiMedianTimespan": "Median Impact Latency",
+          "kpiMedianTimespanDesc": "Median delay between publication and citation",
+          "months": "months",
+          "days": "days",
+          "years": "years",
+          "timelineTitle": "Annual Citation Growth",
+          "timelineSubtitle": "Volume of citations received per year (by citing work publication date)",
+          "venuesTitle": "Citations by Overlay Journal (OpenCitations Venues)",
+          "venuesSubtitle": "Total citations received by each Episciences journal via its ISSN",
+          "selfCitationBreakdown": "Citation Nature Breakdown",
+          "externalCitations": "Strictly External",
+          "journalSelf": "Journal Self-Citations",
+          "authorSelf": "Author Self-Citations",
+          "topCitedTitle": "Top Cited Publications (OpenCitations)",
+          "topCitedSubtitle": "Most cited articles in the current selection with independent citation counts",
+          "noData": "No OpenCitations data recorded for the current filter selection.",
+          "subTabFiliation": "Scientific Filiation",
+          "subTabImpact": "Open Citations Impact"
       },
       "network": {
           "title": "Network Explorer - Episciences Insights",
@@ -749,21 +809,21 @@ export const translations: Record<Locale, Translations> = {
       },
       "disclaimer": {
           "title": "Précision des données & Sources",
-          "metricsP1": "Les indicateurs scientifiques et relations visualisés dans ce tableau de bord sont alimentés par les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open (https://api.zbmath.org/) et ROR (https://ror.org/). Veuillez noter qu'aucun jeu de données ne constitue un catalogue exhaustif absolu des publications d'Episciences : des délais d'indexation peuvent survenir, et la couverture d'un article par les sources externes n'est pas garantie (les indicateurs de science ouverte et classifications thématiques ne sont disponibles que lorsqu'un enregistrement correspondant existe).",
-          "metricsP2": "Certaines métadonnées (notamment les thématiques de recherche, l'alignement avec les ODD et les travaux connexes) sont générées par les modèles automatisés d'OpenAlex. Les codes de financement, entrepôts d'hébergement, licences, indicateurs d'impact des citations et affiliations aux infrastructures de recherche proviennent d'OpenAIRE Graph. Les classifications mathématiques (MSC 2020) proviennent de zbMATH Open. L'identification, la géolocalisation et la désambiguïsation des institutions de recherche et des financeurs s'appuient sur l'API ROR (Research Organization Registry). Episciences s'investit continuellement pour affiner, vérifier et enrichir ces données afin d'offrir une vision toujours plus fidèle de son impact scientifique.",
+          "metricsP1": "Les indicateurs scientifiques et relations visualisés dans ce tableau de bord sont alimentés par les API OpenAlex, OpenAIRE Graph, OpenCitations (https://opencitations.net/), Episciences, zbMATH Open (https://api.zbmath.org/) et ROR (https://ror.org/). Veuillez noter qu'aucun jeu de données ne constitue un catalogue exhaustif absolu des publications d'Episciences : des délais d'indexation peuvent survenir, et la couverture d'un article par les sources externes n'est pas garantie (les indicateurs de science ouverte et classifications thématiques ne sont disponibles que lorsqu'un enregistrement correspondant existe).",
+          "metricsP2": "Certaines métadonnées (notamment les thématiques de recherche, l'alignement avec les ODD et les travaux connexes) sont générées par les modèles automatisés d'OpenAlex. Les données de citations ouvertes, les métriques d'impact au niveau des revues et la chronologie des citations sont issues de l'API OpenCitations Index v2. Les codes de financement, entrepôts d'hébergement, licences, indicateurs d'impact des citations et affiliations aux infrastructures de recherche proviennent d'OpenAIRE Graph. Les classifications mathématiques (MSC 2020) proviennent de zbMATH Open. L'identification, la géolocalisation et la désambiguïsation des institutions de recherche et des financeurs s'appuient sur l'API ROR (Research Organization Registry). Episciences s'investit continuellement pour affiner, vérifier et enrichir ces données afin d'offrir une vision toujours plus fidèle de son impact scientifique.",
           "downloadsNoteTitle": "Statistiques de téléchargement",
           "downloadsNote": "proviennent exclusivement de la plateforme Episciences et reflètent les consultations directes sur les sites des revues. Elles ne comptabilisent pas les téléchargements effectués sur les entrepôts ouverts où les mêmes articles peuvent être librement accessibles. Le lectorat effectif est donc très probablement supérieur aux chiffres présentés ici."
       },
       "footer": {
           "license": "CC-BY 2026 Episciences Insights - Open Source (GPL v3)",
-          "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
+          "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, OpenCitations, Episciences, zbMATH Open et ROR",
           "lastUpdated": "Dernière mise à jour des données : {date}"
       },
       "lineage": {
           "title": "Filiation de la recherche",
           "subtitle": "Filiation de la recherche & Provenance en science ouverte",
           "description": "Permet une inspection au niveau article reliant les identifiants pérennes (DOI, ROR, ORCID). Vérifie l'hébergement en entrepôt ouvert, les artefacts de recherche associés (jeux de données et logiciels via OpenAIRE Scholix), la validité des licences et l'impact des citations.",
-          "source": "Source : Episciences, OpenAlex, OpenAIRE, zbMATH Open & ROR",
+          "source": "Source : Episciences, OpenAlex, OpenAIRE, OpenCitations, zbMATH Open & ROR",
           "heritage": "Patrimoine scientifique",
           "theResearchLineage": "La filiation de la recherche",
           "intro": "Chaque publication dans Episciences s'inscrit dans une filiation scientifique mondiale. Nous traçons la filiation de ces travaux en cartographiant les fondations sur lesquelles ils s'appuient (Références) et les nouveaux horizons qu'ils ouvrent (Travaux connexes).",
@@ -779,6 +839,36 @@ export const translations: Record<Locale, Translations> = {
           "noRelated": "Aucun travail connexe cartographié pour l'instant dans OpenAlex pour cet article.",
           "selectPaperPrompt": "Sélectionnez un article dans la liste pour voir sa filiation",
           "selectedPublication": "Publication sélectionnée"
+      },
+      "citations": {
+          "title": "Citations Ouvertes",
+          "subtitle": "Impact académique transparent issu d'OpenCitations Index v2",
+          "desc": "Analyse l'impact bibliométrique, la chronologie des citations et les dynamiques d'auto-citation à travers les publications en accès ouvert diamant grâce aux données de citations ouvertes.",
+          "source": "Source : OpenCitations Index v2 (I4OC)",
+          "kpiTotal": "Citations Ouvertes",
+          "kpiTotalDesc": "Total des citations entrantes recensées dans OpenCitations Index",
+          "kpiCitedRate": "Publications Citées",
+          "kpiCitedRateDesc": "Proportion des articles ayant reçu au moins 1 citation recensée",
+          "kpiExternalRate": "Part de Citations Externes",
+          "kpiExternalRateDesc": "Citations hors auto-citations auteurs et revues",
+          "kpiMedianTimespan": "Délai médian d'impact",
+          "kpiMedianTimespanDesc": "Délai médian entre publication et citation",
+          "months": "mois",
+          "days": "jours",
+          "years": "ans",
+          "timelineTitle": "Évolution annuelle des citations",
+          "timelineSubtitle": "Volume de citations reçues par année (selon la date de publication du document citant)",
+          "venuesTitle": "Citations par épi-revue (Venues OpenCitations)",
+          "venuesSubtitle": "Total des citations reçues par chaque revue d'Episciences via son ISSN",
+          "selfCitationBreakdown": "Répartition de la nature des citations",
+          "externalCitations": "Strictement externes",
+          "journalSelf": "Auto-citations revue",
+          "authorSelf": "Auto-citations auteurs",
+          "topCitedTitle": "Publications les plus citées (OpenCitations)",
+          "topCitedSubtitle": "Articles les plus cités de la sélection avec détail des citations indépendantes",
+          "noData": "Aucune donnée OpenCitations disponible pour la sélection active.",
+          "subTabFiliation": "Filiation scientifique",
+          "subTabImpact": "Impact des citations ouvertes"
       },
       "network": {
           "title": "Exploration Réseau - Episciences Insights",
@@ -1080,21 +1170,21 @@ export const translations: Record<Locale, Translations> = {
       },
       "disclaimer": {
           "title": "Precisión de datos y Fuentes",
-          "metricsP1": "Los indicadores científicos y relaciones visualizados en este panel son proporcionados por las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open (https://api.zbmath.org/) y ROR (https://ror.org/). Tenga en cuenta que ningún conjunto de datos representa un catálogo exhaustivo absoluto de las publicaciones de Episciences: pueden producirse retrasos en la indexación y no se garantiza la cobertura de una publicación por fuentes externas (los indicadores de ciencia abierta y clasificaciones solo están disponibles donde existen registros concordantes).",
-          "metricsP2": "Ciertos metadatos (incluidos temas de investigación, alineación con ODS y obras relacionadas) son generados por modelos automatizados de OpenAlex. Los códigos de financiación, repositorios de alojamiento, licencias, indicadores de impacto de citas y afiliaciones a infraestructuras de investigación provienen de OpenAIRE Graph. Las clasificaciones matemáticas (MSC 2020) proceden de zbMATH Open. La identificación, geolocalización y desambiguación de instituciones y financiadores se basan en la API ROR (Research Organization Registry). Episciences trabaja continuamente para afinar, verificar y enriquecer estos datos y ofrecer una representación cada vez más fiel de su impacto científico.",
+          "metricsP1": "Los indicadores científicos y relaciones visualizados en este panel son proporcionados por las API de OpenAlex, OpenAIRE Graph, OpenCitations (https://opencitations.net/), Episciences, zbMATH Open (https://api.zbmath.org/) y ROR (https://ror.org/). Tenga en cuenta que ningún conjunto de datos representa un catálogo exhaustivo absoluto de las publicaciones de Episciences: pueden producirse retrasos en la indexación y no se garantiza la cobertura de una publicación por fuentes externas (los indicadores de ciencia abierta y clasificaciones solo están disponibles donde existen registros concordantes).",
+          "metricsP2": "Ciertos metadatos (incluidos temas de investigación, alineación con ODS y obras relacionadas) son generados por modelos automatizados de OpenAlex. Los conteos de citas abiertas, las métricas de impacto por revista y las líneas de tiempo de citas provienen de la API OpenCitations Index v2. Los códigos de financiación, repositorios de alojamiento, licencias, indicadores de impacto de citas y afiliaciones a infraestructuras de investigación provienen de OpenAIRE Graph. Las clasificaciones matemáticas (MSC 2020) proceden de zbMATH Open. La identificación, geolocalización y desambiguación de instituciones y financiadores se basan en la API ROR (Research Organization Registry). Episciences trabaja continuamente para afinar, verificar y enriquecer estos datos y ofrecer una representación cada vez más fiel de su impacto científico.",
           "downloadsNoteTitle": "Estadísticas de descarga",
           "downloadsNote": "proceden exclusivamente de la plataforma Episciences y reflejan las consultas directas en los sitios de las revistas. No contabilizan descargas realizadas en repositorios abiertos donde los mismos artículos también pueden estar disponibles libremente. El número real de lectores es, por tanto, muy probablemente superior al presentado aquí."
       },
       "footer": {
           "license": "CC-BY 2026 Episciences Insights - Código Abierto (GPL v3)",
-          "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open y ROR",
+          "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, OpenCitations, Episciences, zbMATH Open y ROR",
           "lastUpdated": "Última actualización de los datos: {date}"
       },
       "lineage": {
           "title": "Linaje de la investigación",
           "subtitle": "Linaje de la investigación y procedencia en ciencia abierta",
           "description": "Permite la inspección a nivel de artículo conectando identificadores persistentes (DOI, ROR, ORCID). Verifica el alojamiento en repositorios abiertos, los artefactos de investigación vinculados (conjuntos de datos y software mediante OpenAIRE Scholix), la validez de licencias y el impacto de citas.",
-          "source": "Fuente: Episciences, OpenAlex, OpenAIRE, zbMATH Open & ROR",
+          "source": "Fuente: Episciences, OpenAlex, OpenAIRE, OpenCitations, zbMATH Open & ROR",
           "heritage": "Patrimonio científico",
           "theResearchLineage": "El linaje de la investigación",
           "intro": "Cada publicación en Episciences forma parte de un linaje científico global. Trazamos la filiación de estos trabajos mapeando los cimientos sobre los que se construyen (Referencias) y las nuevas fronteras que abren (Obras relacionadas).",
@@ -1110,6 +1200,36 @@ export const translations: Record<Locale, Translations> = {
           "noRelated": "No hay obras relacionadas mapeadas todavía en OpenAlex para este artículo reciente.",
           "selectPaperPrompt": "Seleccione un artículo de la lista para ver su linaje",
           "selectedPublication": "Publicación seleccionada"
+      },
+      "citations": {
+          "title": "Citas Abiertas",
+          "subtitle": "Impacto académico transparente impulsado por OpenCitations Index v2",
+          "desc": "Monitorea el impacto bibliométrico, la evolución temporal de citas y la dinámica de autocitas en publicaciones de acceso abierto diamante mediante datos abiertos de citación.",
+          "source": "Fuente: OpenCitations Index v2 (I4OC)",
+          "kpiTotal": "Citas Abiertas",
+          "kpiTotalDesc": "Total de citas entrantes registradas en OpenCitations Index",
+          "kpiCitedRate": "Publicaciones Citadas",
+          "kpiCitedRateDesc": "Proporción de publicaciones con al menos 1 cita registrada",
+          "kpiExternalRate": "Ratio de Citas Externas",
+          "kpiExternalRateDesc": "Citas excluyendo autocitas de autores y revistas",
+          "kpiMedianTimespan": "Latencia mediana de impacto",
+          "kpiMedianTimespanDesc": "Tiempo mediano transcurrido entre publicación y cita",
+          "months": "meses",
+          "days": "días",
+          "years": "años",
+          "timelineTitle": "Crecimiento anual de citas",
+          "timelineSubtitle": "Volumen de citas recibidas por año (según la fecha de publicación de la obra citante)",
+          "venuesTitle": "Citas por revista overlay (Venues OpenCitations)",
+          "venuesSubtitle": "Total de citas recibidas por cada revista de Episciences a través de su ISSN",
+          "selfCitationBreakdown": "Desglose de la naturaleza de las citas",
+          "externalCitations": "Estrictamente externas",
+          "journalSelf": "Autocitas de la revista",
+          "authorSelf": "Autocitas de autores",
+          "topCitedTitle": "Publicaciones más citadas (OpenCitations)",
+          "topCitedSubtitle": "Artículos más citados en la selección actual con desglose de citas independientes",
+          "noData": "No hay datos de OpenCitations registrados para la selección actual de filtros.",
+          "subTabFiliation": "Linaje científico",
+          "subTabImpact": "Impacto de citas abiertas"
       },
       "network": {
           "title": "Explorador de Red - Episciences Insights",

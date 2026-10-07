@@ -320,7 +320,7 @@ function extractOpenScience(openAireResult) {
  * research-product, and the (optional) Episciences platform export into
  * the final Publication record.
  */
-export function mergePublication(openAlexData, openAireResult, episciencesExport) {
+export function mergePublication(openAlexData, openAireResult, episciencesExport, openCitationsResult) {
   const base = transformOpenAlex(openAlexData);
 
   base.journal = repairJournal(base.journal, openAireResult, episciencesExport);
@@ -328,6 +328,9 @@ export function mergePublication(openAlexData, openAireResult, episciencesExport
   base.authors = enrichOrcids(base.authors, openAireResult?.authors);
   base.open_science = extractOpenScience(openAireResult);
   base.episciences = extractEpisciencesData(episciencesExport);
+  if (openCitationsResult) {
+    base.opencitations = openCitationsResult;
+  }
 
   return base;
 }
