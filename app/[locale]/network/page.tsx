@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
-import { getPublications, getFunders } from '@/lib/data';
+import { getPublications, getFunders, getLastUpdated } from '@/lib/data';
 import NetworkExplorer from '@/components/NetworkExplorer';
+import PageFooter from '@/components/PageFooter';
 import { Locale, translations } from '@/lib/i18n/translations';
 
 export function generateStaticParams() {
@@ -53,6 +54,7 @@ export default async function LocaleNetworkPage({ params }: { params: Promise<{ 
   const { locale } = await params;
   const validLocale = (locale === 'fr' || locale === 'es' ? locale : 'en') as Locale;
   const [publications, funders] = await Promise.all([getPublications(), getFunders()]);
+  const lastUpdated = getLastUpdated();
   const t = translations[validLocale];
   const numLocale = validLocale === 'fr' ? 'fr-FR' : validLocale === 'es' ? 'es-ES' : 'en-US';
 
@@ -80,6 +82,8 @@ export default async function LocaleNetworkPage({ params }: { params: Promise<{ 
         <main id="main-content">
           <NetworkExplorer funders={funders} />
         </main>
+
+        <PageFooter lastUpdated={lastUpdated} />
       </div>
     </div>
   );

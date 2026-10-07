@@ -93,6 +93,7 @@ export interface Translations {
   footer: {
     license: string;
     source: string;
+    lastUpdated: string;
   };
   lineage: {
     title: string;
@@ -424,7 +425,8 @@ export const translations: Record<Locale, Translations> = {
       },
       "footer": {
           "license": "CC-BY 2026 Episciences Insights - Open Source (GPL v3)",
-          "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open, and ROR APIs"
+          "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open, and ROR APIs",
+          "lastUpdated": "Data last updated: {date}"
       },
       "lineage": {
           "title": "Research Lineage",
@@ -754,7 +756,8 @@ export const translations: Record<Locale, Translations> = {
       },
       "footer": {
           "license": "CC-BY 2026 Episciences Insights - Open Source (GPL v3)",
-          "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR"
+          "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
+          "lastUpdated": "Dernière mise à jour des données : {date}"
       },
       "lineage": {
           "title": "Filiation de la recherche",
@@ -1084,7 +1087,8 @@ export const translations: Record<Locale, Translations> = {
       },
       "footer": {
           "license": "CC-BY 2026 Episciences Insights - Código Abierto (GPL v3)",
-          "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open y ROR"
+          "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open y ROR",
+          "lastUpdated": "Última actualización de los datos: {date}"
       },
       "lineage": {
           "title": "Linaje de la investigación",

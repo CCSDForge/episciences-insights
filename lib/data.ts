@@ -55,3 +55,16 @@ export async function getFunders(): Promise<FundersFile> {
     return {};
   }
 }
+
+export function getLastUpdated(): string | null {
+  const filePath = path.join(process.cwd(), 'public/data/publications.json');
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    const stats = fs.statSync(filePath);
+    return stats.mtime.toISOString();
+  } catch (e) {
+    console.error('Failed to get publications.json mtime', e);
+    return null;
+  }
+}
+
