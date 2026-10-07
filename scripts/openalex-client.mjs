@@ -15,6 +15,8 @@ export class OpenAlexClient {
     this.cacheDurationMs = (Number(options.cacheDays) || 30) * 24 * 60 * 60 * 1000;
     this.delayMs = Number(options.delayMs) || 200;
     this.onNotFound = options.onNotFound || (() => {});
+    this.lastRequestTime = 0;
+    this.rateLimitQueue = Promise.resolve();
 
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });
@@ -45,6 +47,18 @@ export class OpenAlexClient {
     fs.writeFileSync(filePath, content);
   }
 
+  async _waitForRateLimit() {
+    return new Promise((resolve) => {
+      this.rateLimitQueue = this.rateLimitQueue.then(async () => {
+        const now = Date.now();
+        const wait = Math.max(0, this.delayMs - (now - this.lastRequestTime));
+        if (wait > 0) await delay(wait);
+        this.lastRequestTime = Date.now();
+        resolve();
+      });
+    });
+  }
+
   /**
    * Returns the raw OpenAlex work object for a DOI, `null` if the DOI is
    * a confirmed 404 (cached, so it isn't retried every run), or
@@ -63,7 +77,7 @@ export class OpenAlexClient {
     const maxRetries = 3;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      await delay(this.delayMs);
+      await this._waitForRateLimit();
 
       let response;
       try {

@@ -11,6 +11,7 @@ import { EpisciencesClient } from './episciences-client.mjs';
 import { mergePublication } from './data-merger.mjs';
 import { enrichFunders } from './funder-enrichment.mjs';
 import { compressData } from './compress-data.mjs';
+import { syncDois } from './sync-dois.mjs';
 
 dotenv.config({ path: '.env.local' });
 
@@ -20,6 +21,7 @@ const FUNDERS_OUTPUT_PATH = path.resolve(path.dirname(OUTPUT_PATH), 'funders.jso
 const CACHE_DIR = path.resolve(process.env.CACHE_DIRECTORY || './.cache');
 const LOG_DIR = path.resolve('./logs');
 const CACHE_DURATION_DAYS = Number(process.env.CACHE_DURATION_DAYS) || 30;
+const CONCURRENCY = Math.max(1, Number(process.env.CONCURRENCY) || 8);
 
 if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
 const outputDir = path.dirname(OUTPUT_PATH);
@@ -31,7 +33,36 @@ function logNotFound(doi) {
   fs.appendFileSync(NOT_FOUND_LOG, `${new Date().toISOString()} - 404 Not Found - ${doi}\n`);
 }
 
+async function pMap(items, mapper, concurrency = 8) {
+  const results = new Array(items.length);
+  let currentIndex = 0;
+
+  async function worker() {
+    while (currentIndex < items.length) {
+      const index = currentIndex++;
+      results[index] = await mapper(items[index], index);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
+
 async function run() {
+  const episciencesClient = new EpisciencesClient({
+    cacheDir: path.join(CACHE_DIR, 'episciences'),
+    exportCacheDays: CACHE_DURATION_DAYS,
+  });
+
+  if (process.env.SKIP_DOI_SYNC !== 'true' && !process.argv.includes('--no-sync')) {
+    try {
+      await syncDois({ csvPath: CSV_PATH, episciencesClient, cacheDir: CACHE_DIR });
+    } catch (err) {
+      console.warn('[Sync DOIs] Warning: Failed to sync DOIs with Episciences API, continuing with existing CSV:', err.message);
+    }
+  }
+
   if (!fs.existsSync(CSV_PATH)) {
     console.error(`[ERROR] CSV file not found: ${CSV_PATH}`);
     process.exitCode = 1;
@@ -47,10 +78,6 @@ async function run() {
   const openAireClient = new OpenAireClient(tokenManager, {
     cacheDir: path.join(CACHE_DIR, 'openaire'),
     cacheDays: CACHE_DURATION_DAYS,
-  });
-  const episciencesClient = new EpisciencesClient({
-    cacheDir: path.join(CACHE_DIR, 'episciences'),
-    exportCacheDays: CACHE_DURATION_DAYS,
   });
   const openAlexFundersClient = new OpenAlexFundersClient({
     cacheDir: path.join(CACHE_DIR, 'openalex-funders'),
@@ -79,43 +106,48 @@ async function run() {
 
   const content = fs.readFileSync(CSV_PATH, 'utf-8');
   const dois = content.split('\n').map((l) => l.trim()).filter(Boolean);
-  console.log(`Starting collection for ${dois.length} DOIs...`);
+  console.log(`Starting collection for ${dois.length} DOIs (concurrency: ${CONCURRENCY})...`);
 
-  const results = [];
   let notFoundInOpenAlex = 0;
   let foundInOpenAire = 0;
   let foundInEpisciences = 0;
   let transientFailures = 0;
+  let processedCount = 0;
 
-  for (let i = 0; i < dois.length; i++) {
-    const doi = dois[i];
-    const progress = `[${i + 1}/${dois.length}]`;
-
-    const openAlexData = await openAlexClient.fetchByDoi(doi);
-    if (openAlexData === null) {
-      notFoundInOpenAlex++;
-      continue;
-    }
-    if (openAlexData === undefined) {
-      console.error(`${progress} [SKIP] Transient failure for ${doi}`);
-      transientFailures++;
-      continue;
-    }
-
-    const openAireResult = await openAireClient.fetchByDoi(doi);
-    if (openAireResult) foundInOpenAire++;
-
+  const rawResults = await pMap(dois, async (doi, i) => {
     const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//i, '').trim().toLowerCase();
     const docid = doiToDocid.get(cleanDoi);
-    const episciencesExport = docid !== undefined ? await episciencesClient.fetchExport(docid) : undefined;
-    if (episciencesExport) foundInEpisciences++;
 
-    results.push(mergePublication(openAlexData, openAireResult, episciencesExport));
+    // Fetch from OpenAlex, OpenAIRE and Episciences concurrently for this DOI
+    const [openAlexData, openAireResult, episciencesExport] = await Promise.all([
+      openAlexClient.fetchByDoi(doi),
+      openAireClient.fetchByDoi(doi),
+      docid !== undefined ? episciencesClient.fetchExport(docid) : Promise.resolve(undefined),
+    ]);
 
-    if ((i + 1) % 100 === 0 || i === dois.length - 1) {
-      console.log(`${progress} processed — ${results.length} merged, ${notFoundInOpenAlex} not found (OpenAlex), ${foundInOpenAire} enriched (OpenAIRE), ${foundInEpisciences} enriched (Episciences)`);
+    let itemResult = null;
+
+    if (openAlexData === null) {
+      notFoundInOpenAlex++;
+    } else if (openAlexData === undefined) {
+      transientFailures++;
+      console.error(`[${i + 1}/${dois.length}] [SKIP] Transient failure for ${doi}`);
+    } else {
+      if (openAireResult) foundInOpenAire++;
+      if (episciencesExport) foundInEpisciences++;
+      itemResult = mergePublication(openAlexData, openAireResult, episciencesExport);
     }
-  }
+
+    processedCount++;
+    if (processedCount % 100 === 0 || processedCount === dois.length) {
+      const mergedCount = processedCount - notFoundInOpenAlex - transientFailures;
+      console.log(`[${processedCount}/${dois.length}] processed — ${mergedCount} merged, ${notFoundInOpenAlex} not found (OpenAlex), ${foundInOpenAire} enriched (OpenAIRE), ${foundInEpisciences} enriched (Episciences)`);
+    }
+
+    return itemResult;
+  }, CONCURRENCY);
+
+  const results = rawResults.filter(Boolean);
 
   const funders = await enrichFunders(results, { openAlexFundersClient, rorClient });
   fs.writeFileSync(FUNDERS_OUTPUT_PATH, JSON.stringify(funders, null, 2));

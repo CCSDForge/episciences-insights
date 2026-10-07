@@ -25,6 +25,8 @@ export class OpenAireClient {
     // dynamically if the ratelimit headers reveal a smaller budget.
     this.minDelayMs = 600;
     this.currentDelayMs = this.minDelayMs;
+    this.lastRequestTime = 0;
+    this.rateLimitQueue = Promise.resolve();
 
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });
@@ -71,6 +73,18 @@ export class OpenAireClient {
     }
   }
 
+  async _waitForRateLimit() {
+    return new Promise((resolve) => {
+      this.rateLimitQueue = this.rateLimitQueue.then(async () => {
+        const now = Date.now();
+        const wait = Math.max(0, this.currentDelayMs - (now - this.lastRequestTime));
+        if (wait > 0) await delay(wait);
+        this.lastRequestTime = Date.now();
+        resolve();
+      });
+    });
+  }
+
   /**
    * Returns the raw OpenAIRE Graph v3 result object for a DOI, or `null`
    * if the DOI is not indexed by OpenAIRE / the request ultimately failed.
@@ -91,12 +105,12 @@ export class OpenAireClient {
     };
     if (token) headers.Authorization = `Bearer ${token}`;
 
-    await delay(this.currentDelayMs);
-
     const url = `${this.baseUrl}?pid=${encodeURIComponent(cleanDoi)}`;
     const maxRetries = 3;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      await this._waitForRateLimit();
+
       let response;
       try {
         response = await fetch(url, { headers });

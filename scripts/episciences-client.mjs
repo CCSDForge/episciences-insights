@@ -29,6 +29,8 @@ export class EpisciencesClient {
     this.indexCacheDurationMs = (Number(options.indexCacheDays) || 1) * 24 * 60 * 60 * 1000;
     this.exportCacheDurationMs = (Number(options.exportCacheDays) || 30) * 24 * 60 * 60 * 1000;
     this.delayMs = Number(options.delayMs) || 300;
+    this.lastRequestTime = 0;
+    this.rateLimitQueue = Promise.resolve();
 
     this.exportDir = path.join(this.cacheDir, 'export');
     if (!fs.existsSync(this.exportDir)) fs.mkdirSync(this.exportDir, { recursive: true });
@@ -53,6 +55,18 @@ export class EpisciencesClient {
     fs.writeFileSync(filePath, content);
   }
 
+  async _waitForRateLimit() {
+    return new Promise((resolve) => {
+      this.rateLimitQueue = this.rateLimitQueue.then(async () => {
+        const now = Date.now();
+        const wait = Math.max(0, this.delayMs - (now - this.lastRequestTime));
+        if (wait > 0) await delay(wait);
+        this.lastRequestTime = Date.now();
+        resolve();
+      });
+    });
+  }
+
   async fetchJournals() {
     const filePath = path.join(this.cacheDir, 'journals.json');
     const cached = this._readCache(filePath, this.indexCacheDurationMs);
@@ -70,7 +84,7 @@ export class EpisciencesClient {
     const cached = this._readCache(filePath, this.indexCacheDurationMs);
     if (cached) return cached;
 
-    await delay(this.delayMs);
+    await this._waitForRateLimit();
     const res = await fetch(`${this.baseUrl}/papers/?rvcode=${encodeURIComponent(rvcode)}&pagination=false`, { headers: { Accept: 'application/json' } });
     if (!res.ok) {
       console.error(`[Episciences] /papers/?rvcode=${rvcode} HTTP ${res.status}`);
@@ -108,7 +122,7 @@ export class EpisciencesClient {
     const cached = this._readCache(filePath, this.exportCacheDurationMs);
     if (cached !== undefined) return cached;
 
-    await delay(this.delayMs);
+    await this._waitForRateLimit();
     try {
       const res = await fetch(`${this.baseUrl}/papers/export/${docid}/json`, { headers: { Accept: 'application/json' } });
       if (!res.ok) {
