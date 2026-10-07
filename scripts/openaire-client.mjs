@@ -20,6 +20,8 @@ export class OpenAireClient {
     this.baseUrl = options.apiUrl || process.env.OPENAIRE_API_URL || 'https://api.openaire.eu/graph/v3/research-products';
     this.cacheDir = path.resolve(options.cacheDir || './.cache/openaire');
     this.cacheDurationMs = (Number(options.cacheDays) || 30) * 24 * 60 * 60 * 1000;
+    this.notFoundCacheDurationMs = (Number(options.notFoundCacheHours) || 24) * 60 * 60 * 1000;
+    this.onNotFound = options.onNotFound || (() => {});
 
     // Safe floor even at the full 7200/h budget (2 req/s); tightened
     // dynamically if the ratelimit headers reveal a smaller budget.
@@ -41,9 +43,13 @@ export class OpenAireClient {
   _readCache(filePath) {
     if (!fs.existsSync(filePath)) return undefined;
     const stats = fs.statSync(filePath);
-    if (Date.now() - stats.mtimeMs >= this.cacheDurationMs) return undefined;
+    const ageMs = Date.now() - stats.mtimeMs;
     try {
-      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const isNotFound = data === null || !data.results || data.results.length === 0;
+      const ttl = isNotFound ? this.notFoundCacheDurationMs : this.cacheDurationMs;
+      if (ageMs >= ttl) return undefined;
+      return data;
     } catch {
       return undefined;
     }
@@ -139,6 +145,7 @@ export class OpenAireClient {
       }
 
       if (response.status === 404) {
+        this.onNotFound(cleanDoi);
         const emptyPayload = { header: { numFound: 0 }, results: [] };
         this._writeCache(filePath, JSON.stringify(emptyPayload, null, 2));
         return null;
@@ -153,7 +160,11 @@ export class OpenAireClient {
       // Negative caching: an empty result set is cached too, so a DOI
       // absent from OpenAIRE isn't re-queried on every subsequent run.
       this._writeCache(filePath, JSON.stringify(data, null, 2));
-      return data.results?.[0] || null;
+      const firstResult = data.results?.[0] || null;
+      if (!firstResult) {
+        this.onNotFound(cleanDoi);
+      }
+      return firstResult;
     }
 
     return null;

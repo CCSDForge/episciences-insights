@@ -28,6 +28,7 @@ export class EpisciencesClient {
     // other API caches.
     this.indexCacheDurationMs = (Number(options.indexCacheDays) || 1) * 24 * 60 * 60 * 1000;
     this.exportCacheDurationMs = (Number(options.exportCacheDays) || 30) * 24 * 60 * 60 * 1000;
+    this.notFoundCacheDurationMs = (Number(options.notFoundCacheHours) || 24) * 60 * 60 * 1000;
     this.delayMs = Number(options.delayMs) || 300;
     this.lastRequestTime = 0;
     this.rateLimitQueue = Promise.resolve();
@@ -39,9 +40,12 @@ export class EpisciencesClient {
   _readCache(filePath, maxAgeMs) {
     if (!fs.existsSync(filePath)) return undefined;
     const stats = fs.statSync(filePath);
-    if (Date.now() - stats.mtimeMs >= maxAgeMs) return undefined;
+    const ageMs = Date.now() - stats.mtimeMs;
     try {
-      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const effectiveMaxAge = data === null ? this.notFoundCacheDurationMs : maxAgeMs;
+      if (ageMs >= effectiveMaxAge) return undefined;
+      return data;
     } catch {
       return undefined;
     }
@@ -120,11 +124,15 @@ export class EpisciencesClient {
   async fetchExport(docid) {
     const filePath = path.join(this.exportDir, `${docid}.json`);
     const cached = this._readCache(filePath, this.exportCacheDurationMs);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) return cached === null ? null : cached;
 
     await this._waitForRateLimit();
     try {
       const res = await fetch(`${this.baseUrl}/papers/export/${docid}/json`, { headers: { Accept: 'application/json' } });
+      if (res.status === 404) {
+        this._writeCache(filePath, JSON.stringify(null));
+        return null;
+      }
       if (!res.ok) {
         console.error(`[Episciences] export/${docid} HTTP ${res.status}`);
         return undefined;

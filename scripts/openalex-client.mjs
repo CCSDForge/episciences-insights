@@ -13,6 +13,7 @@ export class OpenAlexClient {
     this.apiKey = options.apiKey || process.env.OPENALEX_API_KEY || '';
     this.cacheDir = path.resolve(options.cacheDir || './.cache/openalex');
     this.cacheDurationMs = (Number(options.cacheDays) || 30) * 24 * 60 * 60 * 1000;
+    this.notFoundCacheDurationMs = (Number(options.notFoundCacheHours) || 24) * 60 * 60 * 1000;
     this.delayMs = Number(options.delayMs) || 200;
     this.onNotFound = options.onNotFound || (() => {});
     this.lastRequestTime = 0;
@@ -31,9 +32,13 @@ export class OpenAlexClient {
   _readCache(filePath) {
     if (!fs.existsSync(filePath)) return undefined;
     const stats = fs.statSync(filePath);
-    if (Date.now() - stats.mtimeMs >= this.cacheDurationMs) return undefined;
+    const ageMs = Date.now() - stats.mtimeMs;
     try {
-      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const isNotFound = data === null;
+      const ttl = isNotFound ? this.notFoundCacheDurationMs : this.cacheDurationMs;
+      if (ageMs >= ttl) return undefined;
+      return data;
     } catch {
       return undefined;
     }

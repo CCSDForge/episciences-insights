@@ -29,8 +29,8 @@ if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
 const NOT_FOUND_LOG = path.join(LOG_DIR, 'not-found.log');
 
-function logNotFound(doi) {
-  fs.appendFileSync(NOT_FOUND_LOG, `${new Date().toISOString()} - 404 Not Found - ${doi}\n`);
+function logNotFound(source, doi) {
+  fs.appendFileSync(NOT_FOUND_LOG, `${new Date().toISOString()} - [${source}] Not Found - ${doi}\n`);
 }
 
 async function pMap(items, mapper, concurrency = 8) {
@@ -72,12 +72,13 @@ async function run() {
   const openAlexClient = new OpenAlexClient({
     cacheDir: path.join(CACHE_DIR, 'openalex'),
     cacheDays: CACHE_DURATION_DAYS,
-    onNotFound: logNotFound,
+    onNotFound: (doi) => logNotFound('OpenAlex', doi),
   });
   const tokenManager = new OpenAireTokenManager({ cacheDir: CACHE_DIR });
   const openAireClient = new OpenAireClient(tokenManager, {
     cacheDir: path.join(CACHE_DIR, 'openaire'),
     cacheDays: CACHE_DURATION_DAYS,
+    onNotFound: (doi) => logNotFound('OpenAIRE', doi),
   });
   const openAlexFundersClient = new OpenAlexFundersClient({
     cacheDir: path.join(CACHE_DIR, 'openalex-funders'),
@@ -133,8 +134,16 @@ async function run() {
       transientFailures++;
       console.error(`[${i + 1}/${dois.length}] [SKIP] Transient failure for ${doi}`);
     } else {
-      if (openAireResult) foundInOpenAire++;
-      if (episciencesExport) foundInEpisciences++;
+      if (openAireResult) {
+        foundInOpenAire++;
+      }
+
+      if (episciencesExport) {
+        foundInEpisciences++;
+      } else if (docid === undefined || episciencesExport === null) {
+        logNotFound('Episciences', doi);
+      }
+
       itemResult = mergePublication(openAlexData, openAireResult, episciencesExport);
     }
 
