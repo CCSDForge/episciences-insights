@@ -10,6 +10,7 @@
     "lint": "eslint",
     "collect": "node scripts/fetch-data.mjs",
     "collect:links": "node scripts/collect-links.mjs",
+    "collect:citations": "node scripts/collect-citations.mjs",
     "sync:dois": "node scripts/sync-dois.mjs",
     "compress": "node scripts/compress-data.mjs"
   },

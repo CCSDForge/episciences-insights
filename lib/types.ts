@@ -125,6 +125,26 @@ export type EpisciencesMeta = {
   overlay_repository?: string;     // Preprint repository this journal overlays (arXiv, HAL...)
 };
 
+export type OpenCitationsImpact = {
+  citation_count: number;
+  reference_count?: number;
+  self_citations?: {
+    journal_count: number;
+    author_count: number;
+    external_count: number;
+  };
+  citations_by_year?: Record<string, number>;
+  earliest_citation_date?: string;
+  median_citation_timespan_days?: number;
+};
+
+export type VenueCitationSummary = {
+  issn: string;
+  journal_code?: string;
+  journal_name?: string;
+  count: number;
+};
+
 export type Publication = {
   doi: string;
   title: string;
@@ -155,6 +175,7 @@ export type Publication = {
   related_works?: string[];
   episciences?: EpisciencesMeta;
   open_science?: OpenScience;
+  opencitations?: OpenCitationsImpact;
 };
 
 export type UsageStats = {

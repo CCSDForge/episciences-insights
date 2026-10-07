@@ -49,6 +49,9 @@ OPENALEX_API_KEY=your_openalex_key_if_any
 # Leave blank to run in anonymous mode; the client falls back gracefully.
 OPENAIRE_CLIENT_ID=
 OPENAIRE_CLIENT_SECRET=
+
+# Optional — OpenCitations Index v2 access token (free access token from opencitations.net)
+OPENCITATION_API_KEY=your_token_here
 ```
 Registered-service OpenAIRE credentials raise the API rate budget but are not required — the pipeline works, just slower, without them.
 
@@ -59,11 +62,16 @@ Registered-service OpenAIRE credentials raise the API rate budget but are not re
    npm run collect
    ```
    This fetches metadata from OpenAlex, enriches it with OpenAIRE Graph v3 (funding codes/acronyms, hosting repositories, licenses, citation impact indicators, Diamond OA recognition), and saves the result to `public/data/publications.json`.
-3. (Optional) Fetch linked datasets/software — a separate, slower pass kept out of the main run because coverage is low (~10% of publications):
+3. (Optional) Fetch linked datasets/software — a separate pass kept out of the main run because coverage is low (~10% of publications):
    ```bash
    npm run collect:links
    ```
    Writes `public/data/linked-outputs.json`, picked up automatically by the dashboard if present.
+4. (Optional) Fetch open citations metrics from OpenCitations Index v2:
+   ```bash
+   npm run collect:citations
+   ```
+   Fetches venue-level citations for every overlay journal and article-level citation details (self-citations breakdown, latency). Writes `public/data/venue-citations.json` and `public/data/opencitations.json`, integrated automatically into the dashboard.
 
 ### 3. Development
 Start the local development server:
