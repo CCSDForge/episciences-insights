@@ -28,46 +28,59 @@ async function run() {
     cacheDir: CACHE_DIR,
   });
 
-  // 1. Process venue citation counts
+  // 1. Process venue citation counts using authoritative Episciences journals
   console.log('\n--- Step 1: Collecting Venue Citation Counts ---');
   const journalsMap = new Map();
-  for (const pub of publications) {
-    const journal = pub.journal;
-    if (journal && journal.issn && !journalsMap.has(journal.issn)) {
-      journalsMap.set(journal.issn, {
-        issn: journal.issn,
-        journal_code: journal.code,
-        journal_name: journal.name,
-      });
+  const episciencesJournalsPath = path.resolve(CACHE_DIR, '../episciences/journals.json');
+
+  if (fs.existsSync(episciencesJournalsPath)) {
+    try {
+      const canonicalJournals = JSON.parse(fs.readFileSync(episciencesJournalsPath, 'utf-8'));
+      for (const j of canonicalJournals) {
+        const issnSetting = j.settings?.find((s) => s.setting === 'ISSN' || s.setting === 'eISSN');
+        if (issnSetting?.value) {
+          journalsMap.set(j.code, {
+            issn: issnSetting.value.trim(),
+            journal_code: j.code,
+            journal_name: j.name,
+          });
+        }
+      }
+      console.log(`Loaded ${journalsMap.size} canonical journals with official ISSN from Episciences index.`);
+    } catch (e) {
+      console.warn('Could not parse canonical journals, falling back to publications list:', e.message);
     }
   }
 
-  console.log(`Found ${journalsMap.size} distinct journals with an ISSN.`);
-  let venueCitations = {};
-  if (fs.existsSync(VENUES_OUTPUT_PATH)) {
-    try {
-      venueCitations = JSON.parse(fs.readFileSync(VENUES_OUTPUT_PATH, 'utf-8'));
-    } catch {
-      venueCitations = {};
+  // Fallback if cache/episciences/journals.json was absent: gather distinct codes
+  if (journalsMap.size === 0) {
+    for (const pub of publications) {
+      const journal = pub.journal;
+      if (journal && journal.issn && journal.code && !journalsMap.has(journal.code)) {
+        journalsMap.set(journal.code, {
+          issn: journal.issn,
+          journal_code: journal.code,
+          journal_name: journal.name,
+        });
+      }
     }
   }
 
-  for (const [issn, info] of journalsMap.entries()) {
+  console.log(`Found ${journalsMap.size} official journals to query on OpenCitations.`);
+  const venueCitations = {};
+
+  for (const [code, info] of journalsMap.entries()) {
     try {
-      const count = await client.fetchVenueCitationCount(issn);
-      venueCitations[issn] = {
+      const count = await client.fetchVenueCitationCount(info.issn);
+      const record = {
         ...info,
         count,
       };
-      if (info.journal_code) {
-        venueCitations[info.journal_code] = {
-          ...info,
-          count,
-        };
-      }
-      console.log(`[Venue] ${info.journal_name} (${issn}): ${count} citations`);
+      venueCitations[code] = record;
+      venueCitations[info.issn] = record;
+      console.log(`[Venue] ${info.journal_name} (${info.issn}): ${count} citations`);
     } catch (err) {
-      console.error(`Failed to fetch venue citations for ${issn}:`, err.message);
+      console.error(`Failed to fetch venue citations for ${info.issn}:`, err.message);
     }
   }
 

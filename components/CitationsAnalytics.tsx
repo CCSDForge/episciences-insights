@@ -24,6 +24,8 @@ import {
   BookOpen,
   ExternalLink,
   Info,
+  BarChart3,
+  List,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
@@ -117,17 +119,23 @@ export default function CitationsAnalytics({ data, venueCitations = {} }: Citati
       .slice(0, 10);
   }, [data]);
 
-  // 3. Venue citations comparison (journals)
+  const [venueViewMode, setVenueViewMode] = React.useState<'chart' | 'list'>('chart');
+  const [venueLimit, setVenueLimit] = React.useState<number>(12);
+
+  // 3. Venue citations comparison (authoritative overlay journals)
   const venueData = useMemo(() => {
     if (!venueCitations || Object.keys(venueCitations).length === 0) return [];
 
-    // Filter by unique ISSN and count > 0
-    const seenIssns = new Set<string>();
+    const seenKeys = new Set<string>();
     const list: { name: string; count: number; issn: string; code?: string }[] = [];
 
     Object.values(venueCitations).forEach((v) => {
-      if (!v || !v.issn || seenIssns.has(v.issn)) return;
-      seenIssns.add(v.issn);
+      if (!v) return;
+      // Primary dedup key is canonical journal_code if available, otherwise issn
+      const key = v.journal_code || v.issn;
+      if (!key || seenKeys.has(key)) return;
+      seenKeys.add(key);
+
       if (v.count > 0) {
         list.push({
           name: v.journal_name || v.journal_code || v.issn,
@@ -138,8 +146,16 @@ export default function CitationsAnalytics({ data, venueCitations = {} }: Citati
       }
     });
 
-    return list.sort((a, b) => b.count - a.count).slice(0, 12);
+    return list.sort((a, b) => b.count - a.count);
   }, [venueCitations]);
+
+  const displayedVenues = useMemo(() => {
+    return venueLimit === -1 ? venueData : venueData.slice(0, venueLimit);
+  }, [venueData, venueLimit]);
+
+  const maxVenueCount = useMemo(() => {
+    return venueData.length > 0 ? venueData[0].count : 1;
+  }, [venueData]);
 
   // 4. Breakdown data for self-citations chart
   const breakdownData = useMemo(() => {
@@ -429,65 +445,193 @@ export default function CitationsAnalytics({ data, venueCitations = {} }: Citati
       {/* Row 2: Overlay Journals Venues Comparison */}
       {venueData.length > 0 && (
         <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
-          <div className="mb-6 flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <BookOpen size={18} className="text-violet-600 dark:text-violet-400" />
-              <h4 className="font-heading text-base font-black text-zinc-900 dark:text-zinc-50">
-                {t.citations.venuesTitle}
-              </h4>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <BookOpen size={18} className="text-violet-600 dark:text-violet-400" />
+                <h4 className="font-heading text-base font-black text-zinc-900 dark:text-zinc-50">
+                  {t.citations.venuesTitle}
+                </h4>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                {t.citations.venuesSubtitle}
+              </p>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {t.citations.venuesSubtitle}
-            </p>
+
+            {/* Controls: Limits & View Mode */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+                <button
+                  onClick={() => setVenueLimit(10)}
+                  className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                    venueLimit === 10
+                      ? 'bg-white dark:bg-zinc-700 text-violet-700 dark:text-violet-400 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  Top 10
+                </button>
+                <button
+                  onClick={() => setVenueLimit(20)}
+                  className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                    venueLimit === 20
+                      ? 'bg-white dark:bg-zinc-700 text-violet-700 dark:text-violet-400 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  Top 20
+                </button>
+                <button
+                  onClick={() => setVenueLimit(-1)}
+                  className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                    venueLimit === -1
+                      ? 'bg-white dark:bg-zinc-700 text-violet-700 dark:text-violet-400 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  {venueData.length}
+                </button>
+              </div>
+
+              <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+                <button
+                  onClick={() => setVenueViewMode('chart')}
+                  aria-label="Chart view"
+                  className={`p-1.5 rounded-lg transition-all ${
+                    venueViewMode === 'chart'
+                      ? 'bg-white dark:bg-zinc-700 text-violet-700 dark:text-violet-400 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  <BarChart3 size={15} />
+                </button>
+                <button
+                  onClick={() => setVenueViewMode('list')}
+                  aria-label="List view"
+                  className={`p-1.5 rounded-lg transition-all ${
+                    venueViewMode === 'list'
+                      ? 'bg-white dark:bg-zinc-700 text-violet-700 dark:text-violet-400 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  <List size={15} />
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={venueData}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 140, bottom: 5 }}
-              >
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 11, fill: '#71717a' }}
-                  axisLine={{ stroke: '#e4e4e7' }}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  tick={{ fontSize: 11, fill: '#71717a' }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={130}
-                />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const d = payload[0].payload;
-                      return (
-                        <div className="rounded-xl border border-zinc-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm dark:border-zinc-700 dark:bg-zinc-800/95">
-                          <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
-                            {d.name}
-                          </p>
-                          <p className="text-[10px] text-zinc-500 font-mono">ISSN: {d.issn}</p>
-                          <div className="mt-1 flex items-center gap-2">
-                            <span className="font-heading text-sm font-black text-violet-600 dark:text-violet-400">
-                              {formatNum(Number(d.count))}
+          {venueViewMode === 'chart' ? (
+            <div className="w-full overflow-y-auto" style={{ maxHeight: '600px' }}>
+              <div style={{ height: `${Math.max(400, displayedVenues.length * 40)}px`, minWidth: '600px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={displayedVenues}
+                    layout="vertical"
+                    margin={{ top: 10, right: 40, left: 240, bottom: 10 }}
+                  >
+                    <XAxis
+                      type="number"
+                      tick={{ fontSize: 11, fill: '#71717a' }}
+                      axisLine={{ stroke: '#e4e4e7' }}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      tick={{ fontSize: 12, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={230}
+                      tickFormatter={(val: string) => (val.length > 32 ? `${val.slice(0, 31)}…` : val)}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="rounded-xl border border-zinc-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm dark:border-zinc-700 dark:bg-zinc-800/95">
+                              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                {d.name}
+                              </p>
+                              <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                                {d.code && (
+                                  <span className="font-mono rounded bg-zinc-100 dark:bg-zinc-700 px-1.5 py-0.5 uppercase font-bold text-violet-600 dark:text-violet-300">
+                                    {d.code}
+                                  </span>
+                                )}
+                                <span>ISSN: {d.issn}</span>
+                              </div>
+                              <div className="mt-2 flex items-center gap-2">
+                                <span className="font-heading text-base font-black text-violet-600 dark:text-violet-400">
+                                  {formatNum(Number(d.count))}
+                                </span>
+                                <span className="text-xs text-zinc-500">{t.citations.kpiTotal}</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#8b5cf6" radius={[0, 8, 8, 0]} barSize={22} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-1">
+              {displayedVenues.map((v, idx) => {
+                const percent = Math.min(100, Math.max(2, (v.count / maxVenueCount) * 100));
+                return (
+                  <div
+                    key={v.code || v.issn}
+                    className="flex flex-col justify-between p-4 rounded-2xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-violet-700 transition-all shadow-sm"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black text-violet-600 dark:text-violet-400">
+                            #{idx + 1}
+                          </span>
+                          {v.code && (
+                            <span className="text-[10px] font-mono font-bold uppercase rounded bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 px-1.5 py-0.5">
+                              {v.code}
                             </span>
-                            <span className="text-xs text-zinc-500">{t.citations.kpiTotal}</span>
-                          </div>
+                          )}
                         </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Bar dataKey="count" fill="#8b5cf6" radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+                        <span className="text-[10px] font-mono text-zinc-400">
+                          ISSN: {v.issn}
+                        </span>
+                      </div>
+
+                      <h5 className="font-heading text-sm font-bold text-zinc-900 dark:text-zinc-50 leading-snug line-clamp-2">
+                        {v.name}
+                      </h5>
+                    </div>
+
+                    <div className="mt-4 space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-zinc-500 dark:text-zinc-400 font-medium">
+                          {t.citations.kpiTotal}
+                        </span>
+                        <span className="font-heading text-base font-black text-violet-600 dark:text-violet-400">
+                          {formatNum(v.count)}
+                        </span>
+                      </div>
+
+                      {/* Visual progress bar */}
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200/60 dark:bg-zinc-700/60">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
