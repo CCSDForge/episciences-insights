@@ -18,6 +18,7 @@ interface CountryInstitutionsExplorerProps {
 }
 
 interface TreemapContentProps {
+  depth?: number;
   x?: number;
   y?: number;
   width?: number;
@@ -64,7 +65,8 @@ function wrapText(text: string, maxCharsPerLine: number, maxLines = 2): string[]
 }
 
 function TreemapCell(props: TreemapContentProps) {
-  const { x = 0, y = 0, width = 0, height = 0, name = '', color = '#3b82f6', size = 0, count: rawCount } = props;
+  const { depth, x = 0, y = 0, width = 0, height = 0, name = '', color = '#3b82f6', size = 0, count: rawCount } = props;
+  if (depth === 0) return <g />;
   const count = rawCount ?? size;
 
   // Round positions and dimensions to integer pixels to prevent subpixel font blur
@@ -110,12 +112,15 @@ function TreemapCell(props: TreemapContentProps) {
           x={startX}
           y={startY}
           fill="#ffffff"
+          stroke="none"
           fontSize={fontSize}
           fontWeight="600"
-          textRendering="geometricPrecision"
-          className="pointer-events-none select-none antialiased"
+          textRendering="optimizeLegibility"
+          className="pointer-events-none select-none"
           style={{
-            fontFamily: 'var(--font-noto-sans), var(--font-manrope), system-ui, sans-serif',
+            fontFamily: 'var(--font-sans)',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
           }}
         >
           {lines.map((line, idx) => (
@@ -123,6 +128,8 @@ function TreemapCell(props: TreemapContentProps) {
               key={idx}
               x={startX}
               dy={idx === 0 ? 0 : fontSize + 2}
+              fill="#ffffff"
+              stroke="none"
             >
               {line}
             </tspan>
@@ -132,6 +139,7 @@ function TreemapCell(props: TreemapContentProps) {
               x={startX}
               dy={fontSize + 3}
               fill="rgba(255, 255, 255, 0.9)"
+              stroke="none"
               fontSize={Math.max(9, fontSize - 1)}
               fontWeight="500"
             >
@@ -390,7 +398,8 @@ export default function CountryInstitutionsExplorer({
               data={treeData}
               dataKey="size"
               aspectRatio={16 / 9}
-              stroke="#fff"
+              stroke="none"
+              isAnimationActive={false}
               content={(cellProps: Record<string, unknown>) => {
                 const payload = cellProps.payload as { count?: number; name?: string; color?: string } | undefined;
                 const size = typeof cellProps.size === 'number' ? cellProps.size : 0;

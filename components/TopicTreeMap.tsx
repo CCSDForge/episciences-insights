@@ -24,6 +24,7 @@ interface CustomizedContentProps {
 
 const CustomizedContent = (props: CustomizedContentProps) => {
   const { depth = 0, x = 0, y = 0, width = 0, height = 0, name = '', color = '#64748b' } = props;
+  if (depth === 0) return <g />;
 
   const rx = Math.round(x);
   const ry = Math.round(y);
@@ -50,12 +51,15 @@ const CustomizedContent = (props: CustomizedContentProps) => {
           textAnchor="middle"
           dominantBaseline="central"
           fill="#ffffff"
+          stroke="none"
           fontSize={rw < 120 ? 10 : 12}
           fontWeight="600"
-          textRendering="geometricPrecision"
-          className="pointer-events-none select-none tracking-normal antialiased"
+          textRendering="optimizeLegibility"
+          className="pointer-events-none select-none tracking-normal"
           style={{ 
-            fontFamily: 'var(--font-manrope), system-ui, sans-serif',
+            fontFamily: 'var(--font-sans)',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
             pointerEvents: 'none'
           }}
         >
@@ -126,7 +130,8 @@ export default function TopicTreeMap({ data }: TopicTreeMapProps) {
           data={treeData}
           dataKey="size"
           aspectRatio={16 / 9}
-          stroke="#fff"
+          stroke="none"
+          isAnimationActive={false}
           content={CustomizedContent}
         >
           <Tooltip 
