@@ -176,6 +176,7 @@ export interface Translations {
     deduplicatedRor: string;
     noRor: string;
     clickToExplore: string;
+    clickToViewAffiliations: string;
     relationalViews: string;
     topicsNetwork: string;
     topicsMatrix: string;
@@ -509,6 +510,7 @@ export const translations: Record<Locale, Translations> = {
           "deduplicatedRor": "Deduplicated by ROR identifier",
           "noRor": "No ROR available",
           "clickToExplore": "Click to explore affiliations in {country}",
+          "clickToViewAffiliations": "click to view affiliations",
           "relationalViews": "Relational Views & Flows",
           "topicsNetwork": "Topics Network",
           "topicsMatrix": "Topics Matrix",
@@ -840,6 +842,7 @@ export const translations: Record<Locale, Translations> = {
           "deduplicatedRor": "Dédoublonnées par identifiant ROR",
           "noRor": "Aucun ROR disponible",
           "clickToExplore": "Cliquer pour explorer les affiliations : {country}",
+          "clickToViewAffiliations": "cliquer pour afficher les affiliations",
           "relationalViews": "Vues relationnelles & Flux",
           "topicsNetwork": "Réseau thématique",
           "topicsMatrix": "Matrice thématique",
@@ -1171,6 +1174,7 @@ export const translations: Record<Locale, Translations> = {
           "deduplicatedRor": "Desduplicadas mediante identificador ROR",
           "noRor": "Sin ROR disponible",
           "clickToExplore": "Haga clic para explorar las afiliaciones en {country}",
+          "clickToViewAffiliations": "clic para ver las afiliaciones",
           "relationalViews": "Vistas relacionales y Flujos",
           "topicsNetwork": "Red temática",
           "topicsMatrix": "Matriz temática",

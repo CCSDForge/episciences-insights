@@ -9,6 +9,7 @@ import {
   Share2,
   Grid3x3,
   Info,
+  Maximize2,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
@@ -90,7 +91,6 @@ export default function ReachSection() {
         views={REACH_VIEWS}
         activeView={activeView}
         onChange={setActiveView}
-        onFullscreen={activeView !== 'overview' ? () => setIsFullscreen(true) : undefined}
         ariaLabel="Modes de visualisation du rayonnement mondial"
       />
 
@@ -150,7 +150,14 @@ export default function ReachSection() {
               <WorldMap
                 data={countryData}
                 selectedCountry={selectedCountry}
-                onSelectCountry={setSelectedCountry}
+                onSelectCountry={(code) => {
+                  setSelectedCountry(code);
+                  const el = document.getElementById('country-affiliations-explorer');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+                valueUnit={t.common.pubs}
               />
             </div>
           </div>
@@ -329,25 +336,37 @@ export default function ReachSection() {
       {activeView !== 'overview' && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Methodological Guide */}
-          <div className="rounded-xl bg-[var(--episciences-cyan-00)]/10 dark:bg-[var(--episciences-cyan-00)]/15 p-3.5 border border-[var(--episciences-cyan-01)]/30 text-xs text-zinc-600 dark:text-zinc-300 flex items-start gap-2.5">
-            <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shrink-0 mt-0.5" />
-            <div>
-              {activeView === 'flows' && (
-                <p><strong>{t.dashboard.geoFlowsTitle}:</strong> {t.dashboard.geoFlowsDesc}</p>
-              )}
-              {activeView === 'country-network' && (
-                <p><strong>{t.dashboard.countryNetworkTitle}:</strong> {t.dashboard.countryNetworkDesc}</p>
-              )}
-              {activeView === 'institution-network' && (
-                <p><strong>{t.dashboard.institutionNetworkTitle}:</strong> {t.dashboard.institutionNetworkDesc}</p>
-              )}
-              {activeView === 'country-matrix' && (
-                <p><strong>{t.dashboard.collabMatrixTitle}:</strong> {t.dashboard.collabMatrixDesc}</p>
-              )}
+          <div className="rounded-xl bg-[var(--episciences-cyan-00)]/10 dark:bg-[var(--episciences-cyan-00)]/15 p-3.5 border border-[var(--episciences-cyan-01)]/30 text-xs text-zinc-600 dark:text-zinc-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-2.5 min-w-0">
+              <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shrink-0 mt-0.5" />
+              <div>
+                {activeView === 'flows' && (
+                  <p><strong>{t.dashboard.geoFlowsTitle}:</strong> {t.dashboard.geoFlowsDesc}</p>
+                )}
+                {activeView === 'country-network' && (
+                  <p><strong>{t.dashboard.countryNetworkTitle}:</strong> {t.dashboard.countryNetworkDesc}</p>
+                )}
+                {activeView === 'institution-network' && (
+                  <p><strong>{t.dashboard.institutionNetworkTitle}:</strong> {t.dashboard.institutionNetworkDesc}</p>
+                )}
+                {activeView === 'country-matrix' && (
+                  <p><strong>{t.dashboard.collabMatrixTitle}:</strong> {t.dashboard.collabMatrixDesc}</p>
+                )}
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer shrink-0 self-end sm:self-auto"
+              title={t.common.fullscreen}
+              aria-label={t.common.fullscreen}
+            >
+              <Maximize2 size={13} aria-hidden="true" />
+              <span className="hidden sm:inline">{t.common.fullscreen}</span>
+            </button>
           </div>
 
-          <div className="relative">
+          <div>
             {activeView === 'flows' && <CountryGeographicFlowMap data={filteredData} />}
             {activeView === 'country-network' && <CountryCollaborationNetwork data={filteredData} />}
             {activeView === 'institution-network' && <CollaborationWeb data={filteredData} />}

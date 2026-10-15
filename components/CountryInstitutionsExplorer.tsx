@@ -242,7 +242,7 @@ export default function CountryInstitutionsExplorer({
   const activeCountryName = getCountryName(activeCountry);
 
   return (
-    <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8">
+    <div id="country-affiliations-explorer" className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8 scroll-mt-6">
       {/* Header with Title & Country Selector */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-zinc-100 pb-6 dark:border-zinc-800">
         <div className="flex flex-col">

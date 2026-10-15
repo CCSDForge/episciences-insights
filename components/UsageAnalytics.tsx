@@ -283,6 +283,7 @@ export default function UsageAnalytics() {
             <WorldMap
               data={geoData}
               legendLabel={t.usage.mapLegend}
+              valueUnit={t.usage.downloads.toLowerCase()}
               colorRange={["#e0f7f8", "#0aa0be"]}
             />
           </div>

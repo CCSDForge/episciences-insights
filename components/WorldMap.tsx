@@ -16,6 +16,7 @@ interface WorldMapProps {
   colorRange?: [string, string];
   selectedCountry?: string | null;
   onSelectCountry?: (code: string) => void;
+  valueUnit?: string;
 }
 
 export default function WorldMap({
@@ -24,6 +25,7 @@ export default function WorldMap({
   colorRange = ["#dbeafe", "#2563eb"],
   selectedCountry,
   onSelectCountry,
+  valueUnit,
 }: WorldMapProps) {
   const { t } = useTranslation();
   const effectiveLegendLabel = legendLabel || t.dashboard.authorAffiliationsTitle;
@@ -67,24 +69,30 @@ export default function WorldMap({
               const countryCode = ISO_A2 || iso_a2 || (numericId ? ISO_NUMERIC_TO_ALPHA2[numericId] : null);
               const value = countryCode ? (dataMap[countryCode.toUpperCase()] || 0) : 0;
               const isSelected = Boolean(countryCode && selectedCountry && countryCode.toUpperCase() === selectedCountry.toUpperCase());
+              const isInteractive = Boolean(countryCode && onSelectCountry && value > 0);
+              const unit = valueUnit ? ` ${valueUnit}` : '';
+              const baseLabel = `${name}: ${formatNum(value)}${unit}`;
+              const tooltipContent = isInteractive
+                ? `${baseLabel} (${t.dashboard.clickToViewAffiliations})`
+                : baseLabel;
               
               return (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  role={value > 0 ? "button" : undefined}
-                  tabIndex={value > 0 ? 0 : -1}
-                  aria-label={`${name}: ${formatNum(value)} items${value > 0 ? ' (click or press Enter to view affiliations)' : ''}`}
-                  aria-pressed={value > 0 ? isSelected : undefined}
+                  role={isInteractive ? "button" : undefined}
+                  tabIndex={isInteractive ? 0 : -1}
+                  aria-label={tooltipContent}
+                  aria-pressed={isInteractive ? isSelected : undefined}
                   data-tooltip-id="world-map-tooltip"
-                  data-tooltip-content={`${name}: ${formatNum(value)} items${value > 0 ? ' (click to view affiliations)' : ''}`}
+                  data-tooltip-content={tooltipContent}
                   onClick={() => {
-                    if (countryCode && onSelectCountry && value > 0) {
+                    if (isInteractive && countryCode && onSelectCountry) {
                       onSelectCountry(countryCode.toUpperCase());
                     }
                   }}
                   onKeyDown={(e: React.KeyboardEvent) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && countryCode && onSelectCountry && value > 0) {
+                    if ((e.key === 'Enter' || e.key === ' ') && isInteractive && countryCode && onSelectCountry) {
                       e.preventDefault();
                       onSelectCountry(countryCode.toUpperCase());
                     }
@@ -94,7 +102,7 @@ export default function WorldMap({
                   strokeWidth={isSelected ? 1.8 : 0.5}
                   style={{
                     default: { outline: "none" },
-                    hover: { fill: colorRange[1], outline: "none", cursor: value > 0 ? "pointer" : "default" },
+                    hover: { fill: colorRange[1], outline: "none", cursor: isInteractive ? "pointer" : "default" },
                     pressed: { outline: "none" },
                   }}
                   className="focus-visible:stroke-teal-500 focus-visible:stroke-2 focus-visible:outline-none"
