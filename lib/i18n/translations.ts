@@ -115,6 +115,29 @@ export interface Translations {
     noRelated: string;
     selectPaperPrompt: string;
     selectedPublication: string;
+    searchPlaceholder: string;
+    clearSearch: string;
+    noResults: string;
+    articlesMatching: string;
+    viewArticle: string;
+    exploreOpenAlex: string;
+    relatedWorkIndex: string;
+    consultOnOpenAlex: string;
+    authors: string;
+    discipline: string;
+    openAccessDiamond: string;
+    bibliographicDepth: string;
+    deepCorpus: string;
+    standardCorpus: string;
+    targetedCorpus: string;
+    referencesHint: string;
+    citationsReceived: string;
+    citationsCount: string;
+    semanticAffinity: string;
+    semanticAffinityDesc: string;
+    loadMore: string;
+    showingCount: string;
+    openAlexLimitExplanation: string;
   };
   network: {
     title: string;
@@ -448,7 +471,30 @@ export const translations: Record<Locale, Translations> = {
           "worksMapped": "works mapped",
           "noRelated": "No related works mapped yet in OpenAlex for this recent paper.",
           "selectPaperPrompt": "Select a paper from the list to view its lineage",
-          "selectedPublication": "Selected Publication"
+          "selectedPublication": "Selected Publication",
+          "searchPlaceholder": "Search by title, author, or keyword...",
+          "clearSearch": "Clear search",
+          "noResults": "No publications match your search.",
+          "articlesMatching": "publications",
+          "viewArticle": "View publication (DOI)",
+          "exploreOpenAlex": "Explore related network on OpenAlex",
+          "relatedWorkIndex": "Related work",
+          "consultOnOpenAlex": "View on OpenAlex",
+          "authors": "Authors",
+          "discipline": "Discipline",
+          "openAccessDiamond": "Diamond Open Access",
+          "bibliographicDepth": "Bibliographic Depth",
+          "deepCorpus": "Extensive scientific corpus (> 50 sources)",
+          "standardCorpus": "Standard scientific corpus (20–50 sources)",
+          "targetedCorpus": "Focused scientific study (< 20 sources)",
+          "referencesHint": "Full references are listed in the full-text publication on Episciences.",
+          "citationsReceived": "Recorded Citations",
+          "citationsCount": "citation(s) detected in OpenAIRE / OpenAlex",
+          "semanticAffinity": "Thematic Neighborhood & Related Works",
+          "semanticAffinityDesc": "Publications sharing co-citations and high semantic affinity in the global scientific graph.",
+          "loadMore": "Load 50 more publications",
+          "showingCount": "Showing {visible} of {total} publications",
+          "openAlexLimitExplanation": "OpenAlex computes up to 10 nearest scientific neighbors per work based on co-citation and text embeddings similarity."
       },
       "network": {
           "title": "Network Explorer - Episciences Insights",
@@ -780,7 +826,30 @@ export const translations: Record<Locale, Translations> = {
           "worksMapped": "travaux cartographiés",
           "noRelated": "Aucun travail connexe cartographié pour l'instant dans OpenAlex pour cet article.",
           "selectPaperPrompt": "Sélectionnez un article dans la liste pour voir sa filiation",
-          "selectedPublication": "Publication sélectionnée"
+          "selectedPublication": "Publication sélectionnée",
+          "searchPlaceholder": "Rechercher par titre, auteur ou mot-clé...",
+          "clearSearch": "Effacer la recherche",
+          "noResults": "Aucune publication ne correspond à votre recherche.",
+          "articlesMatching": "publications",
+          "viewArticle": "Consulter la publication (DOI)",
+          "exploreOpenAlex": "Explorer le réseau connexe sur OpenAlex",
+          "relatedWorkIndex": "Publication liée",
+          "consultOnOpenAlex": "Consulter sur OpenAlex",
+          "authors": "Auteurs",
+          "discipline": "Discipline",
+          "openAccessDiamond": "Accès Ouvert Diamant",
+          "bibliographicDepth": "Profondeur bibliographique",
+          "deepCorpus": "Corpus scientifique approfondi (> 50 sources)",
+          "standardCorpus": "Corpus scientifique standard (20–50 sources)",
+          "targetedCorpus": "Étude scientifique ciblée (< 20 sources)",
+          "referencesHint": "Les références complètes sont consultables dans le texte intégral de la publication sur Episciences.",
+          "citationsReceived": "Citations reçues",
+          "citationsCount": "citation(s) recensée(s) dans OpenAIRE / OpenAlex",
+          "semanticAffinity": "Voisinage thématique & Travaux connexes",
+          "semanticAffinityDesc": "Publications partageant des co-citations et une forte proximité thématique dans le graphe scientifique mondial.",
+          "loadMore": "Afficher 50 publications de plus",
+          "showingCount": "Affichage de {visible} sur {total} publications",
+          "openAlexLimitExplanation": "OpenAlex identifie algorithmiquement jusqu'à 10 voisins scientifiques les plus proches (co-citations et similarité vectorielle)."
       },
       "network": {
           "title": "Exploration Réseau - Episciences Insights",
@@ -1112,7 +1181,30 @@ export const translations: Record<Locale, Translations> = {
           "worksMapped": "obras mapeadas",
           "noRelated": "No hay obras relacionadas mapeadas todavía en OpenAlex para este artículo reciente.",
           "selectPaperPrompt": "Seleccione un artículo de la lista para ver su linaje",
-          "selectedPublication": "Publicación seleccionada"
+          "selectedPublication": "Publicación seleccionada",
+          "searchPlaceholder": "Buscar por título, autor o palabra clave...",
+          "clearSearch": "Borrar búsqueda",
+          "noResults": "Ninguna publicación coincide con su búsqueda.",
+          "articlesMatching": "publicaciones",
+          "viewArticle": "Ver publicación (DOI)",
+          "exploreOpenAlex": "Explorar la red relacionada en OpenAlex",
+          "relatedWorkIndex": "Publicación vinculada",
+          "consultOnOpenAlex": "Ver en OpenAlex",
+          "authors": "Autores",
+          "discipline": "Disciplina",
+          "openAccessDiamond": "Acceso Abierto Diamante",
+          "bibliographicDepth": "Profundidad bibliográfica",
+          "deepCorpus": "Cuerpo científico extenso (> 50 fuentes)",
+          "standardCorpus": "Cuerpo científico estándar (20–50 fuentes)",
+          "targetedCorpus": "Estudio científico focalizado (< 20 fuentes)",
+          "referencesHint": "Las referencias completas se pueden consultar en el texto completo de la publicación en Episciences.",
+          "citationsReceived": "Citas recibidas",
+          "citationsCount": "cita(s) detectada(s) en OpenAIRE / OpenAlex",
+          "semanticAffinity": "Vecindario temático y Obras afines",
+          "semanticAffinityDesc": "Publicaciones que comparten cocitaciones y afinidad temática en el grafo científico global.",
+          "loadMore": "Cargar 50 publicaciones más",
+          "showingCount": "Mostrando {visible} de {total} publicaciones",
+          "openAlexLimitExplanation": "OpenAlex identifica algorítmicamente hasta 10 vecinos científicos más cercanos (cocitaciones y similitud vectorial)."
       },
       "network": {
           "title": "Explorador de Red - Episciences Insights",
