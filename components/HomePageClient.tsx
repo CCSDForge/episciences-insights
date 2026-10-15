@@ -16,6 +16,7 @@ import {
 import { useDashboard } from '@/components/DashboardContext';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import PageHeader from '@/components/PageHeader';
+import { renderLinkedText } from '@/lib/renderLinkedText';
 
 interface HomePageClientProps {
   lastUpdated?: string | null;
@@ -214,8 +215,8 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
 
         {/* Narrative & Methodology */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300 font-medium">
-          <p>{t.disclaimer.metricsP1}</p>
-          <p>{t.disclaimer.metricsP2}</p>
+          <p>{renderLinkedText(t.disclaimer.metricsP1)}</p>
+          <p>{renderLinkedText(t.disclaimer.metricsP2)}</p>
         </div>
 
         {/* Downloads Note */}
