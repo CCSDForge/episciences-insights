@@ -398,7 +398,7 @@ export const translations: Record<Locale, Translations> = {
           "of17": "of 17",
           "abstractViews": "Abstract Views",
           "globalCoverage": "Global Coverage",
-          "countriesMetric": "Countries"
+          "countriesMetric": "Countries & territories"
       },
       "tabs": {
           "overview": "Overview",
@@ -729,7 +729,7 @@ export const translations: Record<Locale, Translations> = {
           "of17": "sur 17",
           "abstractViews": "Vues de résumés",
           "globalCoverage": "Couverture mondiale",
-          "countriesMetric": "Pays"
+          "countriesMetric": "Pays & territoires"
       },
       "tabs": {
           "overview": "Vue d'ensemble",
@@ -1060,7 +1060,7 @@ export const translations: Record<Locale, Translations> = {
           "of17": "de 17",
           "abstractViews": "Vistas de resúmenes",
           "globalCoverage": "Cobertura global",
-          "countriesMetric": "Países"
+          "countriesMetric": "Países y territorios"
       },
       "tabs": {
           "overview": "Resumen",
