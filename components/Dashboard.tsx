@@ -120,7 +120,7 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
     { id: 'journal', label: t.tabs.reach, icon: <MapIcon size={16} aria-hidden="true" />, colorClass: 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' },
     { id: 'topics', label: t.tabs.topics, icon: <Library size={16} aria-hidden="true" />, colorClass: 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' },
     { id: 'funder', label: t.tabs.funders, icon: <FlaskConical size={16} aria-hidden="true" />, colorClass: 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' },
-    { id: 'lineage', label: t.lineage.title, icon: <Search size={16} aria-hidden="true" />, colorClass: 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20' },
+    { id: 'lineage', label: t.lineage.title, icon: <Search size={16} aria-hidden="true" />, colorClass: 'bg-[#005fb9] text-white shadow-lg shadow-sky-600/20' },
   ];
 
   const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -322,15 +322,6 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                   <Share2 size={15} aria-hidden="true" /> {t.dashboard.networksAndCoOccurrences}
                 </button>
               </div>
-
-              {topicsSubTab === 'networks' && (
-                <button
-                  onClick={() => setIsTopicsFullscreen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50 transition-colors shadow-sm cursor-pointer"
-                >
-                  <Maximize2 size={14} aria-hidden="true" /> {t.common.fullscreen}
-                </button>
-              )}
             </div>
 
             {topicsSubTab === 'overview' ? (
@@ -452,28 +443,42 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                 </div>
 
                 {/* Methodological Guide for Topics Views */}
-                <div className="rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 p-3.5 border border-indigo-100 dark:border-indigo-900/40 text-xs text-zinc-600 dark:text-zinc-300 flex items-start gap-2.5">
-                  <Info size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-                  <div>
-                    {topicsNetworkView === 'topics-network' && (
-                      <p><strong>{t.dashboard.topicsNetworkTitle}:</strong> {t.dashboard.topicsNetworkDesc}</p>
-                    )}
-                    {topicsNetworkView === 'topics-matrix' && (
-                      <p><strong>{t.dashboard.topicsMatrixTitle}:</strong> {t.dashboard.topicsMatrixDesc}</p>
-                    )}
-                    {topicsNetworkView === 'msc-network' && (
-                      <p><strong>{t.dashboard.mscNetworkTitle}:</strong> {t.dashboard.mscNetworkDesc}</p>
-                    )}
-                    {topicsNetworkView === 'msc-matrix' && (
-                      <p><strong>{t.dashboard.mscMatrixTitle}:</strong> {t.dashboard.mscMatrixDesc}</p>
-                    )}
+                <div className="rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 p-3.5 border border-indigo-100 dark:border-indigo-900/40 text-xs text-zinc-600 dark:text-zinc-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <Info size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                    <div>
+                      {topicsNetworkView === 'topics-network' && (
+                        <p><strong>{t.dashboard.topicsNetworkTitle}:</strong> {t.dashboard.topicsNetworkDesc}</p>
+                      )}
+                      {topicsNetworkView === 'topics-matrix' && (
+                        <p><strong>{t.dashboard.topicsMatrixTitle}:</strong> {t.dashboard.topicsMatrixDesc}</p>
+                      )}
+                      {topicsNetworkView === 'msc-network' && (
+                        <p><strong>{t.dashboard.mscNetworkTitle}:</strong> {t.dashboard.mscNetworkDesc}</p>
+                      )}
+                      {topicsNetworkView === 'msc-matrix' && (
+                        <p><strong>{t.dashboard.mscMatrixTitle}:</strong> {t.dashboard.mscMatrixDesc}</p>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsTopicsFullscreen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer shrink-0 self-end sm:self-auto"
+                    title={t.common.fullscreen}
+                    aria-label={t.common.fullscreen}
+                  >
+                    <Maximize2 size={13} aria-hidden="true" />
+                    <span className="hidden sm:inline">{t.common.fullscreen}</span>
+                  </button>
                 </div>
 
-                {topicsNetworkView === 'topics-network' && <TopicCoOccurrenceNetwork data={filteredData} />}
-                {topicsNetworkView === 'topics-matrix' && <TopicCoOccurrenceMatrix data={filteredData} />}
-                {topicsNetworkView === 'msc-network' && <MscCoOccurrenceNetwork data={filteredData} />}
-                {topicsNetworkView === 'msc-matrix' && <MscCoOccurrenceMatrix data={filteredData} />}
+                <div>
+                  {topicsNetworkView === 'topics-network' && <TopicCoOccurrenceNetwork data={filteredData} />}
+                  {topicsNetworkView === 'topics-matrix' && <TopicCoOccurrenceMatrix data={filteredData} />}
+                  {topicsNetworkView === 'msc-network' && <MscCoOccurrenceNetwork data={filteredData} />}
+                  {topicsNetworkView === 'msc-matrix' && <MscCoOccurrenceMatrix data={filteredData} />}
+                </div>
               </div>
             )}
 
@@ -643,15 +648,6 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                   >
                     <RotateCcw className="h-3 w-3" />
                     <span>{t.common.reset}</span>
-                  </button>
-                )}
-
-                {funderSubTab === 'networks' && (
-                  <button
-                    onClick={() => setIsFunderFullscreen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-colors shadow-sm cursor-pointer"
-                  >
-                    <Maximize2 size={14} /> {t.common.fullscreen}
                   </button>
                 )}
               </div>
@@ -862,32 +858,46 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                 </div>
 
                 {/* Methodological Guide for Co-funding Views */}
-                <div className="rounded-xl bg-teal-50/50 dark:bg-teal-950/20 p-3.5 border border-teal-100 dark:border-teal-900/40 text-xs text-zinc-600 dark:text-zinc-300 flex items-start gap-2.5">
-                  <Info size={16} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                  <div>
-                    {funderNetworkView === 'network' && (
-                      <p><strong>{t.dashboard.funderNetworkTitle}:</strong> {t.dashboard.funderNetworkDesc}</p>
-                    )}
-                    {funderNetworkView === 'matrix' && (
-                      <p><strong>{t.dashboard.funderMatrixTitle}:</strong> {t.dashboard.funderMatrixDesc}</p>
-                    )}
-                    {funderNetworkView === 'cluster' && (
-                      <p><strong>{t.dashboard.funderClusterTitle}:</strong> {t.dashboard.funderClusterDesc}</p>
-                    )}
-                    {funderNetworkView === 'sankey' && (
-                      <p><strong>{t.dashboard.funderSankeyTitle}:</strong> {t.dashboard.funderSankeyDesc}</p>
-                    )}
-                    {funderNetworkView === 'flows' && (
-                      <p><strong>{t.dashboard.funderFlowsTitle}:</strong> {t.dashboard.funderFlowsDesc}</p>
-                    )}
+                <div className="rounded-xl bg-teal-50/50 dark:bg-teal-950/20 p-3.5 border border-teal-100 dark:border-teal-900/40 text-xs text-zinc-600 dark:text-zinc-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <Info size={16} className="text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+                    <div>
+                      {funderNetworkView === 'network' && (
+                        <p><strong>{t.dashboard.funderNetworkTitle}:</strong> {t.dashboard.funderNetworkDesc}</p>
+                      )}
+                      {funderNetworkView === 'matrix' && (
+                        <p><strong>{t.dashboard.funderMatrixTitle}:</strong> {t.dashboard.funderMatrixDesc}</p>
+                      )}
+                      {funderNetworkView === 'cluster' && (
+                        <p><strong>{t.dashboard.funderClusterTitle}:</strong> {t.dashboard.funderClusterDesc}</p>
+                      )}
+                      {funderNetworkView === 'sankey' && (
+                        <p><strong>{t.dashboard.funderSankeyTitle}:</strong> {t.dashboard.funderSankeyDesc}</p>
+                      )}
+                      {funderNetworkView === 'flows' && (
+                        <p><strong>{t.dashboard.funderFlowsTitle}:</strong> {t.dashboard.funderFlowsDesc}</p>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsFunderFullscreen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer shrink-0 self-end sm:self-auto"
+                    title={t.common.fullscreen}
+                    aria-label={t.common.fullscreen}
+                  >
+                    <Maximize2 size={13} aria-hidden="true" />
+                    <span className="hidden sm:inline">{t.common.fullscreen}</span>
+                  </button>
                 </div>
 
-                {funderNetworkView === 'network' && <FunderCofundingNetwork data={funderFilteredData} />}
-                {funderNetworkView === 'matrix' && <FunderCofundingMatrix data={funderFilteredData} />}
-                {funderNetworkView === 'cluster' && <FunderCofundingClusterNetwork data={funderFilteredData} />}
-                {funderNetworkView === 'sankey' && <FunderSankey data={funderFilteredData} funders={funders} />}
-                {funderNetworkView === 'flows' && <FunderGeographicFlowMap data={funderFilteredData} funders={funders} />}
+                <div>
+                  {funderNetworkView === 'network' && <FunderCofundingNetwork data={funderFilteredData} />}
+                  {funderNetworkView === 'matrix' && <FunderCofundingMatrix data={funderFilteredData} />}
+                  {funderNetworkView === 'cluster' && <FunderCofundingClusterNetwork data={funderFilteredData} />}
+                  {funderNetworkView === 'sankey' && <FunderSankey data={funderFilteredData} funders={funders} />}
+                  {funderNetworkView === 'flows' && <FunderGeographicFlowMap data={funderFilteredData} funders={funders} />}
+                </div>
               </div>
             )}
 
@@ -964,15 +974,6 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                   <Share2 size={15} aria-hidden="true" /> {t.dashboard.reachNetworks}
                 </button>
               </div>
-
-              {reachSubTab === 'networks' && (
-                <button
-                  onClick={() => setIsReachFullscreen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors shadow-sm cursor-pointer"
-                >
-                  <Maximize2 size={14} aria-hidden="true" /> {t.common.fullscreen}
-                </button>
-              )}
             </div>
 
             {reachSubTab === 'overview' ? (
@@ -1023,7 +1024,14 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                     <WorldMap
                       data={countryData}
                       selectedCountry={selectedCountry}
-                      onSelectCountry={setSelectedCountry}
+                      onSelectCountry={(code) => {
+                        setSelectedCountry(code);
+                        const el = document.getElementById('country-affiliations-explorer');
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }}
+                      valueUnit={t.common.pubs}
                     />
                   </div>
                 </div>
@@ -1238,26 +1246,38 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                 </div>
 
                 {/* Methodological Guide for Collaboration Views */}
-                <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/20 p-3.5 border border-blue-100 dark:border-blue-900/40 text-xs text-zinc-600 dark:text-zinc-300 flex items-start gap-2.5">
-                  <Info size={16} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                  <div>
-                    {networkViewMode === 'flow' && (
-                      <p><strong>{t.dashboard.geoFlowsTitle}:</strong> {t.dashboard.geoFlowsDesc}</p>
-                    )}
-                    {networkViewMode === 'country-network' && (
-                      <p><strong>{t.dashboard.countryNetworkTitle}:</strong> {t.dashboard.countryNetworkDesc}</p>
-                    )}
-                    {networkViewMode === 'institution-network' && (
-                      <p><strong>{t.dashboard.institutionNetworkTitle}:</strong> {t.dashboard.institutionNetworkDesc}</p>
-                    )}
-                    {networkViewMode === 'country-matrix' && (
-                      <p><strong>{t.dashboard.collabMatrixTitle}:</strong> {t.dashboard.collabMatrixDesc}</p>
-                    )}
+                <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/20 p-3.5 border border-blue-100 dark:border-blue-900/40 text-xs text-zinc-600 dark:text-zinc-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <Info size={16} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                    <div>
+                      {networkViewMode === 'flow' && (
+                        <p><strong>{t.dashboard.geoFlowsTitle}:</strong> {t.dashboard.geoFlowsDesc}</p>
+                      )}
+                      {networkViewMode === 'country-network' && (
+                        <p><strong>{t.dashboard.countryNetworkTitle}:</strong> {t.dashboard.countryNetworkDesc}</p>
+                      )}
+                      {networkViewMode === 'institution-network' && (
+                        <p><strong>{t.dashboard.institutionNetworkTitle}:</strong> {t.dashboard.institutionNetworkDesc}</p>
+                      )}
+                      {networkViewMode === 'country-matrix' && (
+                        <p><strong>{t.dashboard.collabMatrixTitle}:</strong> {t.dashboard.collabMatrixDesc}</p>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsReachFullscreen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer shrink-0 self-end sm:self-auto"
+                    title={t.common.fullscreen}
+                    aria-label={t.common.fullscreen}
+                  >
+                    <Maximize2 size={13} aria-hidden="true" />
+                    <span className="hidden sm:inline">{t.common.fullscreen}</span>
+                  </button>
                 </div>
 
                 {/* Render Selected Network Component */}
-                <div className="relative">
+                <div>
                   {networkViewMode === 'flow' && <CountryGeographicFlowMap data={filteredData} />}
                   {networkViewMode === 'country-network' && <CountryCollaborationNetwork data={filteredData} />}
                   {networkViewMode === 'institution-network' && <CollaborationWeb data={filteredData} />}
@@ -1294,14 +1314,14 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
         {activeTab === 'lineage' && (
           <section id="panel-lineage" role="tabpanel" aria-labelledby="tab-lineage" tabIndex={0} className="space-y-8 animate-in fade-in duration-500 focus:outline-none">
             {/* Tab Purpose & Analytical Intent */}
-            <div className="rounded-2xl bg-gradient-to-r from-fuchsia-500/10 via-fuchsia-500/5 to-transparent p-6 border border-fuchsia-500/20 dark:from-fuchsia-500/15 dark:border-fuchsia-500/30">
+            <div className="rounded-2xl bg-gradient-to-r from-[#0aa0be]/10 via-[#005fb9]/5 to-transparent p-6 border border-[#0aa0be]/20 dark:from-[#0aa0be]/15 dark:border-[#0aa0be]/30">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center p-1.5 rounded-lg bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300" aria-hidden="true">
+                    <span className="inline-flex items-center justify-center p-1.5 rounded-lg bg-[#005fb9]/10 dark:bg-[#57bec3]/20 text-[#005fb9] dark:text-[#57bec3]" aria-hidden="true">
                       <Search size={16} />
                     </span>
-                    <h2 className="text-base font-black uppercase tracking-wider text-fuchsia-900 dark:text-fuchsia-200">
+                    <h2 className="text-base font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                       {t.lineage.subtitle}
                     </h2>
                   </div>
@@ -1309,7 +1329,7 @@ function DashboardContent({ funders = {} }: { funders?: FundersFile }) {
                     {t.lineage.description}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-fuchsia-800 dark:text-fuchsia-300 shrink-0 bg-fuchsia-100/60 dark:bg-fuchsia-950/50 px-3 py-1.5 rounded-xl border border-fuchsia-300/40 dark:border-fuchsia-700/50">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#005fb9] dark:text-[#57bec3] shrink-0 bg-cyan-100/60 dark:bg-cyan-950/50 px-3 py-1.5 rounded-xl border border-cyan-300/40 dark:border-cyan-700/50">
                   <span>{t.lineage.source}</span>
                 </div>
               </div>

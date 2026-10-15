@@ -8,6 +8,7 @@ import {
   Grid3x3,
   Sigma,
   Info,
+  Maximize2,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
@@ -69,7 +70,6 @@ export default function TopicsSection() {
         views={TOPICS_VIEWS}
         activeView={activeView}
         onChange={setActiveView}
-        onFullscreen={activeView !== 'overview' ? () => setIsFullscreen(true) : undefined}
         ariaLabel="Modes de visualisation des thématiques de recherche"
       />
 
@@ -139,25 +139,37 @@ export default function TopicsSection() {
       {activeView !== 'overview' && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Methodological Guide */}
-          <div className="rounded-xl bg-[var(--episciences-cyan-00)]/10 dark:bg-[var(--episciences-cyan-00)]/15 p-3.5 border border-[var(--episciences-cyan-01)]/30 text-xs text-zinc-600 dark:text-zinc-300 flex items-start gap-2.5">
-            <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shrink-0 mt-0.5" />
-            <div>
-              {activeView === 'topics-network' && (
-                <p><strong>{t.dashboard.topicsNetworkTitle}:</strong> {t.dashboard.topicsNetworkDesc}</p>
-              )}
-              {activeView === 'topics-matrix' && (
-                <p><strong>{t.dashboard.topicsMatrixTitle}:</strong> {t.dashboard.topicsMatrixDesc}</p>
-              )}
-              {activeView === 'msc-network' && (
-                <p><strong>{t.dashboard.mscNetworkTitle}:</strong> {t.dashboard.mscNetworkDesc}</p>
-              )}
-              {activeView === 'msc-matrix' && (
-                <p><strong>{t.dashboard.mscMatrixTitle}:</strong> {t.dashboard.mscMatrixDesc}</p>
-              )}
+          <div className="rounded-xl bg-[var(--episciences-cyan-00)]/10 dark:bg-[var(--episciences-cyan-00)]/15 p-3.5 border border-[var(--episciences-cyan-01)]/30 text-xs text-zinc-600 dark:text-zinc-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-2.5 min-w-0">
+              <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shrink-0 mt-0.5" />
+              <div>
+                {activeView === 'topics-network' && (
+                  <p><strong>{t.dashboard.topicsNetworkTitle}:</strong> {t.dashboard.topicsNetworkDesc}</p>
+                )}
+                {activeView === 'topics-matrix' && (
+                  <p><strong>{t.dashboard.topicsMatrixTitle}:</strong> {t.dashboard.topicsMatrixDesc}</p>
+                )}
+                {activeView === 'msc-network' && (
+                  <p><strong>{t.dashboard.mscNetworkTitle}:</strong> {t.dashboard.mscNetworkDesc}</p>
+                )}
+                {activeView === 'msc-matrix' && (
+                  <p><strong>{t.dashboard.mscMatrixTitle}:</strong> {t.dashboard.mscMatrixDesc}</p>
+                )}
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer shrink-0 self-end sm:self-auto"
+              title={t.common.fullscreen}
+              aria-label={t.common.fullscreen}
+            >
+              <Maximize2 size={13} aria-hidden="true" />
+              <span className="hidden sm:inline">{t.common.fullscreen}</span>
+            </button>
           </div>
 
-          <div className="relative">
+          <div>
             {activeView === 'topics-network' && <TopicCoOccurrenceNetwork data={filteredData} />}
             {activeView === 'topics-matrix' && <TopicCoOccurrenceMatrix data={filteredData} />}
             {activeView === 'msc-network' && <MscCoOccurrenceNetwork data={filteredData} />}

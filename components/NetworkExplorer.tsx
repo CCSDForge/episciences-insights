@@ -196,30 +196,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
         </p>
       </section>
 
-      <section aria-labelledby="funders-heading" className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 id="funders-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderHeading}</h2>
-          <ViewToggle
-            value={funderView}
-            onChange={setFunderView}
-            options={[
-              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
-              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
-              { value: 'cluster', label: t.common.cluster, icon: <Orbit size={14} /> },
-            ]}
-          />
-        </div>
-        {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
-        {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
-        {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
-      </section>
-
-      <section aria-labelledby="funder-geography-heading" className="space-y-6">
-        <h2 id="funder-geography-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderGeoHeading}</h2>
-        <FunderSankey data={filteredData} funders={funders} />
-        <FunderGeographicFlowMap data={filteredData} funders={funders} />
-      </section>
-
+      {/* 1. Global Reach (Institutions) */}
       <section aria-labelledby="institutions-heading" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="institutions-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.reachHeading}</h2>
@@ -260,6 +237,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
           : <InstitutionCofundingMatrix data={reachScopedData} />}
       </section>
 
+      {/* 2. Country Collaboration & Geographic Flow Map */}
       <section aria-labelledby="countries-heading" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="countries-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.countryCollabHeading}</h2>
@@ -295,29 +273,13 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
               .replace('{total}', filteredData.length.toLocaleString(numLocale))}
           </p>
         )}
+        <CountryGeographicFlowMap data={countryScopedData} />
         {countryView === 'network'
           ? <CountryCollaborationNetwork data={countryScopedData} />
           : <CountryCollaborationMatrix data={countryScopedData} />}
-        <CountryGeographicFlowMap data={countryScopedData} />
       </section>
 
-      <section aria-labelledby="msc-heading" className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 id="msc-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.mscHeading}</h2>
-          <ViewToggle
-            value={mscView}
-            onChange={setMscView}
-            options={[
-              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
-              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
-            ]}
-          />
-        </div>
-        {mscView === 'network'
-          ? <MscCoOccurrenceNetwork data={filteredData} />
-          : <MscCoOccurrenceMatrix data={filteredData} />}
-      </section>
-
+      {/* 3. Research Topics Co-occurrence */}
       <section aria-labelledby="topics-heading" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="topics-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.topicsHeading}</h2>
@@ -333,6 +295,50 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
         {topicView === 'matrix'
           ? <TopicCoOccurrenceMatrix data={filteredData} />
           : <TopicCoOccurrenceNetwork data={filteredData} />}
+      </section>
+
+      {/* 4. Funder Co-funding */}
+      <section aria-labelledby="funders-heading" className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="funders-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderHeading}</h2>
+          <ViewToggle
+            value={funderView}
+            onChange={setFunderView}
+            options={[
+              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
+              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
+              { value: 'cluster', label: t.common.cluster, icon: <Orbit size={14} /> },
+            ]}
+          />
+        </div>
+        {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
+        {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
+        {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
+      </section>
+
+      {/* 5. Funder Geography */}
+      <section aria-labelledby="funder-geography-heading" className="space-y-6">
+        <h2 id="funder-geography-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderGeoHeading}</h2>
+        <FunderSankey data={filteredData} funders={funders} />
+        <FunderGeographicFlowMap data={filteredData} funders={funders} />
+      </section>
+
+      {/* 6. MSC 2020 Classification */}
+      <section aria-labelledby="msc-heading" className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="msc-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.mscHeading}</h2>
+          <ViewToggle
+            value={mscView}
+            onChange={setMscView}
+            options={[
+              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
+              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
+            ]}
+          />
+        </div>
+        {mscView === 'network'
+          ? <MscCoOccurrenceNetwork data={filteredData} />
+          : <MscCoOccurrenceMatrix data={filteredData} />}
       </section>
     </div>
   );

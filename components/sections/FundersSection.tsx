@@ -13,6 +13,7 @@ import {
   Search,
   ChevronDown,
   RotateCcw,
+  Maximize2,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
@@ -94,7 +95,6 @@ export default function FundersSection() {
           views={FUNDER_VIEWS}
           activeView={activeView}
           onChange={setActiveView}
-          onFullscreen={activeView !== 'overview' ? () => setIsFullscreen(true) : undefined}
           ariaLabel="Modes de visualisation des financeurs"
           className="border-b-0 pb-0"
         />
@@ -242,8 +242,20 @@ export default function FundersSection() {
 
       {/* Relational Views */}
       {activeView !== 'overview' && (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          <div className="relative">
+        <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
+              title={t.common.fullscreen}
+              aria-label={t.common.fullscreen}
+            >
+              <Maximize2 size={13} aria-hidden="true" />
+              <span className="hidden sm:inline">{t.common.fullscreen}</span>
+            </button>
+          </div>
+          <div>
             {activeView === 'network' && <FunderCofundingNetwork data={funderFilteredData} />}
             {activeView === 'matrix' && <FunderCofundingMatrix data={funderFilteredData} />}
             {activeView === 'cluster' && <FunderCofundingClusterNetwork data={funderFilteredData} />}

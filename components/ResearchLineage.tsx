@@ -37,13 +37,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
   return (
     <div className="space-y-12">
       {/* Introduction Header */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center bg-gradient-to-br from-fuchsia-600 to-violet-700 p-10 rounded-3xl text-white shadow-2xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center bg-gradient-to-br from-[#0aa0be] via-[#005fb9] to-[#00005f] p-10 rounded-3xl text-white shadow-2xl">
         <div className="lg:col-span-2 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-widest">
             <History size={12} /> {t.lineage.heritage}
           </div>
           <h3 className="text-4xl font-black tracking-tight font-heading">{t.lineage.theResearchLineage}</h3>
-          <p className="text-fuchsia-100 max-w-xl leading-relaxed">
+          <p className="text-cyan-100 max-w-xl leading-relaxed">
             {t.lineage.intro}
           </p>
         </div>
@@ -71,12 +71,12 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                 aria-pressed={selectedPaper?.doi === paper.doi}
                 className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 ${
                   selectedPaper?.doi === paper.doi 
-                    ? 'bg-white dark:bg-zinc-800 border-fuchsia-500 shadow-xl ring-4 ring-fuchsia-500/10' 
+                    ? 'bg-white dark:bg-zinc-800 border-[#0aa0be] shadow-xl ring-4 ring-[#0aa0be]/10' 
                     : 'bg-transparent border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
                 }`}
               >
                 <div className="flex justify-between items-start gap-4 mb-3">
-                  <span className="text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400 uppercase tracking-wider">{paper.year}</span>
+                  <span className="text-xs font-bold text-[#005fb9] dark:text-[#57bec3] uppercase tracking-wider">{paper.year}</span>
                   <div className="flex items-center gap-2 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     <span className="flex items-center gap-1"><LinkIcon size={12} aria-hidden="true" /> {paper.referenced_works_count}</span>
                     <span className="flex items-center gap-1"><Network size={12} aria-hidden="true" /> {paper.related_works?.length}</span>
@@ -98,13 +98,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                 
                 {/* 1. Foundations (References) */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-fuchsia-600 dark:text-fuchsia-400">
+                  <div className="flex items-center gap-3 text-[#005fb9] dark:text-[#57bec3]">
                     <History size={20} />
                     <h5 className="text-xs font-black uppercase tracking-[0.2em]">{t.lineage.scientificFoundations}</h5>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {Array.from({ length: Math.min(selectedPaper.referenced_works_count || 0, 12) }).map((_, i) => (
-                      <div key={i} className="h-2 w-8 rounded-full bg-fuchsia-200 dark:bg-fuchsia-900/30" />
+                      <div key={i} className="h-2 w-8 rounded-full bg-cyan-200 dark:bg-cyan-900/40" />
                     ))}
                     {(selectedPaper.referenced_works_count || 0) > 12 && (
                       <span className="text-[10px] font-bold text-zinc-400">+{selectedPaper.referenced_works_count! - 12} {t.lineage.morePapersReferenced}</span>
@@ -119,13 +119,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
 
                 {/* 2. The Bridge */}
                 <div className="flex items-center justify-center py-4">
-                  <div className="h-12 w-0.5 bg-gradient-to-b from-fuchsia-500 to-violet-500" />
+                  <div className="h-12 w-0.5 bg-gradient-to-b from-[#0aa0be] to-[#005fb9]" />
                 </div>
 
                 {/* 3. The Core Paper */}
-                <div className="relative p-6 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-violet-500 shadow-lg z-10">
-                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-8 w-1.5 bg-violet-500 rounded-full" />
-                  <p className="text-[10px] font-black text-violet-500 uppercase tracking-widest mb-2">{t.lineage.selectedPublication}</p>
+                <div className="relative p-6 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-[#005fb9] dark:border-[#57bec3] shadow-lg z-10">
+                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-8 w-1.5 bg-[#005fb9] dark:bg-[#57bec3] rounded-full" />
+                  <p className="text-[10px] font-black text-[#005fb9] dark:text-[#57bec3] uppercase tracking-widest mb-2">{t.lineage.selectedPublication}</p>
                   <h4 className="text-lg font-black text-zinc-900 dark:text-zinc-50 leading-tight mb-4">{selectedPaper.title}</h4>
                   <div className="flex flex-col gap-3 text-xs font-bold text-zinc-500">
                     <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                         href={getDoiUrl(selectedPaper.doi)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline break-all"
+                        className="text-[#005fb9] dark:text-[#57bec3] hover:underline break-all"
                         aria-label={`View DOI for ${selectedPaper.title}`}
                       >
                         {getDoiUrl(selectedPaper.doi)}
@@ -149,7 +149,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
 
                 {/* 4. The Bridge */}
                 <div className="flex items-center justify-center py-4">
-                  <div className="h-12 w-0.5 bg-gradient-to-b from-violet-500 to-teal-500" />
+                  <div className="h-12 w-0.5 bg-gradient-to-b from-[#005fb9] to-teal-500" />
                 </div>
 
                 {/* 5. Horizons (Related) */}
@@ -173,13 +173,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                           href={link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-900/10 border border-fuchsia-100 dark:border-fuchsia-900/30 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900/20 transition-colors group"
+                          className="flex items-center gap-3 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-900/30 hover:bg-cyan-100/60 dark:hover:bg-cyan-900/30 transition-colors group"
                           aria-label={`View related work on OpenAlex`}
                         >
-                          <div className="h-6 w-6 rounded-lg bg-fuchsia-500 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                          <div className="h-6 w-6 rounded-lg bg-[#0aa0be] flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
                             <ArrowRight size={12} />
                           </div>
-                          <span className="text-[10px] font-mono text-fuchsia-700 dark:text-fuchsia-400 truncate">OpenAlex: {link.split('/').pop()}</span>
+                          <span className="text-[10px] font-mono text-[#005fb9] dark:text-[#57bec3] truncate">OpenAlex: {link.split('/').pop()}</span>
                         </a>
                       ))
                     ) : (
