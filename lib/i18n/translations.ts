@@ -424,7 +424,7 @@ export const translations: Record<Locale, Translations> = {
           "downloadsNote": "are sourced exclusively from the Episciences platform and reflect downloads occurring directly on journal websites. They do not account for downloads from open repositories, where the same articles may also be freely available. Actual readership figures are therefore likely higher than those reported here."
       },
       "footer": {
-          "license": "CC-BY 2026 Episciences Insights - Open Source (GPL v3)",
+          "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open, and ROR APIs",
           "lastUpdated": "Data last updated: {date}"
       },
@@ -755,7 +755,7 @@ export const translations: Record<Locale, Translations> = {
           "downloadsNote": "proviennent exclusivement de la plateforme Episciences et reflètent les consultations directes sur les sites des revues. Elles ne comptabilisent pas les téléchargements effectués sur les entrepôts ouverts où les mêmes articles peuvent être librement accessibles. Le lectorat effectif est donc très probablement supérieur aux chiffres présentés ici."
       },
       "footer": {
-          "license": "CC-BY 2026 Episciences Insights - Open Source (GPL v3)",
+          "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
           "lastUpdated": "Dernière mise à jour des données : {date}"
       },
@@ -1086,7 +1086,7 @@ export const translations: Record<Locale, Translations> = {
           "downloadsNote": "proceden exclusivamente de la plataforma Episciences y reflejan las consultas directas en los sitios de las revistas. No contabilizan descargas realizadas en repositorios abiertos donde los mismos artículos también pueden estar disponibles libremente. El número real de lectores es, por tanto, muy probablemente superior al presentado aquí."
       },
       "footer": {
-          "license": "CC-BY 2026 Episciences Insights - Código Abierto (GPL v3)",
+          "license": "CC-BY 2026 CCSD - Episciences - Código Abierto (GPL v3)",
           "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open y ROR",
           "lastUpdated": "Última actualización de los datos: {date}"
       },
