@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, use, useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Publication, UsageSummary } from '@/lib/types';
+import { Publication, UsageSummary, FundersFile } from '@/lib/types';
 import { normalizeLicense } from '@/lib/licenses';
 import { getCountryName } from '@/lib/countryNames';
 
@@ -59,6 +59,7 @@ interface DashboardActions {
 interface DashboardData {
   filteredData: Publication[];
   usageSummary: UsageSummary | null;
+  funders: FundersFile;
   stats: { totalPubs: number; totalSdgs: number; totalFunders: number };
   sdgData: { name: string; value: number }[];
   funderData: { name: string; value: number }[];
@@ -100,10 +101,11 @@ export function useDashboard() {
 interface DashboardProviderProps {
   initialData: Publication[];
   usageSummary: UsageSummary | null;
+  funders?: FundersFile;
   children: React.ReactNode;
 }
 
-export function DashboardProvider({ initialData, usageSummary, children }: DashboardProviderProps) {
+export function DashboardProvider({ initialData, usageSummary, funders = {}, children }: DashboardProviderProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('usage');
   const [yearFilter, setYearFilter] = useState('all');
   const [funderFilter, setFunderFilter] = useState('all');
@@ -308,7 +310,7 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
     <DashboardContext value={{
       state: { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, countryLimit, topicLimit, topicDomainFilter, isFunderOpen, funderSearch },
       actions: { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, resetFilters, setFunderLimit, setInstitutionLimit, setCountryLimit, setTopicLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch },
-      data: { filteredData, usageSummary, stats, sdgData, funderData, institutionData, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, groupedFunders, journals, openScienceStats },
+      data: { filteredData, usageSummary, funders, stats, sdgData, funderData, institutionData, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, groupedFunders, journals, openScienceStats },
       meta: { dropdownRef },
     }}>
       {children}

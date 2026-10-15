@@ -2,8 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { BookOpen, Download, Globe, MousePointerClick, Network, Wallet } from 'lucide-react';
+import { BookOpen, Download, Globe, MousePointerClick, Wallet } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { UsageSummary } from '@/lib/types';
 
@@ -63,19 +62,12 @@ export default function PageHeader({ corpusStats, initialUsageStats, kpiSummary 
             {t.header.subtitle}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-500/15 dark:text-blue-300">
+            <span className="inline-flex items-center rounded-full bg-[var(--episciences-cyan-00)]/15 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[var(--episciences-cyan-04)] ring-1 ring-inset ring-[var(--episciences-cyan-01)]/30 dark:bg-[var(--episciences-cyan-00)]/10 dark:text-[var(--episciences-cyan-00)]">
               {t.header.overlayJournals}
             </span>
-            <span className="inline-flex items-center rounded-full bg-teal-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-teal-700 ring-1 ring-inset ring-teal-700/10 dark:bg-teal-500/15 dark:text-teal-300">
+            <span className="inline-flex items-center rounded-full bg-[var(--ccsd-bleu-01)]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[var(--ccsd-bleu-01)] ring-1 ring-inset ring-[var(--ccsd-bleu-01)]/20 dark:bg-[var(--episciences-cyan-01)]/15 dark:text-[var(--episciences-cyan-00)]">
               {t.header.diamondDashboard}
             </span>
-            <Link
-              href="/network"
-              className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-teal-700 transition-colors"
-            >
-              <Network size={14} />
-              <span>{t.header.networkExplorerBtn}</span>
-            </Link>
           </div>
         </div>
       </div>

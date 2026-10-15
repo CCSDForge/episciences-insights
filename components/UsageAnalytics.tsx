@@ -176,7 +176,7 @@ export default function UsageAnalytics() {
             </div>
             <div className="flex items-center gap-4">
                <div className="flex items-center gap-1.5">
-                 <div className="h-3 w-3 rounded-full bg-amber-500" aria-hidden="true" />
+                 <div className="h-3 w-3 rounded-full bg-[var(--episciences-cyan-02)]" aria-hidden="true" />
                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase">{t.usage.downloads}</span>
                </div>
                <div className="flex items-center gap-1.5">
@@ -196,8 +196,8 @@ export default function UsageAnalytics() {
               <AreaChart data={yearlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorDownloads" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#d97706" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#d97706" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#0aa0be" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#0aa0be" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -214,9 +214,9 @@ export default function UsageAnalytics() {
                   labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                 />
                 <Area type="monotone" dataKey="views" name={t.usage.views} stroke="#94a3b8" fill="transparent" strokeWidth={2} dot={{ r: 4, fill: '#94a3b8' }} connectNulls={false} />
-                <Area type="monotone" dataKey="downloads" name={t.usage.downloads} stroke="#d97706" fillOpacity={1} fill="url(#colorDownloads)" strokeWidth={3} dot={{ r: 6, fill: '#d97706' }} connectNulls={false} />
+                <Area type="monotone" dataKey="downloads" name={t.usage.downloads} stroke="#0aa0be" fillOpacity={1} fill="url(#colorDownloads)" strokeWidth={3} dot={{ r: 6, fill: '#0aa0be' }} connectNulls={false} />
                 <Area type="monotone" dataKey="viewsProjected" name={`${t.usage.views} (${t.usage.estimate.toLowerCase()})`} stroke="#94a3b8" strokeDasharray="6 5" fill="transparent" strokeWidth={2} dot={{ r: 4, fill: '#94a3b8', fillOpacity: 0.4 }} connectNulls={false} legendType="none" />
-                <Area type="monotone" dataKey="downloadsProjected" name={`${t.usage.downloads} (${t.usage.estimate.toLowerCase()})`} stroke="#d97706" strokeDasharray="6 5" fill="transparent" strokeWidth={3} dot={{ r: 6, fill: '#d97706', fillOpacity: 0.4 }} connectNulls={false} legendType="none" />
+                <Area type="monotone" dataKey="downloadsProjected" name={`${t.usage.downloads} (${t.usage.estimate.toLowerCase()})`} stroke="#0aa0be" strokeDasharray="6 5" fill="transparent" strokeWidth={3} dot={{ r: 6, fill: '#0aa0be', fillOpacity: 0.4 }} connectNulls={false} legendType="none" />
               </AreaChart>
             </ChartContainer>
           </div>
@@ -230,8 +230,8 @@ export default function UsageAnalytics() {
           
           <div className="flex-1 flex flex-col justify-around">
             <div className="space-y-6">
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 transition-all border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30">
-                <div className="rounded-xl bg-amber-100 dark:bg-amber-900/30 p-3 text-amber-600 dark:text-amber-400 shrink-0" aria-hidden="true">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 transition-all border border-transparent hover:border-[var(--episciences-cyan-01)]/40">
+                <div className="rounded-xl bg-[var(--episciences-cyan-00)]/15 dark:bg-[var(--episciences-cyan-00)]/20 p-3 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shrink-0" aria-hidden="true">
                   <Download size={22} />
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -251,12 +251,12 @@ export default function UsageAnalytics() {
               </div>
             </div>
             
-            <div className="mt-8 rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-6 border border-amber-100 dark:border-amber-900/30 text-center">
-              <BarChart3 className="h-8 w-8 text-amber-600 dark:text-amber-400 mx-auto mb-2" aria-hidden="true" />
-              <p className="text-lg font-black text-amber-700 dark:text-amber-300 uppercase tracking-tighter">
+            <div className="mt-8 rounded-2xl bg-[var(--episciences-cyan-00)]/10 dark:bg-[var(--episciences-cyan-00)]/15 p-6 border border-[var(--episciences-cyan-01)]/30 text-center">
+              <BarChart3 className="h-8 w-8 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] mx-auto mb-2" aria-hidden="true" />
+              <p className="text-lg font-black text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] uppercase tracking-tighter">
                 {journalFilter === 'all' ? t.usage.archiveVolume : t.usage.journalVolume}
               </p>
-              <p className="text-xs font-bold text-amber-700/80 dark:text-amber-300/80 uppercase tracking-wider mt-1">{t.usage.aggregatedKpis}</p>
+              <p className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider mt-1">{t.usage.aggregatedKpis}</p>
             </div>
           </div>
         </div>
@@ -283,7 +283,7 @@ export default function UsageAnalytics() {
             <WorldMap
               data={geoData}
               legendLabel={t.usage.mapLegend}
-              colorRange={["#fef3c7", "#d97706"]}
+              colorRange={["#e0f7f8", "#0aa0be"]}
             />
           </div>
         </div>
@@ -303,14 +303,14 @@ export default function UsageAnalytics() {
         <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Star className="h-6 w-6 text-amber-500" />
+              <Star className="h-6 w-6 text-[var(--episciences-cyan-02)]" />
               <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">{t.usage.mostDownloaded}</h3>
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{t.usage.top20Trending}</span>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {usageSummary.journalTopPapers[rvcode!].map((paper: TopPaper, idx: number) => (
-              <div key={paper.doi} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-6 ring-1 ring-zinc-200 transition-all hover:bg-white hover:shadow-xl hover:ring-amber-200 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-amber-900">
+              <div key={paper.doi} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-6 ring-1 ring-zinc-200 transition-all hover:bg-white hover:shadow-xl hover:ring-[var(--episciences-cyan-01)]/50 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-[var(--episciences-cyan-01)]/50">
                 <div className="mb-4 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-900 text-[10px] font-black text-white dark:bg-zinc-50 dark:text-zinc-900 font-sans">
@@ -322,7 +322,7 @@ export default function UsageAnalytics() {
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">{formatNum(paper.views)} {t.common.views}</span>
                   </div>
                 </div>
-                <h4 className="mb-4 text-sm font-bold leading-relaxed text-zinc-900 dark:text-zinc-50 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-3 min-h-[3rem]">
+                <h4 className="mb-4 text-sm font-bold leading-relaxed text-zinc-900 dark:text-zinc-50 group-hover:text-[var(--episciences-cyan-03)] dark:group-hover:text-[var(--episciences-cyan-00)] transition-colors line-clamp-3 min-h-[3rem]">
                   {paper.title}
                 </h4>
                 <div className="flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-700/50">

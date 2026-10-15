@@ -6,10 +6,24 @@
   --background: #ffffff;
   --foreground: #111827;
   
-  /* Accessible Episciences-inspired colors */
-  --primary-blue: #143CAA;    /* Episciences Blue */
-  --primary-teal: #0D9488;    /* Darker Teal for AA contrast */
-  --primary-indigo: #4338CA;
+  /* Charte Graphique Officielle Episciences (CCSD) */
+  --episciences-cyan-00: #57bec3; /* Principal : RVB 87, 190, 195 */
+  --episciences-cyan-01: #0aa0be; /* Secondaire : RVB 10, 160, 190 */
+  --episciences-cyan-02: #008cc3; /* Secondaire : RVB 0, 140, 195 */
+  --episciences-cyan-03: #005fb9; /* Secondaire : RVB 0, 95, 185 */
+  --episciences-cyan-04: #0a32af; /* Secondaire : RVB 10, 50, 175 */
+  
+  /* Charte CCSD Institutionnelle */
+  --ccsd-bleu-00: #00005f;       /* RVB 0, 0, 95 */
+  --ccsd-bleu-01: #20208c;       /* RVB 32, 32, 140 */
+  
+  /* Couleurs sémantiques accessibles (Thème Clair) */
+  --primary: #005fb9;            /* Cyan 03 (ratio 5.1:1 sur blanc) */
+  --primary-text: #0a32af;       /* Cyan 04 (ratio 8.5:1 sur blanc) */
+  --primary-accent: #57bec3;     /* Cyan 00 */
+  --primary-border: #0aa0be;     /* Cyan 01 */
+  --primary-focus: #008cc3;      /* Cyan 02 */
+  --primary-bg-subtle: #edf8f9;  /* Teinte très douce */
   
   --font-sans: var(--font-noto-sans), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -18,6 +32,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-episciences-cyan-00: var(--episciences-cyan-00);
+  --color-episciences-cyan-01: var(--episciences-cyan-01);
+  --color-episciences-cyan-02: var(--episciences-cyan-02);
+  --color-episciences-cyan-03: var(--episciences-cyan-03);
+  --color-episciences-cyan-04: var(--episciences-cyan-04);
+  --color-ccsd-bleu-00: var(--ccsd-bleu-00);
+  --color-ccsd-bleu-01: var(--ccsd-bleu-01);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
 }
@@ -25,16 +46,27 @@
 :root.dark {
   --background: #09090b;
   --foreground: #f9fafb;
-  --primary-blue: #60a5fa;
-  --primary-teal: #2dd4bf;
+  
+  /* Couleurs sémantiques accessibles (Thème Sombre) */
+  --primary: #57bec3;            /* Cyan 00 (ratio 9.2:1 sur fond sombre) */
+  --primary-text: #57bec3;       /* Cyan 00 */
+  --primary-accent: #0aa0be;     /* Cyan 01 */
+  --primary-border: #0aa0be;     /* Cyan 01 */
+  --primary-focus: #57bec3;      /* Cyan 00 */
+  --primary-bg-subtle: rgba(87, 190, 195, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --background: #09090b;
     --foreground: #f9fafb;
-    --primary-blue: #60a5fa;
-    --primary-teal: #2dd4bf;
+    
+    --primary: #57bec3;
+    --primary-text: #57bec3;
+    --primary-accent: #0aa0be;
+    --primary-border: #0aa0be;
+    --primary-focus: #57bec3;
+    --primary-bg-subtle: rgba(87, 190, 195, 0.12);
   }
 }
 
@@ -51,7 +83,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Accessible focus states */
 :focus-visible {
-  outline: 2px solid var(--primary-teal);
+  outline: 2px solid var(--primary-focus);
   outline-offset: 2px;
 }
 
@@ -60,7 +92,7 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   top: -100px;
   left: 0;
-  background: var(--primary-blue);
+  background: var(--primary);
   color: white;
   padding: 12px 24px;
   z-index: 100;

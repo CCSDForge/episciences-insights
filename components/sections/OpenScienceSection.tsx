@@ -1,0 +1,88 @@
+'use client';
+
+import React from 'react';
+import { Search, Scale } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { useDashboard } from '@/components/DashboardContext';
+import ResearchLineage from '@/components/ResearchLineage';
+import LicenseSpectrum from '@/components/LicenseSpectrum';
+
+export default function OpenScienceSection() {
+  const { t } = useTranslation();
+  const { data } = useDashboard();
+  const { filteredData, openScienceStats } = data;
+
+  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+
+  return (
+    <section id="panel-open-science" aria-labelledby="open-science-heading" className="space-y-8 animate-in fade-in duration-300">
+      {/* Purpose Banner */}
+      <div className="rounded-2xl bg-gradient-to-r from-[var(--episciences-cyan-00)]/15 via-[var(--episciences-cyan-00)]/5 to-transparent p-6 border border-[var(--episciences-cyan-01)]/30">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center p-1.5 rounded-lg bg-[var(--episciences-cyan-00)]/20 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true">
+                <Search size={16} />
+              </span>
+              <h1 id="open-science-heading" className="text-base font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
+                {t.lineage.subtitle}
+              </h1>
+            </div>
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-3xl leading-relaxed">
+              {t.lineage.description}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40 shadow-xs">
+            <span>{t.lineage.source}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Licensing Spectrum Card */}
+      <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-zinc-100 pb-6 dark:border-zinc-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 text-white rounded-xl shadow-md bg-[var(--episciences-cyan-03)] dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)]">
+              <Scale size={24} aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
+                {t.dashboard.licensingTitle}
+              </h2>
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">
+                {t.dashboard.licensingSubtitle}
+              </p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 max-w-2xl leading-relaxed">
+                {t.dashboard.licensingDesc}
+              </p>
+            </div>
+          </div>
+          {openScienceStats.totalLicenseMentions > 0 && (
+            <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 max-w-sm text-right">
+              {formatNum(openScienceStats.totalLicenseMentions)} {t.dashboard.licenseDeclarations}
+            </p>
+          )}
+        </div>
+
+        {openScienceStats.totalLicenseMentions === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+            <Scale size={48} className="text-zinc-200 dark:text-zinc-800 mb-4" />
+            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">
+              {t.dashboard.noLicenseData}
+            </p>
+          </div>
+        ) : (
+          <LicenseSpectrum licenses={openScienceStats.topLicenses} total={openScienceStats.totalLicenseMentions} />
+        )}
+      </div>
+
+      {/* Research Lineage Explorer */}
+      <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+        <h2 className="mb-8 text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
+          {t.lineage.title}
+        </h2>
+        <ResearchLineage data={filteredData} />
+      </div>
+    </section>
+  );
+}

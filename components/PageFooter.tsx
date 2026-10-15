@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface PageFooterProps {
@@ -10,6 +11,8 @@ interface PageFooterProps {
 
 export default function PageFooter({ lastUpdated }: PageFooterProps) {
   const { t, locale } = useTranslation();
+  const pathname = usePathname();
+  const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
 
   const formattedDate = React.useMemo(() => {
     if (!lastUpdated) return null;
@@ -22,6 +25,10 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
       day: 'numeric',
     }).format(date);
   }, [lastUpdated, locale]);
+
+  if (isHome) {
+    return null;
+  }
 
   return (
     <footer className="mt-20 border-t border-zinc-200 py-12 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
