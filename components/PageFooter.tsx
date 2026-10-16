@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
@@ -157,10 +158,18 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           />
         </a>
       </div>
+      <div className="mb-4 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
+        <Link
+          href={`/${locale}/help`}
+          className="text-zinc-600 hover:text-[var(--episciences-cyan-03)] dark:text-zinc-400 dark:hover:text-[var(--episciences-cyan-00)] underline underline-offset-4 transition-colors"
+        >
+          {t.footer.methodologyLink}
+        </Link>
+      </div>
       <p className="font-semibold">{t.footer.license}</p>
       <p className="mt-2">{t.footer.source}</p>
       {formattedDate && (
-        <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
           {t.footer.lastUpdated.replace('{date}', formattedDate)}
         </p>
       )}

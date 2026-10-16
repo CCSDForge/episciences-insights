@@ -10,6 +10,7 @@ import { OpenAireClient } from './openaire-client.mjs';
 import { EpisciencesClient } from './episciences-client.mjs';
 import { mergePublication } from './data-merger.mjs';
 import { enrichFunders } from './funder-enrichment.mjs';
+import { enrichInstitutionCountries } from './affiliation-enrichment.mjs';
 import { compressData } from './compress-data.mjs';
 import { syncDois } from './sync-dois.mjs';
 
@@ -97,9 +98,12 @@ async function run() {
 
   console.log('[Episciences] Resolving DOI -> docid map across all journals...');
   let doiToDocid;
+  let hostedJournalsCount = 0;
   try {
+    const hostedJournals = await episciencesClient.fetchJournals();
+    hostedJournalsCount = Array.isArray(hostedJournals) ? hostedJournals.length : 0;
     doiToDocid = await episciencesClient.buildDoiToDocidMap();
-    console.log(`[Episciences] Resolved ${doiToDocid.size} DOIs across the platform.`);
+    console.log(`[Episciences] Resolved ${doiToDocid.size} DOIs across ${hostedJournalsCount} journals.`);
   } catch (err) {
     console.error('[Episciences] Failed to build the DOI -> docid map, continuing without it:', err.message);
     doiToDocid = new Map();
@@ -158,12 +162,25 @@ async function run() {
 
   const results = rawResults.filter(Boolean);
 
+  await enrichInstitutionCountries(results, { rorClient });
   const funders = await enrichFunders(results, { openAlexFundersClient, rorClient });
   fs.writeFileSync(FUNDERS_OUTPUT_PATH, JSON.stringify(funders, null, 2));
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(results));
   console.log('---');
   console.log(`Done. ${results.length} records written to ${OUTPUT_PATH} (minified)`);
+
+  const statsOutputPath = path.join(path.dirname(OUTPUT_PATH), 'corpus-stats.json');
+  const activeJournals = new Set(results.map((p) => p.journal?.code).filter(Boolean)).size;
+  const corpusStats = {
+    totalPublications: results.length,
+    totalHostedJournals: hostedJournalsCount || activeJournals,
+    activeJournals,
+    collectedAt: new Date().toISOString(),
+  };
+  fs.writeFileSync(statsOutputPath, JSON.stringify(corpusStats, null, 2));
+  console.log(`  Corpus stats written   : ${statsOutputPath}`);
+
   compressData();
   console.log(`  Not found in OpenAlex  : ${notFoundInOpenAlex}`);
   console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${((100 * foundInOpenAire) / results.length).toFixed(1)}%)`);

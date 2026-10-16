@@ -1,12 +1,14 @@
 import React from 'react';
 
 /**
- * Parses markdown-style links [Label](URL) into accessible, styled React elements.
+ * Parses markdown-style links [Label](URL) into accessible, styled React elements,
+ * and foreign-language terms [[lang:term]] into italic elements carrying a `lang`
+ * attribute (e.g. [[en:overlay journals]]) so screen readers switch pronunciation.
  */
 export function renderLinkedText(text: string): React.ReactNode {
   if (!text) return null;
   const parts: React.ReactNode[] = [];
-  const regex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+  const regex = /\[\[([a-z]{2,3}):([^\]]+)\]\]|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
@@ -14,8 +16,17 @@ export function renderLinkedText(text: string): React.ReactNode {
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
-    const label = match[1];
-    const url = match[2];
+    if (match[1]) {
+      parts.push(
+        <i key={`lang-${match.index}`} lang={match[1]}>
+          {match[2]}
+        </i>
+      );
+      lastIndex = regex.lastIndex;
+      continue;
+    }
+    const label = match[3];
+    const url = match[4];
     parts.push(
       <a
         key={`${url}-${match.index}`}

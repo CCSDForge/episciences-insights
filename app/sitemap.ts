@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://insights.episciences.org';
   const lastModified = new Date();
   const locales = ['en', 'fr', 'es'] as const;
-  const sections = ['usage', 'reach', 'topics', 'funders', 'open-science', 'network'] as const;
+  const sections = ['usage', 'reach', 'topics', 'funders', 'open-science', 'network', 'help'] as const;
 
   const entries: MetadataRoute.Sitemap = [];
 
