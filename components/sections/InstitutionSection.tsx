@@ -21,6 +21,7 @@ import TopicCoOccurrenceNetwork from '@/components/TopicCoOccurrenceNetwork';
 import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import FunderStoryline from '@/components/FunderStoryline';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { getCountryName } from '@/lib/countryNames';
 
 export default function InstitutionSection() {
   const { locale } = useTranslation();
@@ -69,7 +70,11 @@ export default function InstitutionSection() {
       });
     });
     return Object.entries(counts)
-      .map(([code, count]) => ({ code, count }))
+      .map(([code, count]) => ({
+        code,
+        name: getCountryName(code),
+        count,
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
   }, [filteredData]);
@@ -230,7 +235,7 @@ export default function InstitutionSection() {
                     key={c.code}
                     className="rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300"
                   >
-                    {c.code} ({c.count})
+                    {c.name} ({formatNum(c.count)})
                   </span>
                 ))}
               </div>

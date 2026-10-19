@@ -15,6 +15,7 @@ interface WorldMapProps {
   selectedCountry?: string | null;
   onSelectCountry?: (code: string) => void;
   valueUnit?: string;
+  tooltipId?: string;
 }
 
 export default function WorldMap({
@@ -24,6 +25,7 @@ export default function WorldMap({
   selectedCountry,
   onSelectCountry,
   valueUnit,
+  tooltipId = "world-map-tooltip",
 }: WorldMapProps) {
   const { t } = useTranslation();
   const effectiveLegendLabel = legendLabel || t.dashboard.authorAffiliationsTitle;
@@ -82,7 +84,7 @@ export default function WorldMap({
                   tabIndex={isInteractive ? 0 : -1}
                   aria-label={tooltipContent}
                   aria-pressed={isInteractive ? isSelected : undefined}
-                  data-tooltip-id="world-map-tooltip"
+                  data-tooltip-id={tooltipId}
                   data-tooltip-content={tooltipContent}
                   onClick={() => {
                     if (isInteractive && countryCode && onSelectCountry) {
@@ -112,7 +114,7 @@ export default function WorldMap({
       </ComposableMap>
       
       <Tooltip 
-        id="world-map-tooltip" 
+        id={tooltipId} 
         style={{ 
           backgroundColor: "#111827", 
           color: "#fff", 

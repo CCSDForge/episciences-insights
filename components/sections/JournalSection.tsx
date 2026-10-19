@@ -8,6 +8,7 @@ import {
   Library,
   Wallet,
   Info,
+  Globe,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
@@ -18,6 +19,7 @@ import TopicTreeMap from '@/components/TopicTreeMap';
 import TopicCoOccurrenceNetwork from '@/components/TopicCoOccurrenceNetwork';
 import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import FunderStoryline from '@/components/FunderStoryline';
+import OverlayRepositorySpectrum from '@/components/OverlayRepositorySpectrum';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getCountryName } from '@/lib/countryNames';
 
@@ -60,29 +62,43 @@ export default function JournalSection() {
         year,
         downloads: val.downloads as number | null,
         views: val.views as number | null,
-        downloadsIncomplete: null as number | null,
-        viewsIncomplete: null as number | null,
+        downloadsProjected: null as number | null,
+        viewsProjected: null as number | null,
       }))
       .sort((a, b) => a.year.localeCompare(b.year));
 
     const currentIndex = entries.findIndex((e) => e.year === currentYearStr);
     if (currentIndex === -1) return entries;
 
+    const refDate = usageSummary.generatedAt ? new Date(usageSummary.generatedAt) : new Date();
+    const currentYearNum = Number(currentYearStr) || refDate.getFullYear();
+    const startOfYear = new Date(currentYearNum, 0, 1);
+    const startOfNextYear = new Date(currentYearNum + 1, 0, 1);
+    const elapsedFraction = Math.min(
+      1,
+      Math.max(0.01, (refDate.getTime() - startOfYear.getTime()) / (startOfNextYear.getTime() - startOfYear.getTime()))
+    );
+
+    const project = (val: number | null) =>
+      val != null && elapsedFraction > 0 ? Math.round(val / elapsedFraction) : val;
+
+    const current = entries[currentIndex];
+
     return entries.map((entry, idx) => {
       if (idx === currentIndex - 1) {
-        // Bridge connecting prior full year to current partial year
+        // Bridge connecting prior full year to current projected year
         return {
           ...entry,
-          downloadsIncomplete: entry.downloads,
-          viewsIncomplete: entry.views,
+          downloadsProjected: entry.downloads,
+          viewsProjected: entry.views,
         };
       }
       if (idx === currentIndex) {
-        // Current year in progress: switch to dashed series
+        // Current year in progress: switch to dashed projected series
         return {
           ...entry,
-          downloadsIncomplete: entry.downloads,
-          viewsIncomplete: entry.views,
+          downloadsProjected: project(current.downloads),
+          viewsProjected: project(current.views),
           downloads: null,
           views: null,
         };
@@ -107,7 +123,24 @@ export default function JournalSection() {
         total: downloads + views,
       };
     });
-    return entries.sort((a, b) => b.total - a.total).slice(0, 10);
+    return entries.sort((a, b) => b.total - a.total).slice(0, 20);
+  }, [usageSummary, rvcode]);
+
+  // Complete readership world map data (ISO2 -> total consultations)
+  const readershipMapData = useMemo(() => {
+    if (!usageSummary) return [];
+    const countryMap = rvcode ? usageSummary.journalCountrySummary[rvcode] || {} : usageSummary.countryYearlySummary;
+    return Object.entries(countryMap)
+      .map(([code, stats]) => {
+        const s = stats as { downloads?: number; views?: number; all?: { downloads: number; views: number } };
+        const downloads = typeof s.downloads === 'number' ? s.downloads : s.all?.downloads || 0;
+        const views = typeof s.views === 'number' ? s.views : s.all?.views || 0;
+        return {
+          name: code,
+          value: downloads + views,
+        };
+      })
+      .filter((d) => d.value > 0);
   }, [usageSummary, rvcode]);
 
   // Top articles of the journal
@@ -132,6 +165,11 @@ export default function JournalSection() {
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
   }, [filteredData]);
+
+  // Total count of articles with identified overlay repository
+  const totalOverlayRepos = useMemo(() => {
+    return hostingRepositories.reduce((acc, r) => acc + r.count, 0);
+  }, [hostingRepositories]);
 
   return (
     <section aria-labelledby="journal-section-heading" className="space-y-8 animate-in fade-in duration-300">
@@ -199,10 +237,10 @@ export default function JournalSection() {
               <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                 <span className="inline-block w-3.5 h-0.5 border-t-2 border-dashed border-amber-500" />
                 {locale === 'fr'
-                  ? `* ${currentYearStr} en cours (données partielles)`
+                  ? `* ${currentYearStr} estimation de fin d'année`
                   : locale === 'es'
-                  ? `* ${currentYearStr} en curso (datos parciales)`
-                  : `* ${currentYearStr} in progress (partial data)`}
+                  ? `* ${currentYearStr} estimación de fin de año`
+                  : `* ${currentYearStr} year-end estimate`}
               </span>
             </div>
             <div className="h-64 w-full">
@@ -228,19 +266,46 @@ export default function JournalSection() {
                   />
                   <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ borderRadius: '1rem', border: '1px solid #e4e4e7', fontSize: '12px' }}
-                    labelFormatter={(label: unknown) => {
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload || !payload.length) return null;
                       const yr = String(label ?? '');
-                      return yr === currentYearStr
-                        ? `${yr} (${locale === 'fr' ? 'année en cours - partiel' : locale === 'es' ? 'año en curso - parcial' : 'year in progress - partial'})`
-                        : yr;
-                    }}
-                    formatter={(val: unknown, name: unknown) => {
-                      const isDl = String(name).toLowerCase().includes('download');
-                      const title = isDl
-                        ? locale === 'fr' ? 'Téléchargements' : 'Downloads'
-                        : locale === 'fr' ? 'Vues des résumés' : 'Abstract Views';
-                      return [formatNum(Number(val) || 0), title];
+                      const isCurrent = yr === currentYearStr;
+                      const seen = new Set<string>();
+                      const uniqueItems = payload.filter((item) => {
+                        const key = String(item.dataKey || '');
+                        const metric = key.toLowerCase().includes('download') ? 'dl' : 'pv';
+                        if (seen.has(metric) || item.value == null) return false;
+                        seen.add(metric);
+                        return true;
+                      });
+
+                      return (
+                        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-3 shadow-lg text-xs space-y-1.5">
+                          <p className="font-bold text-zinc-900 dark:text-zinc-100">
+                            {isCurrent
+                              ? `${yr} (${locale === 'fr' ? "estimation de fin d'année" : locale === 'es' ? 'estimación de fin de año' : 'year-end estimate'})`
+                              : yr}
+                          </p>
+                          {uniqueItems.map((item) => {
+                            const isDl = String(item.dataKey).toLowerCase().includes('download');
+                            const color = isDl ? '#0aa0be' : '#57bec3';
+                            const title = isDl
+                              ? locale === 'fr' ? 'Téléchargements' : 'Downloads'
+                              : locale === 'fr' ? 'Vues des résumés' : 'Abstract Views';
+                            return (
+                              <div key={String(item.dataKey)} className="flex items-center justify-between gap-4">
+                                <span className="flex items-center gap-1.5 font-medium text-zinc-600 dark:text-zinc-300">
+                                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                                  {title}
+                                </span>
+                                <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                                  {formatNum(Number(item.value) || 0)}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
                     }}
                   />
                   {/* Solid area for complete years */}
@@ -264,27 +329,27 @@ export default function JournalSection() {
                     name="views"
                     connectNulls={false}
                   />
-                  {/* Dashed line for in-progress current year */}
+                  {/* Dashed line for projected current year */}
                   <Area
                     type="monotone"
-                    dataKey="downloadsIncomplete"
+                    dataKey="downloadsProjected"
                     stroke="#0aa0be"
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     fill="transparent"
-                    name="downloadsIncomplete"
+                    name="downloadsProjected"
                     legendType="none"
                     dot={{ r: 4, fill: '#0aa0be', strokeWidth: 1.5, stroke: '#ffffff' }}
                     connectNulls={false}
                   />
                   <Area
                     type="monotone"
-                    dataKey="viewsIncomplete"
+                    dataKey="viewsProjected"
                     stroke="#57bec3"
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     fill="transparent"
-                    name="viewsIncomplete"
+                    name="viewsProjected"
                     legendType="none"
                     dot={{ r: 4, fill: '#57bec3', strokeWidth: 1.5, stroke: '#ffffff' }}
                     connectNulls={false}
@@ -294,13 +359,36 @@ export default function JournalSection() {
             </div>
           </div>
 
+          {/* Readership geographic footprint map */}
+          {readershipMapData.length > 0 && (
+            <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                  {locale === 'fr' ? 'Origine géographique du lectorat' : locale === 'es' ? 'Origen geográfico del lectorado' : 'Geographic Reach of Readership'}
+                </h3>
+                <span className="text-[11px] text-zinc-500 font-medium">
+                  {formatNum(readershipMapData.length)} {locale === 'fr' ? 'pays actifs' : locale === 'es' ? 'países activos' : 'active countries'}
+                </span>
+              </div>
+              <div className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+                <WorldMap
+                  data={readershipMapData}
+                  legendLabel={locale === 'fr' ? 'Consultations par pays' : locale === 'es' ? 'Consultas por país' : 'Readership by Country'}
+                  valueUnit={locale === 'fr' ? 'consultations' : locale === 'es' ? 'consultas' : 'consultations'}
+                  colorRange={['#e0f7f8', '#0aa0be']}
+                  tooltipId="readership-world-map-tooltip"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Readership top countries */}
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               {locale === 'fr' ? 'Top pays du lectorat' : 'Top Readership Countries'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {readershipCountries.slice(0, 5).map((c) => (
+              {readershipCountries.slice(0, 20).map((c) => (
                 <div key={c.code} className="rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-2.5 text-center">
                   <div className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 truncate" title={c.name}>
                     {c.name}
@@ -367,7 +455,7 @@ export default function JournalSection() {
               {locale === 'fr' ? 'Origine géographique des auteurs' : 'Geographic Reach of Authors'}
             </h3>
             <div className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
-              <WorldMap data={countryData} />
+              <WorldMap data={countryData} tooltipId="authorship-world-map-tooltip" />
             </div>
           </div>
 
@@ -381,26 +469,23 @@ export default function JournalSection() {
 
           {/* Open Science footprint: Hosting Repositories */}
           {hostingRepositories.length > 0 && (
-            <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Entrepôts d’origine (Overlay)' : 'Source Preprint Repositories'}
-                </h3>
-                <span className="text-[11px] text-zinc-500 font-medium">HAL, arXiv, Zenodo...</span>
+            <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                    {locale === 'fr' ? 'Entrepôts d’origine (Revues en épi / Overlay)' : 'Source Preprint Repositories (Overlay)'}
+                  </h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    {locale === 'fr'
+                      ? 'Archives ouvertes hébergeant les manuscrits évalués par les pairs et publiés sur Episciences.'
+                      : 'Open repositories hosting the manuscripts peer-reviewed and published on Episciences.'}
+                  </p>
+                </div>
+                <span className="text-[11px] text-zinc-500 font-medium shrink-0">
+                  {formatNum(totalOverlayRepos)} {locale === 'fr' ? 'articles répertoriés' : 'indexed articles'}
+                </span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {hostingRepositories.map((repo) => (
-                  <div
-                    key={repo.name}
-                    className="flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200"
-                  >
-                    <span>{repo.name}</span>
-                    <span className="rounded-md bg-white dark:bg-zinc-700 px-1.5 py-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-300">
-                      {formatNum(repo.count)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <OverlayRepositorySpectrum repositories={hostingRepositories} total={totalOverlayRepos} />
             </div>
           )}
         </div>

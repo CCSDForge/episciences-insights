@@ -483,7 +483,7 @@ export default function PlatformSection() {
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'OpenAIRE' : 'OpenAIRE'}
+                {locale === 'fr' ? 'Filiation' : locale === 'es' ? 'Filiación' : 'Lineage'}
               </button>
             </div>
           </div>
