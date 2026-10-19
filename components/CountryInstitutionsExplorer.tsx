@@ -5,7 +5,7 @@ import { Publication } from '@/lib/types';
 import { getCountryName } from '@/lib/countryNames';
 import { COMMUNITY_COLORS } from '@/lib/colorRamps';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Treemap,
+  BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Treemap,
 } from 'recharts';
 import ChartContainer from '@/components/ChartContainer';
 import { Building2, LayoutGrid, BarChart2, Globe, ExternalLink, ChevronDown } from 'lucide-react';
@@ -64,10 +64,30 @@ function wrapText(text: string, maxCharsPerLine: number, maxLines = 2): string[]
   return lines.slice(0, maxLines);
 }
 
+/**
+ * Calculates relative luminance and returns the text color ('#ffffff' or '#09090b')
+ * guaranteeing compliance with WCAG 2.1 AA (contrast ratio >= 4.5:1).
+ */
+function getContrastTextColor(hexColor?: string): '#ffffff' | '#09090b' {
+  if (!hexColor) return '#ffffff';
+  const cleanHex = hexColor.replace('#', '');
+  if (cleanHex.length !== 6) return '#ffffff';
+  const r = parseInt(cleanHex.substring(0, 2), 16) / 255;
+  const g = parseInt(cleanHex.substring(2, 4), 16) / 255;
+  const b = parseInt(cleanHex.substring(4, 6), 16) / 255;
+  const toLinear = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  const L = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  const contrastWithWhite = 1.05 / (L + 0.05);
+  const contrastWithBlack = (L + 0.05) / 0.05;
+  return contrastWithWhite >= contrastWithBlack ? '#ffffff' : '#09090b';
+}
+
 function TreemapCell(props: TreemapContentProps) {
   const { depth, x = 0, y = 0, width = 0, height = 0, name = '', color = '#3b82f6', size = 0, count: rawCount } = props;
   if (depth === 0) return <g />;
   const count = rawCount ?? size;
+  const textColor = getContrastTextColor(color);
+  const secondaryColor = textColor === '#ffffff' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(9, 9, 11, 0.85)';
 
   // Round positions and dimensions to integer pixels to prevent subpixel font blur
   const rx = Math.round(x);
@@ -111,7 +131,7 @@ function TreemapCell(props: TreemapContentProps) {
         <text
           x={startX}
           y={startY}
-          fill="#ffffff"
+          fill={textColor}
           stroke="none"
           fontSize={fontSize}
           fontWeight="600"
@@ -128,7 +148,7 @@ function TreemapCell(props: TreemapContentProps) {
               key={idx}
               x={startX}
               dy={idx === 0 ? 0 : fontSize + 2}
-              fill="#ffffff"
+              fill={textColor}
               stroke="none"
             >
               {line}
@@ -138,7 +158,7 @@ function TreemapCell(props: TreemapContentProps) {
             <tspan
               x={startX}
               dy={fontSize + 3}
-              fill="rgba(255, 255, 255, 0.9)"
+              fill={secondaryColor}
               stroke="none"
               fontSize={Math.max(9, fontSize - 1)}
               fontWeight="500"
@@ -157,7 +177,7 @@ export default function CountryInstitutionsExplorer({
   selectedCountry: externalSelectedCountry,
   onSelectCountry: externalOnSelectCountry,
 }: CountryInstitutionsExplorerProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [internalCountry, setInternalCountry] = useState<string>('FR');
   const [viewMode, setViewMode] = useState<'treemap' | 'bars'>('treemap');
   const [limit, setLimit] = useState<15 | 30 | 50>(30);
@@ -474,7 +494,11 @@ export default function CountryInstitutionsExplorer({
                   }}
                   cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
                 />
-                <Bar dataKey="count" fill="#2563eb" radius={[0, 8, 8, 0]} barSize={20} />
+                <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={20}>
+                  {institutions.slice(0, limit).map((inst, idx) => (
+                    <Cell key={inst.ror || inst.name || idx} fill={COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length]} />
+                  ))}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </div>
@@ -487,45 +511,55 @@ export default function CountryInstitutionsExplorer({
           Ranked Institutions in {activeCountryName} ({Math.min(limit, institutions.length)} of {institutions.length})
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {institutions.slice(0, limit).map((inst, idx) => (
-            <div
-              key={inst.ror || inst.name}
-              className="flex flex-col justify-between p-4 rounded-xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all group"
-            >
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-700 text-[10px] font-black text-zinc-700 dark:text-zinc-300 font-sans">
-                  {idx + 1}
-                </span>
-                {inst.ror ? (
-                  <a
-                    href={inst.ror.startsWith('http') ? inst.ror : `https://ror.org/${inst.ror}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-bold uppercase truncate hover:underline flex items-center gap-1 shrink-0"
-                    title={`View ${inst.name} on ROR`}
+          {institutions.slice(0, limit).map((inst, idx) => {
+            const badgeColor = COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length];
+            const badgeTextColor = getContrastTextColor(badgeColor);
+            const rankLabel = `${locale === 'fr' ? 'Rang' : locale === 'es' ? 'Rango' : 'Rank'} ${idx + 1}`;
+            return (
+              <div
+                key={inst.ror || inst.name}
+                className="flex flex-col justify-between p-4 rounded-xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all group"
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <span
+                    className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg text-[10px] font-black font-sans shadow-xs ring-1 ring-black/10 dark:ring-white/15"
+                    style={{ backgroundColor: badgeColor, color: badgeTextColor }}
+                    aria-label={rankLabel}
+                    title={rankLabel}
                   >
-                    {inst.ror.split('/').pop()}
-                    <ExternalLink size={10} />
-                  </a>
-                ) : (
-                  <span className="text-[9px] text-zinc-400 font-mono uppercase tracking-tighter shrink-0">
-                    No ROR
+                    <span aria-hidden="true">{idx + 1}</span>
                   </span>
-                )}
+                  {inst.ror ? (
+                    <a
+                      href={inst.ror.startsWith('http') ? inst.ror : `https://ror.org/${inst.ror}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-bold uppercase truncate hover:underline flex items-center gap-1 shrink-0"
+                      title={`View ${inst.name} on ROR`}
+                    >
+                      {inst.ror.split('/').pop()}
+                      <ExternalLink size={10} />
+                    </a>
+                  ) : (
+                    <span className="text-[9px] text-zinc-400 font-mono uppercase tracking-tighter shrink-0">
+                      No ROR
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 min-h-[2.5rem]" title={inst.name}>
+                  {inst.name}
+                </p>
+                <div className="flex items-center justify-between pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+                  <span className="font-black text-zinc-900 dark:text-zinc-100">
+                    {formatNum(inst.count)} <span className="text-[10px] font-normal text-zinc-400">pubs</span>
+                  </span>
+                  <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full text-[10px]">
+                    {inst.percentage}%
+                  </span>
+                </div>
               </div>
-              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 min-h-[2.5rem]" title={inst.name}>
-                {inst.name}
-              </p>
-              <div className="flex items-center justify-between pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs">
-                <span className="font-black text-zinc-900 dark:text-zinc-100">
-                  {formatNum(inst.count)} <span className="text-[10px] font-normal text-zinc-400">pubs</span>
-                </span>
-                <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full text-[10px]">
-                  {inst.percentage}%
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
