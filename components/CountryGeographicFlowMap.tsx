@@ -12,12 +12,12 @@ import { getCountryName } from '@/lib/countryNames';
 import { ISO_NUMERIC_TO_ALPHA2 } from '@/lib/isoNumericToAlpha2';
 import NodeCountSlider from './NodeCountSlider';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { WORLD_GEO_URL } from '@/lib/geo';
 
 interface CountryGeographicFlowMapProps {
   data: Publication[];
 }
 
-const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const TOOLTIP_ID = 'country-flow-map-tooltip';
 const DEFAULT_MAX_NODES = 20;
 const MIN_NODES = 10;
@@ -39,7 +39,7 @@ interface GeographyFeature {
 // useGeographies needs the map's projection context, so this has to run as
 // a child of <ComposableMap>; it renders nothing itself.
 function CentroidCollector({ onReady }: { onReady: (centroids: Record<string, [number, number]>) => void }) {
-  const { geographies } = useGeographies({ geography: geoUrl }) as { geographies: GeographyFeature[] };
+  const { geographies } = useGeographies({ geography: WORLD_GEO_URL }) as { geographies: GeographyFeature[] };
 
   useEffect(() => {
     if (geographies.length === 0) return;
@@ -128,7 +128,7 @@ export default function CountryGeographicFlowMap({ data }: CountryGeographicFlow
         >
           <CentroidCollector onReady={handleCentroidsReady} />
 
-          <Geographies geography={geoUrl}>
+          <Geographies geography={WORLD_GEO_URL}>
             {({ geographies }: { geographies: Array<{ rsmKey: string }> }) =>
               geographies.map((geo) => (
                 <Geography

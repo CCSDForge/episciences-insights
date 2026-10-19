@@ -246,6 +246,101 @@ function enrichOrcids(authors, openAireAuthors) {
   });
 }
 
+const asArray = (x) => (x == null ? [] : Array.isArray(x) ? x : [x]);
+
+const ROR_ID_PATTERN = /^(?:https?:\/\/ror\.org\/)?(0[a-z0-9]{6}[0-9]{2})$/i;
+
+function normalizeRor(value) {
+  const match = ROR_ID_PATTERN.exec((value || '').trim());
+  return match ? `https://ror.org/${match[1].toLowerCase()}` : null;
+}
+
+function nameTokens(str) {
+  return stripAccentsLower(str).split(/\s+/).filter(Boolean);
+}
+
+/**
+ * Finds the OpenAlex author an Episciences contributor refers to: exact
+ * accent/case-insensitive full-name match first, then surname + first
+ * initial (OpenAlex often abbreviates given names or adds a middle
+ * initial / particle: "T. N. Shorey", "Bhalchandra D. Thatte", "Pierre Le
+ * Roux" for Episciences' "Tarlok Nath Shorey", "Bhalchandra Thatte",
+ * "Pierre Roux"). The fallback only accepts a single unambiguous
+ * candidate within the paper.
+ */
+function findOpenAlexAuthor(authors, person) {
+  const given = nameTokens(person.given_name);
+  const surname = nameTokens(person.surname);
+  if (!surname.length) return undefined;
+
+  const full = [...given, ...surname].join(' ');
+  const exact = authors.find((a) => nameTokens(a.name).join(' ') === full);
+  if (exact) return exact;
+
+  const candidates = authors.filter((a) => {
+    const tokens = nameTokens(a.name);
+    if (!surname.every((t) => tokens.includes(t))) return false;
+    return !given.length || tokens[0]?.[0] === given[0][0];
+  });
+  return candidates.length === 1 ? candidates[0] : undefined;
+}
+
+/**
+ * Adds the author affiliations declared on Episciences (Crossref-style
+ * `journal.journal_article.contributors.person_name[].affiliations` in the
+ * export) to the OpenAlex authors. Only affiliations carrying a ROR id are
+ * used: the ones without (~60%) are free text, often a lab team or a job
+ * title ("Assistant Professor"), and can't be placed on a map. OpenAlex
+ * institutions are kept; Episciences ones are appended when their ROR id
+ * isn't already there. `country` is left null here and resolved by
+ * `enrichInstitutionCountries()` (affiliation-enrichment.mjs), which needs
+ * network access.
+ *
+ * Each added institution carries a temporary `declared_names` list (every
+ * name the author's affiliation list gives for that ROR id), checked then
+ * removed by `enrichInstitutionCountries()`: the export's ROR ids are not
+ * always right (see that function). Several names per ROR id happen
+ * because the export sometimes copies an institution's ROR id onto the
+ * entry just before it ("Université de Strasbourg" and "Linguistique,
+ * Langues et Parole" both carrying LiLPa's id).
+ */
+export function mergeEpisciencesAffiliations(authors, episciencesExport) {
+  const persons = asArray(episciencesExport?.journal?.journal_article?.contributors?.person_name);
+  if (!persons.length || !authors.length) return authors;
+
+  const additions = new Map();
+  for (const person of persons) {
+    const institutions = asArray(person.affiliations?.institution)
+      .map((inst) => {
+        const rorId = asArray(inst.institution_id).find((id) => id['@type'] === 'ror');
+        const ror = normalizeRor(rorId?.value);
+        const name = cleanText(inst.institution_name);
+        return ror ? { name: name || ror, ror, country: null, declared_names: name ? [name] : [] } : null;
+      })
+      .filter(Boolean);
+    if (!institutions.length) continue;
+
+    const author = findOpenAlexAuthor(authors, person);
+    if (!author) continue;
+    additions.set(author, [...(additions.get(author) || []), ...institutions]);
+  }
+  if (!additions.size) return authors;
+
+  return authors.map((author) => {
+    const extra = additions.get(author);
+    if (!extra) return author;
+    const known = new Set(author.institutions.map((i) => i.ror).filter(Boolean));
+    const added = new Map();
+    for (const inst of extra) {
+      if (known.has(inst.ror)) continue;
+      const existing = added.get(inst.ror);
+      if (existing) existing.declared_names.push(...inst.declared_names);
+      else added.set(inst.ror, inst);
+    }
+    return added.size ? { ...author, institutions: [...author.institutions, ...added.values()] } : author;
+  });
+}
+
 function extractOpenScience(openAireResult) {
   if (!openAireResult) return { found_in_openaire: false };
 
@@ -326,6 +421,7 @@ export function mergePublication(openAlexData, openAireResult, episciencesExport
   base.journal = repairJournal(base.journal, openAireResult, episciencesExport);
   base.awards = mergeAwards(base.awards, openAireResult?.projects);
   base.authors = enrichOrcids(base.authors, openAireResult?.authors);
+  base.authors = mergeEpisciencesAffiliations(base.authors, episciencesExport);
   base.open_science = extractOpenScience(openAireResult);
   base.episciences = extractEpisciencesData(episciencesExport);
 

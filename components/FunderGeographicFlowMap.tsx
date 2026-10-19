@@ -8,13 +8,13 @@ import { Publication, FundersFile } from '@/lib/types';
 import { COLOR_RAMPS, rampStep } from '@/lib/colorRamps';
 import NodeCountSlider from './NodeCountSlider';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { WORLD_GEO_URL } from '@/lib/geo';
 
 interface FunderGeographicFlowMapProps {
   data: Publication[];
   funders: FundersFile;
 }
 
-const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const TOOLTIP_ID = 'funder-flow-map-tooltip';
 const DEFAULT_MAX_NODES = 20;
 const MIN_NODES = 10;
@@ -96,7 +96,7 @@ export default function FunderGeographicFlowMap({ data, funders }: FunderGeograp
           height={450}
           style={{ width: '100%', height: '100%' }}
         >
-          <Geographies geography={geoUrl}>
+          <Geographies geography={WORLD_GEO_URL}>
             {({ geographies }: { geographies: Array<{ rsmKey: string }> }) =>
               geographies.map((geo) => (
                 <Geography

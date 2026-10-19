@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Home, BarChart3, Map as MapIcon, Library, FlaskConical, Search, Network } from 'lucide-react';
+import { Home, BookOpen, Building2, Globe, Network } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
@@ -12,93 +12,44 @@ import ThemeSwitcher from '@/components/ThemeSwitcher';
 export default function AppHeader() {
   const { t, locale } = useTranslation();
   const pathname = usePathname();
-
-  const getNavLabel = (slug: string) => {
-    if (locale === 'fr') {
-      switch (slug) {
-        case 'home': return 'Accueil';
-        case 'usage': return 'Statistiques';
-        case 'reach': return 'Rayonnement';
-        case 'topics': return 'Thématiques';
-        case 'funders': return 'Financeurs';
-        case 'open-science': return 'Science Ouverte';
-        default: return slug;
-      }
-    }
-    if (locale === 'es') {
-      switch (slug) {
-        case 'home': return 'Inicio';
-        case 'usage': return 'Estadísticas';
-        case 'reach': return 'Alcance';
-        case 'topics': return 'Temas';
-        case 'funders': return 'Financiadores';
-        case 'open-science': return 'Ciencia Abierta';
-        default: return slug;
-      }
-    }
-    switch (slug) {
-      case 'home': return 'Home';
-      case 'usage': return 'Usage';
-      case 'reach': return 'Global Reach';
-      case 'topics': return 'Topics';
-      case 'funders': return 'Funders';
-      case 'open-science': return 'Open Science';
-      default: return slug;
-    }
-  };
+  const isNetworkPage = pathname?.includes(`/${locale}/network`);
 
   const NAV_ITEMS = [
     {
       href: `/${locale}`,
       slug: 'home',
-      label: getNavLabel('home'),
-      title: locale === 'fr' ? 'Page d\'accueil et synthèse' : locale === 'es' ? 'Inicio y resumen' : 'Home & overview',
+      label: locale === 'fr' ? 'Accueil' : locale === 'es' ? 'Inicio' : 'Home',
+      title: locale === 'fr' ? "Page d'accueil et présentation" : locale === 'es' ? 'Inicio y resumen' : 'Home & overview',
       icon: <Home size={15} aria-hidden="true" />,
     },
     {
-      href: `/${locale}/usage`,
-      slug: 'usage',
-      label: getNavLabel('usage'),
-      title: t.tabs.usage,
-      icon: <BarChart3 size={15} aria-hidden="true" />,
+      href: `/${locale}/journals`,
+      slug: 'journals',
+      label: t.tabs.journals,
+      title: locale === 'fr' ? "Statistiques à l'usage des revues" : locale === 'es' ? 'Estadísticas de revistas' : 'Journal statistics',
+      icon: <BookOpen size={15} aria-hidden="true" />,
     },
     {
-      href: `/${locale}/reach`,
-      slug: 'reach',
-      label: getNavLabel('reach'),
-      title: t.tabs.reach,
-      icon: <MapIcon size={15} aria-hidden="true" />,
+      href: `/${locale}/institutions`,
+      slug: 'institutions',
+      label: t.tabs.institutions,
+      title: locale === 'fr' ? "Statistiques à l'usage des institutions" : locale === 'es' ? 'Estadísticas por institución' : 'Institution statistics',
+      icon: <Building2 size={15} aria-hidden="true" />,
     },
     {
-      href: `/${locale}/topics`,
-      slug: 'topics',
-      label: getNavLabel('topics'),
-      title: t.tabs.topics,
-      icon: <Library size={15} aria-hidden="true" />,
-    },
-    {
-      href: `/${locale}/funders`,
-      slug: 'funders',
-      label: getNavLabel('funders'),
-      title: t.tabs.funders,
-      icon: <FlaskConical size={15} aria-hidden="true" />,
-    },
-    {
-      href: `/${locale}/open-science`,
-      slug: 'open-science',
-      label: getNavLabel('open-science'),
-      title: t.tabs.lineage,
-      icon: <Search size={15} aria-hidden="true" />,
+      href: `/${locale}/platform`,
+      slug: 'platform',
+      label: t.tabs.platform,
+      title: locale === 'fr' ? "Données globales de la plateforme Episciences" : locale === 'es' ? 'Datos globales de la plataforma' : 'Platform data & global impact',
+      icon: <Globe size={15} aria-hidden="true" />,
     },
   ];
-
-  const isNetworkPage = pathname?.includes(`/${locale}/network`);
 
   const checkIsActive = (item: (typeof NAV_ITEMS)[number]) => {
     if (item.slug === 'home') {
       return pathname === `/${locale}` || pathname === `/${locale}/`;
     }
-    return pathname === item.href || (pathname?.startsWith(item.href) && !isNetworkPage);
+    return pathname === item.href || pathname?.startsWith(item.href);
   };
 
   return (

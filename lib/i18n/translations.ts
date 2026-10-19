@@ -74,6 +74,9 @@ export interface Translations {
     funders: string;
     lineage: string;
     usage: string;
+    journals: string;
+    institutions: string;
+    platform: string;
   };
   kpi: {
     publicationsDesc: string;
@@ -510,7 +513,10 @@ export const translations: Record<Locale, Translations> = {
           "topics": "Research Landscape",
           "funders": "Funder Impact",
           "lineage": "Research Lineage & Open Science",
-          "usage": "Usage Analytics"
+          "usage": "Usage Analytics",
+          "journals": "Journal Statistics",
+          "institutions": "Institution Statistics",
+          "platform": "Platform Data"
       },
       "kpi": {
           "publicationsDesc": "Open access peer-reviewed papers",
@@ -950,7 +956,10 @@ export const translations: Record<Locale, Translations> = {
           "topics": "Paysage thématique",
           "funders": "Impact financeurs",
           "lineage": "Filiation & Science Ouverte",
-          "usage": "Analytique d'usage"
+          "usage": "Analytique d'usage",
+          "journals": "Statistiques des revues",
+          "institutions": "Statistiques par institution",
+          "platform": "Données de la plateforme"
       },
       "kpi": {
           "publicationsDesc": "Articles évalués par les pairs en libre accès",
@@ -1390,7 +1399,10 @@ export const translations: Record<Locale, Translations> = {
           "topics": "Panorama temático",
           "funders": "Impacto de financiadores",
           "lineage": "Linaje & Ciencia Abierta",
-          "usage": "Analítica de uso"
+          "usage": "Analítica de uso",
+          "journals": "Estadísticas de revistas",
+          "institutions": "Estadísticas por institución",
+          "platform": "Datos de la plataforma"
       },
       "kpi": {
           "publicationsDesc": "Artículos revisados por pares en acceso abierto",

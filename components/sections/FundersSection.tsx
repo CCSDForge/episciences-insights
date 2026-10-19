@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import {
   FlaskConical,
@@ -41,15 +41,42 @@ type FunderView = 'overview' | 'network' | 'matrix' | 'cluster' | 'sankey' | 'fl
 
 export default function FundersSection() {
   const { t } = useTranslation();
-  const { state, actions, data, meta } = useDashboard();
-  const { funderFilter, funderLimit, isFunderOpen, funderSearch } = state;
-  const { setFunderFilter, setFunderLimit, setIsFunderOpen, setFunderSearch } = actions;
-  const { filteredData, funderData, groupedFunders, funders } = data;
-  const { dropdownRef } = meta;
+  const { state, actions, data } = useDashboard();
+  const { funderFilter, funderLimit } = state;
+  const { setFunderFilter, setFunderLimit } = actions;
+  const { filteredData, funderData, allFunders, funders } = data;
 
   const [activeView, setActiveView] = useState<FunderView>('overview');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFunderOpen, setIsFunderOpen] = useState(false);
+  const [funderSearch, setFunderSearch] = useState('');
   const funderButtonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isFunderOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsFunderOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFunderOpen]);
+
+  const groupedFunders = useMemo(() => {
+    const query = funderSearch.toLowerCase().trim();
+    const filtered = query
+      ? allFunders.filter((f) => f.toLowerCase().includes(query))
+      : allFunders;
+    const groups: Record<string, string[]> = {};
+    filtered.forEach((f) => {
+      const letter = /^[A-Z]/.test(f[0].toUpperCase()) ? f[0].toUpperCase() : '#';
+      if (!groups[letter]) groups[letter] = [];
+      groups[letter].push(f);
+    });
+    return groups;
+  }, [allFunders, funderSearch]);
 
   const funderFilteredData = useMemo(() => {
     if (funderFilter === 'all') return filteredData;

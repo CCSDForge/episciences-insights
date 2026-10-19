@@ -124,8 +124,8 @@ export default function TopicTreeMap({ data }: TopicTreeMapProps) {
   }
 
   return (
-    <div className="h-full w-full p-2" role="region" aria-label={t.treemap.ariaLabel}>
-      <ChartContainer width="100%" height="100%">
+    <div className="h-[480px] w-full p-2" role="region" aria-label={t.treemap.ariaLabel}>
+      <ChartContainer width="100%" height="100%" minHeight={480}>
         <Treemap
           data={treeData}
           dataKey="size"

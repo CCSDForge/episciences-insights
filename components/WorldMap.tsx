@@ -6,9 +6,7 @@ import { scaleLog } from 'd3-scale';
 import { Tooltip } from 'react-tooltip';
 import { ISO_NUMERIC_TO_ALPHA2 } from '@/lib/isoNumericToAlpha2';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
-
-// Reliable TopoJSON source from world-atlas
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+import { WORLD_GEO_URL } from '@/lib/geo';
 
 interface WorldMapProps {
   data: { name: string; value: number }[]; // name is ISO country code (2 letters)
@@ -59,9 +57,9 @@ export default function WorldMap({
         }}
         width={800}
         height={450}
-        style={{ width: "100%", height: "auto" }}
+        style={{ width: "100%", height: "100%" }}
       >
-        <Geographies geography={geoUrl}>
+        <Geographies geography={WORLD_GEO_URL}>
           {({ geographies }: { geographies: Array<{ properties: { ISO_A2?: string; iso_a2?: string; name: string }; id: string | number; rsmKey: string }> }) =>
             geographies.map((geo) => {
               const { ISO_A2, iso_a2, name } = geo.properties;

@@ -4,14 +4,12 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  BarChart3,
+  BookOpen,
+  Building2,
   Globe,
-  Library,
-  Wallet,
-  Search,
-  Network,
   ArrowRight,
-  Database,
+  ExternalLink,
+  ShieldCheck,
 } from 'lucide-react';
 import { useDashboard } from '@/components/DashboardContext';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
@@ -54,111 +52,75 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
     }).format(date);
   }, [lastUpdated, locale]);
 
-  const SECTIONS = [
+  const PERSONA_SECTIONS = [
     {
-      href: `/${locale}/usage`,
-      title: locale === 'fr' ? 'Statistiques & Dynamique' : locale === 'es' ? 'Estadísticas y Uso' : 'Usage & Impact',
-      badge: locale === 'fr' ? 'Chronologie & Consultations' : locale === 'es' ? 'Cronología y Consultas' : 'Timeline & Reads',
+      href: `/${locale}/journals`,
+      title: locale === 'fr' ? 'Statistiques des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Statistics',
+      badge: locale === 'fr' ? 'Comités éditoriaux & Revues' : locale === 'es' ? 'Comités editoriales' : 'Editorial Boards & Journals',
       desc: locale === 'fr'
-        ? 'Évolution temporelle des articles, volumétrie des consultations et téléchargements, dynamique des revues.'
+        ? 'Indicateurs de lectorat (dynamique d’usage, pays), autorat, thématiques et financeurs pour le pilotage de chaque revue.'
         : locale === 'es'
-        ? 'Evolución temporal de publicaciones, descargas, consultas y dinámicas por revista.'
-        : 'Publication chronology, readership metrics, abstract views, and journal dynamics.',
-      icon: <BarChart3 className="h-6 w-6 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
+        ? 'Indicadores de lectores (dinámica de uso, países), autoría, temas y financiadores para la gestión de cada revista.'
+        : 'Readership metrics (usage trends, countries), authorship, topics, and funders for editorial evaluation.',
+      icon: <BookOpen className="h-6 w-6 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
       borderHover: 'hover:border-[var(--episciences-cyan-03)] dark:hover:border-[var(--episciences-cyan-00)]',
     },
     {
-      href: `/${locale}/reach`,
-      title: locale === 'fr' ? 'Rayonnement Mondial' : locale === 'es' ? 'Alcance Global' : 'Global Reach',
-      badge: locale === 'fr' ? 'Cartographie & Affiliations' : locale === 'es' ? 'Cartografía y Colaboraciones' : 'World Map & Affiliations',
+      href: `/${locale}/institutions`,
+      title: locale === 'fr' ? 'Statistiques par institution' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Statistics',
+      badge: locale === 'fr' ? 'Établissements & Recherche' : locale === 'es' ? 'Instituciones y Centros' : 'Universities & Research Bodies',
       desc: locale === 'fr'
-        ? 'Distribution géographique des auteurs, collaborations internationales et institutions partenaires.'
+        ? 'Mesurez la production de votre établissement sur Episciences : réseaux de co-autorat, revues hébergeant vos articles et financeurs.'
         : locale === 'es'
-        ? 'Distribución geográfica de autores, colaboraciones internacionales e instituciones.'
-        : 'Geographic distribution of authors, international co-authorship rates, and partner institutions.',
-      icon: <Globe className="h-6 w-6 text-[var(--episciences-cyan-02)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
+        ? 'Mida la producción de su institución en Episciences: redes de coautoría, revistas receptoras y entidades financiadoras.'
+        : 'Measure your institution’s footprint on Episciences: co-authorship networks, hosting journals, topics, and funding bodies.',
+      icon: <Building2 className="h-6 w-6 text-[var(--episciences-cyan-02)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
       borderHover: 'hover:border-[var(--episciences-cyan-02)] dark:hover:border-[var(--episciences-cyan-00)]',
     },
     {
-      href: `/${locale}/topics`,
-      title: locale === 'fr' ? 'Thématiques & ODD' : locale === 'es' ? 'Temas y ODS' : 'Topics & SDGs',
-      badge: locale === 'fr' ? 'Objectifs ONU & MSC 2020' : locale === 'es' ? 'Objetivos ONU y MSC 2020' : 'UN SDGs & MSC 2020',
+      href: `/${locale}/platform`,
+      title: locale === 'fr' ? 'Données de la plateforme' : locale === 'es' ? 'Datos de la plataforma' : 'Platform Data',
+      badge: locale === 'fr' ? 'Impact Global & Tutelles' : locale === 'es' ? 'Impacto Global y Tutelas' : 'Global Impact & Stakeholders',
       desc: locale === 'fr'
-        ? 'Alignement avec les 17 Objectifs de Développement Durable de l’ONU et classifications zbMATH Open.'
+        ? 'Bilan global de la plateforme : évolution des publications, délais d’évaluation par les pairs, réseaux de coopération et ODD.'
         : locale === 'es'
-        ? 'Alineación con los 17 ODS de la ONU y clasificaciones matemáticas zbMATH Open.'
-        : 'Alignment with the 17 UN Sustainable Development Goals and zbMATH Open mathematics classifications.',
-      icon: <Library className="h-6 w-6 text-[var(--ccsd-bleu-01)] dark:text-[var(--episciences-cyan-01)]" aria-hidden="true" />,
+        ? 'Balance global de la plataforma: evolución de publicaciones, tiempos de revisión por pares, redes de cooperación y ODS.'
+        : 'Global platform metrics: publication volume, peer-review timelines, international collaboration networks, and UN SDGs.',
+      icon: <Globe className="h-6 w-6 text-[var(--ccsd-bleu-01)] dark:text-[var(--episciences-cyan-01)]" aria-hidden="true" />,
       borderHover: 'hover:border-[var(--ccsd-bleu-01)] dark:hover:border-[var(--episciences-cyan-01)]',
-    },
-    {
-      href: `/${locale}/funders`,
-      title: locale === 'fr' ? 'Bailleurs & Financements' : locale === 'es' ? 'Financiadores y Proyectos' : 'Funders & Grants',
-      badge: locale === 'fr' ? 'Agences & Programmes' : locale === 'es' ? 'Agencias y Programas' : 'Agencies & Programs',
-      desc: locale === 'fr'
-        ? 'Cartographie des bailleurs de fonds (ANR, Commission Européenne, NSF...), programmes et bourses.'
-        : locale === 'es'
-        ? 'Mapeo de financiadores (ANR, Comisión Europea, NSF...), proyectos y becas.'
-        : 'Mapping of funding agencies (ANR, European Commission, NSF...), grants, and research programs.',
-      icon: <Wallet className="h-6 w-6 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
-      borderHover: 'hover:border-[var(--episciences-cyan-03)] dark:hover:border-[var(--episciences-cyan-00)]',
-    },
-    {
-      href: `/${locale}/open-science`,
-      title: locale === 'fr' ? 'Science Ouverte & Filiation' : locale === 'es' ? 'Ciencia Abierta y Linaje' : 'Open Science & Provenance',
-      badge: locale === 'fr' ? 'Dépôts, Licences & Données' : locale === 'es' ? 'Repositorios, Licencias y Datos' : 'Repositories & Scholix',
-      desc: locale === 'fr'
-        ? 'Dépôts en archives ouvertes (HAL, arXiv, Zenodo), licences Creative Commons, logiciels et jeux de données.'
-        : locale === 'es'
-        ? 'Depósitos en repositorios abiertos (HAL, arXiv...), licencias CC, software y conjuntos de datos vinculados.'
-        : 'Open repository hosting (HAL, arXiv, Zenodo), Creative Commons licenses, and linked datasets/software.',
-      icon: <Search className="h-6 w-6 text-[var(--episciences-cyan-01)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
-      borderHover: 'hover:border-[var(--episciences-cyan-01)] dark:hover:border-[var(--episciences-cyan-00)]',
-    },
-    {
-      href: `/${locale}/network`,
-      title: locale === 'fr' ? 'Graphe du Réseau' : locale === 'es' ? 'Grafo de Red' : 'Network Graph',
-      badge: locale === 'fr' ? 'Explorateur Relationnel' : locale === 'es' ? 'Explorador Relacional' : 'Relational Explorer',
-      desc: locale === 'fr'
-        ? 'Exploration interactive en graphe reliant les publications, co-auteurs, institutions et financeurs.'
-        : locale === 'es'
-        ? 'Visualización interactiva en grafo de publicaciones, coautores, instituciones y financiadores.'
-        : 'Interactive graph visualization connecting publications, co-authors, research bodies, and funders.',
-      icon: <Network className="h-6 w-6 text-[var(--ccsd-bleu-00)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
-      borderHover: 'hover:border-[var(--ccsd-bleu-00)] dark:hover:border-[var(--episciences-cyan-00)]',
     },
   ];
 
   return (
     <div className="space-y-16">
-      {/* 1. Hero Block with the 6 KPI cards (from /tmp/pasted-image-9.png) */}
+      {/* 1. Hero Block with the 5 KPI cards (Maquette 1) */}
       <PageHeader
         corpusStats={corpusStats}
         initialUsageStats={initialUsageStats}
         kpiSummary={usageSummary}
       />
 
-      {/* 2. Exploration Cards Grid */}
-      <section aria-labelledby="section-navigation-title" className="space-y-6">
+      {/* 2. Three User-Oriented Navigation Cards */}
+      <section aria-labelledby="section-personas-title" className="space-y-6">
         <div className="text-center sm:text-left">
-          <h2 id="section-navigation-title" className="font-heading text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h2 id="section-personas-title" className="font-heading text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
             {locale === 'fr'
-              ? 'Explorer les dimensions de la recherche'
+              ? 'Accéder aux statistiques par profil'
               : locale === 'es'
-              ? 'Explorar las dimensiones de la investigación'
-              : 'Explore Research Dimensions'}
+              ? 'Acceder a las estadísticas por perfil'
+              : 'Access Statistics by Profile'}
           </h2>
           <p className="mt-2 text-sm sm:text-base text-zinc-600 dark:text-zinc-400 font-medium max-w-3xl">
             {locale === 'fr'
-              ? 'Naviguez à travers les différentes sections pour analyser en profondeur les impacts, collaborations et engagements en science ouverte d’Episciences.'
+              ? 'Sélectionnez votre espace pour explorer les données adaptées à vos besoins de pilotage, d’évaluation ou de suivi de la science ouverte.'
               : locale === 'es'
-              ? 'Navegue por las distintas secciones para analizar en profundidad los impactos, colaboraciones y compromisos de ciencia abierta de Episciences.'
-              : 'Navigate through each section for an in-depth analysis of scientific impact, global collaborations, and open science indicators.'}
+              ? 'Seleccione su espacio para explorar los datos adaptados a sus necesidades de gestión, evaluación o seguimiento de la ciencia abierta.'
+              : 'Select your workspace to explore data tailored to your editorial, institutional, or open science monitoring needs.'}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {SECTIONS.map((sec) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {PERSONA_SECTIONS.map((sec) => (
             <Link
               key={sec.href}
               href={sec.href}
@@ -173,7 +135,7 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
                     {sec.badge}
                   </span>
                 </div>
-                <h3 className="font-heading text-lg font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-[var(--episciences-cyan-03)] dark:group-hover:text-[var(--episciences-cyan-01)] transition-colors">
+                <h3 className="font-heading text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-[var(--episciences-cyan-03)] dark:group-hover:text-[var(--episciences-cyan-01)] transition-colors">
                   {sec.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium">
@@ -182,7 +144,7 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
               </div>
 
               <div className="mt-6 flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] group-hover:translate-x-1 transition-transform">
-                <span>{locale === 'fr' ? 'Accéder à la section' : locale === 'es' ? 'Ver sección' : 'View section'}</span>
+                <span>{locale === 'fr' ? 'Accéder à la vue' : locale === 'es' ? 'Ver espacio' : 'Enter view'}</span>
                 <ArrowRight size={14} aria-hidden="true" />
               </div>
             </Link>
@@ -190,27 +152,41 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
         </div>
       </section>
 
-      {/* 3. Data Sources, Methodology & Partners (integrated on Home page) */}
+      {/* 3. Disclaimer and Link to Methodology (Matching bottom of Mockup 1) */}
       <section
-        aria-labelledby="home-sources-title"
-        className="rounded-[2.5rem] bg-white p-8 sm:p-12 shadow-xl ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-10"
+        aria-labelledby="home-methodology-title"
+        className="rounded-[2.5rem] bg-white p-8 sm:p-12 shadow-xl ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-8"
       >
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-6">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--episciences-cyan-03)]/10 text-[var(--episciences-cyan-03)] dark:bg-[var(--episciences-cyan-00)]/15 dark:text-[var(--episciences-cyan-00)]">
-            <Database size={24} aria-hidden="true" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--episciences-cyan-03)]/10 text-[var(--episciences-cyan-03)] dark:bg-[var(--episciences-cyan-00)]/15 dark:text-[var(--episciences-cyan-00)]">
+              <ShieldCheck size={26} aria-hidden="true" />
+            </div>
+            <div>
+              <h2 id="home-methodology-title" className="font-heading text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-50">
+                {locale === 'fr'
+                  ? 'Disclaimer et renvoi vers la page méthodologies'
+                  : locale === 'es'
+                  ? 'Aviso legal y enlace a la metodología'
+                  : 'Disclaimer & Methodological Framework'}
+              </h2>
+              <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                {locale === 'fr'
+                  ? 'Transparence des sources ouvertes, non-utilisation du facteur d’impact et respect des chartes DORA et CoARA'
+                  : locale === 'es'
+                  ? 'Transparencia de fuentes abiertas, no uso del factor de impacto y respeto a DORA y CoARA'
+                  : 'Open source transparency, non-use of impact factors, and full alignment with DORA and CoARA'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 id="home-sources-title" className="font-heading text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-50">
-              {t.disclaimer.title}
-            </h2>
-            <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
-              {locale === 'fr'
-                ? 'Provenance des données, processus d’enrichissement automatisé et périmètre de mesure'
-                : locale === 'es'
-                ? 'Procedencia de los datos, proceso de enriquecimiento y alcance de medición'
-                : 'Data provenance, automated enrichment pipelines, and measurement scope'}
-            </p>
-          </div>
+
+          <Link
+            href={`/${locale}/help`}
+            className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors whitespace-nowrap"
+          >
+            <span>{locale === 'fr' ? 'Consulter la méthodologie' : locale === 'es' ? 'Ver metodología' : 'View methodology'}</span>
+            <ExternalLink size={14} />
+          </Link>
         </div>
 
         {/* Narrative & Methodology */}
@@ -249,120 +225,38 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
                 alt="CCSD - Centre pour la Communication Scientifique Directe"
                 width={180}
                 height={50}
-                className="hidden h-12 sm:h-14 w-auto dark:block"
+                className="h-12 sm:h-14 w-auto hidden dark:block"
               />
             </a>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-            {/* MESRE */}
-            <a
-              href="https://www.enseignementsup-recherche.gouv.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
-            >
-              <Image
-                src="/tutelles/mesre-light.png"
-                alt="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
-                width={180}
-                height={150}
-                className="h-20 sm:h-[6.5rem] w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/mesre-dark.png"
-                alt="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
-                width={180}
-                height={150}
-                className="hidden h-20 sm:h-[6.5rem] w-auto dark:block"
-              />
-            </a>
-
-            {/* CNRS */}
-            <a
-              href="https://www.cnrs.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label="CNRS - Centre national de la recherche scientifique"
-            >
-              <Image
-                src="/tutelles/cnrs-light.svg"
-                alt="CNRS - Centre national de la recherche scientifique"
-                width={100}
-                height={100}
-                className="h-9 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/cnrs-dark.svg"
-                alt="CNRS - Centre national de la recherche scientifique"
-                width={100}
-                height={100}
-                className="hidden h-9 w-auto dark:block"
-              />
-            </a>
-
-            {/* Inria */}
-            <a
-              href="https://www.inria.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label="Inria - Institut national de recherche en sciences et technologies du numérique"
-            >
-              <Image
-                src="/tutelles/inria-light.svg"
-                alt="Inria"
-                width={120}
-                height={35}
-                className="h-7 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/inria-dark.svg"
-                alt="Inria"
-                width={120}
-                height={35}
-                className="hidden h-7 w-auto dark:block"
-              />
-            </a>
-
-            {/* INRAE */}
-            <a
-              href="https://www.inrae.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label="INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement"
-            >
-              <Image
-                src="/tutelles/inrae-light.png"
-                alt="INRAE"
-                width={120}
-                height={32}
-                className="h-6 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/inrae-dark.png"
-                alt="INRAE"
-                width={120}
-                height={32}
-                className="hidden h-6 w-auto dark:block"
-              />
-            </a>
-          </div>
-
-          {/* Legal & Timestamp */}
-          <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 space-y-1 pt-4">
-            <p className="font-semibold text-zinc-700 dark:text-zinc-300">{t.footer.license}</p>
-            <p>{t.footer.source}</p>
-            {formattedDate && (
-              <p className="text-zinc-400 dark:text-zinc-500">
-                {t.footer.lastUpdated.replace('{date}', formattedDate)}
-              </p>
-            )}
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-80 transition-opacity hover:opacity-100">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                {locale === 'fr' ? 'Tutelles :' : locale === 'es' ? 'Tutelas:' : 'Supervisory bodies:'}
+              </span>
+            </div>
+            <div className="flex items-center gap-6">
+              <span className="font-heading font-black tracking-tight text-zinc-800 dark:text-zinc-200 text-sm">
+                CNRS
+              </span>
+              <span className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
+              <span className="font-heading font-black tracking-tight text-zinc-800 dark:text-zinc-200 text-sm">
+                INRAE
+              </span>
+              <span className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
+              <span className="font-heading font-black tracking-tight text-zinc-800 dark:text-zinc-200 text-sm">
+                Inria
+              </span>
+            </div>
           </div>
         </div>
+
+        {formattedDate && (
+          <p className="text-center text-xs font-medium text-zinc-400 dark:text-zinc-500 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            {t.footer.lastUpdated.replace('{date}', formattedDate)}
+          </p>
+        )}
       </section>
     </div>
   );

@@ -39,9 +39,9 @@ export default function ViewSegmentedControl<T extends string = string>({
               role="tab"
               aria-selected={isSelected}
               onClick={() => onChange(v.id)}
-              className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all duration-200 whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 whitespace-nowrap cursor-pointer ${
                 isSelected
-                  ? 'bg-[var(--episciences-cyan-03)] text-white shadow-sm dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)] dark:font-black'
+                  ? 'bg-[var(--episciences-cyan-03)] text-white shadow-sm dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)] dark:font-bold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50'
               }`}
             >
