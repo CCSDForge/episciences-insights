@@ -46,7 +46,7 @@ export default function LicenseSpectrum({ licenses, total }: LicenseSpectrumProp
           <div key={license.name} className="flex items-center gap-2 min-w-0">
             <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: colorForRank(i) }} aria-hidden="true" />
             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate" title={license.name}>{license.name}</span>
-            <span className="text-[10px] font-black text-zinc-400 shrink-0 ml-auto">{((license.count / total) * 100).toFixed(1)}%</span>
+            <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 shrink-0 ml-auto">{((license.count / total) * 100).toFixed(1)}%</span>
           </div>
         ))}
       </div>

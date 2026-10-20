@@ -111,7 +111,7 @@ export default function CoOccurrenceNetwork({
   const getLinkWidth = useMemo(() => (weight: number) => {
     if (!network.maxWeight || network.maxWeight <= 1) return 1.5;
     const ratio = Math.log(weight + 1) / Math.log(network.maxWeight + 1);
-    return 1.5 + ratio * 4.5;
+    return Math.round((1.5 + ratio * 4.5) * 10000) / 10000;
   }, [network.maxWeight]);
   const getNodeColor = useMemo(() => (count: number) => rampStep(count, network.maxCount, ramp), [network.maxCount, ramp]);
 

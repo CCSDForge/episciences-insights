@@ -3,6 +3,7 @@
 import React from 'react';
 import { Publication } from '@/lib/types';
 import { Network } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 import CoOccurrenceNetwork from './CoOccurrenceNetwork';
 
 interface CollaborationWebProps {
@@ -10,6 +11,8 @@ interface CollaborationWebProps {
 }
 
 export default function CollaborationWeb({ data }: CollaborationWebProps) {
+  const { locale } = useTranslation();
+
   return (
     <CoOccurrenceNetwork
       data={data}
@@ -22,13 +25,19 @@ export default function CollaborationWeb({ data }: CollaborationWebProps) {
         return Array.from(seen.values());
       }}
       icon={<Network size={24} />}
-      title="Global Reach"
-      subtitle="Institutional Synergy Map"
-      entityLabelPlural="Institutions"
-      metaLabel="Region"
+      title={locale === 'fr' ? 'Rayonnement mondial' : locale === 'es' ? 'Alcance global' : 'Global Reach'}
+      subtitle={locale === 'fr' ? 'Carte des synergies institutionnelles' : locale === 'es' ? 'Mapa de sinergias institucionales' : 'Institutional Synergy Map'}
+      entityLabelPlural={locale === 'fr' ? 'Institutions' : locale === 'es' ? 'Instituciones' : 'Institutions'}
+      metaLabel={locale === 'fr' ? 'Région' : locale === 'es' ? 'Región' : 'Region'}
       colorTheme="blue"
       tooltipId="collab-tooltip"
-      emptyMessage="Collaborative data unavailable for this selection"
+      emptyMessage={
+        locale === 'fr'
+          ? 'Données de collaboration indisponibles pour cette sélection'
+          : locale === 'es'
+          ? 'Datos de colaboración no disponibles para esta selección'
+          : 'Collaborative data unavailable for this selection'
+      }
     />
   );
 }

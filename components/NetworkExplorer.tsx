@@ -61,18 +61,20 @@ interface ToggleOption<T extends string> {
 }
 
 function ViewToggle<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: ToggleOption<T>[] }) {
+  const { locale } = useTranslation();
   return (
-    <div role="group" aria-label="View mode toggle" className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+    <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation' : locale === 'es' ? 'Modo de visualización' : 'View mode toggle'} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
       {options.map((opt) => (
         <button
           key={opt.value}
+          type="button"
           onClick={() => onChange(opt.value)}
           aria-pressed={value === opt.value}
           className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all first:rounded-l-lg last:rounded-r-lg border-r last:border-r-0 border-zinc-200 dark:border-zinc-600 ${
             value === opt.value ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
           }`}
         >
-          {opt.icon} {opt.label}
+          <span aria-hidden="true">{opt.icon}</span> {opt.label}
         </button>
       ))}
     </div>
@@ -109,21 +111,26 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
   );
 
   const journals = useMemo(() => {
-    const nameToId = new Map<string, string>();
+    const idToNames = new Map<string, Map<string, number>>();
+
     data.forEach((p) => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name && p.journal.code) {
-        nameToId.set(name, p.journal.code);
+      if (!name) return;
+      const id = p.journal.code || p.journal.issn || name;
+      if (!idToNames.has(id)) {
+        idToNames.set(id, new Map());
       }
+      const counts = idToNames.get(id)!;
+      counts.set(name, (counts.get(name) || 0) + 1);
     });
-    data.forEach((p) => {
-      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name && !nameToId.has(name)) {
-        nameToId.set(name, p.journal.issn || name);
-      }
-    });
-    return Array.from(nameToId.entries())
-      .map(([name, id]) => [id, name] as [string, string])
+
+    return Array.from(idToNames.entries())
+      .map(([id, counts]) => {
+        const bestName = Array.from(counts.entries()).sort(
+          (a, b) => b[1] - a[1] || b[0].length - a[0].length
+        )[0][0];
+        return [id, bestName] as [string, string];
+      })
       .sort((a, b) => a[1].localeCompare(b[1]));
   }, [data]);
 

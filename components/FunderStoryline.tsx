@@ -82,12 +82,12 @@ export default function FunderStoryline({ data }: FunderStorylineProps) {
     <div className="w-full bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-xl p-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-6 dark:border-zinc-800">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 text-white rounded-2xl shadow-lg bg-teal-600 shadow-teal-600/20">
+          <div className="p-2.5 text-white rounded-2xl shadow-lg bg-teal-600 shadow-teal-600/20" aria-hidden="true">
             <Handshake size={24} />
           </div>
           <div>
             <h3 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">{t.funderStoryline.title}</h3>
-            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">{t.funderStoryline.subtitle}</p>
+            <p className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mt-1">{t.funderStoryline.subtitle}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-4">

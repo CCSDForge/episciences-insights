@@ -31,6 +31,7 @@ export default function InstitutionSection() {
 
   const [collabView, setCollabView] = useState<'network' | 'matrix' | 'flow'>('network');
   const [topicView, setTopicView] = useState<'treemap' | 'network' | 'msc'>('treemap');
+  const [journalLimit, setJournalLimit] = useState<'all' | '10'>('all');
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
@@ -44,18 +45,27 @@ export default function InstitutionSection() {
     );
   }, [institutionFilter, institutionsList]);
 
-  // Distribution of the institution's publications across Episciences journals
-  const journalDistribution = useMemo(() => {
+  // Distribution of the institution's publications across Episciences journals (all with >= 1 publication)
+  const allJournalDistribution = useMemo(() => {
     const counts: Record<string, { name: string; count: number }> = {};
     filteredData.forEach((p) => {
       const name = p.journal.name || 'Unknown Journal';
       if (!counts[name]) counts[name] = { name, count: 0 };
       counts[name].count += 1;
     });
-    return Object.values(counts)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
+    return Object.values(counts).sort((a, b) => b.count - a.count);
   }, [filteredData]);
+
+  const displayedJournals = useMemo(() => {
+    if (journalLimit === '10') {
+      return allJournalDistribution.slice(0, 10);
+    }
+    return allJournalDistribution;
+  }, [allJournalDistribution, journalLimit]);
+
+  const journalChartHeight = useMemo(() => {
+    return Math.max(380, displayedJournals.length * 32);
+  }, [displayedJournals]);
 
   // Partner countries with which this institution collaborates
   const partnerCountries = useMemo(() => {
@@ -90,15 +100,17 @@ export default function InstitutionSection() {
                 <Building2 size={20} />
               </span>
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {locale === 'fr' ? 'Statistiques par institution' : 'Institution Dashboard'}
+                {locale === 'fr' ? 'Statistiques par institution' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Dashboard'}
               </span>
             </div>
             <h1 id="institution-section-heading" className="font-heading text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
-              {currentInstitution ? currentInstitution.name : locale === 'fr' ? 'Toutes les institutions' : 'All Institutions'}
+              {currentInstitution ? currentInstitution.name : locale === 'fr' ? 'Toutes les institutions' : locale === 'es' ? 'Todas las instituciones' : 'All Institutions'}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-4xl leading-relaxed font-medium">
               {locale === 'fr'
                 ? 'Cet espace est conçu pour les universités, organismes de recherche et bibliométriciens. Il permet d’évaluer la visibilité de votre établissement dans les revues Episciences, d’identifier les coopérations scientifiques internationales et les bailleurs finançant vos équipes.'
+                : locale === 'es'
+                ? 'Este espacio está diseñado para universidades, centros de investigación y bibliómetras. Permite evaluar la presencia de su institución en las revistas Episciences, identificar colaboraciones científicas internacionales y organismos que financian a sus equipos.'
                 : 'This section is designed for universities, research bodies, and bibliometrics offices. It enables measuring your institution’s contribution to Episciences overlay journals, analyzing co-authorship networks, and mapping research grants.'}
             </p>
           </div>
@@ -108,6 +120,8 @@ export default function InstitutionSection() {
             <span>
               {locale === 'fr'
                 ? 'Sources : API Episciences, ROR (Research Organization Registry), OpenAlex et OpenAIRE Graph.'
+                : locale === 'es'
+                ? 'Fuentes: API Episciences, ROR (Research Organization Registry), OpenAlex y OpenAIRE Graph.'
                 : 'Sources: Episciences API, ROR (Research Organization Registry), OpenAlex and OpenAIRE Graph.'}
             </span>
           </div>
@@ -119,7 +133,7 @@ export default function InstitutionSection() {
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 p-4 ring-1 ring-zinc-200 dark:ring-zinc-700 text-xs font-semibold">
           <div className="flex items-center gap-3">
             <span className="text-zinc-500 dark:text-zinc-400 uppercase tracking-wider text-[11px] font-bold">
-              {locale === 'fr' ? 'Établissement sélectionné :' : 'Selected Institution:'}
+              {locale === 'fr' ? 'Établissement sélectionné :' : locale === 'es' ? 'Institución seleccionada:' : 'Selected Institution:'}
             </span>
             <strong className="text-zinc-900 dark:text-zinc-100 font-black">{currentInstitution.name}</strong>
             {currentInstitution.country && (
@@ -131,9 +145,9 @@ export default function InstitutionSection() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <span className="text-zinc-500">{locale === 'fr' ? 'Volume :' : 'Volume:'}</span>
+              <span className="text-zinc-500">{locale === 'fr' ? 'Volume :' : locale === 'es' ? 'Volumen:' : 'Volume:'}</span>
               <span className="font-black text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)]">
-                {formatNum(filteredData.length)} {locale === 'fr' ? 'publications' : 'publications'}
+                {formatNum(filteredData.length)} {locale === 'fr' ? 'publications' : locale === 'es' ? 'publicaciones' : 'publications'}
               </span>
             </div>
 
@@ -144,7 +158,7 @@ export default function InstitutionSection() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] hover:underline"
               >
-                <span>Fiche ROR</span>
+                <span>{locale === 'fr' ? 'Fiche ROR' : locale === 'es' ? 'Ficha ROR' : 'ROR Record'}</span>
                 <ExternalLink size={12} />
               </a>
             )}
@@ -165,48 +179,51 @@ export default function InstitutionSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Autorat & Réseaux' : 'Authorship & Networks'}
+                  {locale === 'fr' ? 'Autorat & Réseaux' : locale === 'es' ? 'Autoría y Redes' : 'Authorship & Networks'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Co-publications & Réseaux de co-autorat' : 'Co-authorships & Partnership networks'}
+                  {locale === 'fr' ? 'Co-publications & Réseaux de co-autorat' : locale === 'es' ? 'Copublicaciones y redes de coautoría' : 'Co-authorships & Partnership networks'}
                 </p>
               </div>
             </div>
 
             {/* Toggle views */}
-            <div className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+            <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des coopérations' : locale === 'es' ? 'Modo de visualización de cooperaciones' : 'Collaboration view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
               <button
                 type="button"
                 onClick={() => setCollabView('network')}
+                aria-pressed={collabView === 'network'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   collabView === 'network'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Réseau' : 'Network'}
+                {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
               </button>
               <button
                 type="button"
                 onClick={() => setCollabView('matrix')}
+                aria-pressed={collabView === 'matrix'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   collabView === 'matrix'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Matrice' : 'Matrix'}
+                {locale === 'fr' ? 'Matrice' : locale === 'es' ? 'Matriz' : 'Matrix'}
               </button>
               <button
                 type="button"
                 onClick={() => setCollabView('flow')}
+                aria-pressed={collabView === 'flow'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   collabView === 'flow'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Flux' : 'Flows'}
+                {locale === 'fr' ? 'Flux' : locale === 'es' ? 'Flujos' : 'Flows'}
               </button>
             </div>
           </div>
@@ -222,10 +239,10 @@ export default function InstitutionSection() {
           <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <div className="flex items-center justify-between text-xs font-bold">
               <span className="text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
-                {locale === 'fr' ? 'Coopérations internationales' : 'International Collaboration Scope'}
+                {locale === 'fr' ? 'Coopérations internationales' : locale === 'es' ? 'Cooperaciones internacionales' : 'International Collaboration Scope'}
               </span>
               <span className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)]">
-                {globalReachStats.intlCollabRate}% {locale === 'fr' ? 'de co-publications internationales' : 'intl. co-authorship rate'}
+                {globalReachStats.intlCollabRate}% {locale === 'fr' ? 'de co-publications internationales' : locale === 'es' ? 'de copublicaciones internacionales' : 'intl. co-authorship rate'}
               </span>
             </div>
             {partnerCountries.length > 0 && (
@@ -254,59 +271,109 @@ export default function InstitutionSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Revues' : 'Overlay Journals'}
+                  {locale === 'fr' ? 'Revues' : locale === 'es' ? 'Revistas' : 'Overlay Journals'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Représentation dans les publications par revue' : 'Distribution across Episciences journals'}
+                  {locale === 'fr' ? 'Représentation dans les publications par revue' : locale === 'es' ? 'Distribución en publicaciones por revista' : 'Distribution across Episciences journals'}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Journal breakdown chart */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Revues hébergeant les articles de l’institution' : 'Top Publishing Journals'}
-            </h3>
-            <div className="h-[420px] w-full">
-              <ChartContainer minHeight={380}>
-                <BarChart
-                  data={journalDistribution}
-                  layout="vertical"
-                  margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                {locale === 'fr'
+                  ? `Revues hébergeant les articles de l’institution (${displayedJournals.length})`
+                  : locale === 'es'
+                  ? `Revistas que publican artículos de la institución (${displayedJournals.length})`
+                  : `Publishing Journals (${displayedJournals.length})`}
+              </h3>
+              {allJournalDistribution.length > 10 && (
+                <div
+                  role="group"
+                  aria-label={locale === 'fr' ? 'Nombre de revues à afficher' : locale === 'es' ? 'Número de revistas para mostrar' : 'Number of journals to show'}
+                  className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg shadow-inner"
                 >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#88888820" />
-                  <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    tickLine={false}
-                    axisLine={false}
-                    width={260}
-                    tick={{ fontSize: 11 }}
-                    tickFormatter={(val: string) => (val.length > 36 ? `${val.slice(0, 34)}…` : val)}
-                  />
-                  <Tooltip
-                    contentStyle={{ borderRadius: '1rem', border: '1px solid #e4e4e7', fontSize: '12px' }}
-                    formatter={(val: unknown) => [formatNum(Number(val) || 0), locale === 'fr' ? 'Publications' : 'Publications']}
-                    labelFormatter={(label: unknown) => String(label ?? '')}
-                  />
-                  <Bar dataKey="count" fill="#0aa0be" radius={[0, 8, 8, 0]} />
-                </BarChart>
-              </ChartContainer>
+                  <button
+                    type="button"
+                    onClick={() => setJournalLimit('all')}
+                    aria-pressed={journalLimit === 'all'}
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors cursor-pointer ${
+                      journalLimit === 'all'
+                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                    }`}
+                  >
+                    {locale === 'fr' ? `Toutes (${allJournalDistribution.length})` : locale === 'es' ? `Todas (${allJournalDistribution.length})` : `All (${allJournalDistribution.length})`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setJournalLimit('10')}
+                    aria-pressed={journalLimit === '10'}
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors cursor-pointer ${
+                      journalLimit === '10'
+                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                    }`}
+                  >
+                    Top 10
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="w-full max-h-[540px] overflow-y-auto pr-1">
+              <div style={{ height: `${journalChartHeight}px` }} className="w-full">
+                <ChartContainer minHeight={380}>
+                  <BarChart
+                    data={displayedJournals}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#88888820" />
+                    <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      tickLine={false}
+                      axisLine={false}
+                      width={260}
+                      tick={{ fontSize: 11 }}
+                      tickFormatter={(val: string) => (val.length > 36 ? `${val.slice(0, 34)}…` : val)}
+                    />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '1rem', border: '1px solid #e4e4e7', fontSize: '12px' }}
+                      formatter={(val: unknown) => [formatNum(Number(val) || 0), locale === 'fr' ? 'Publications' : locale === 'es' ? 'Publicaciones' : 'Publications']}
+                      labelFormatter={(label: unknown) => String(label ?? '')}
+                    />
+                    <Bar dataKey="count" fill="#0aa0be" maxBarSize={22} radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </div>
             </div>
           </div>
 
           {/* Table summary */}
           <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Détail des revues' : 'Journal Summary'}
-            </h3>
-            <div className="max-h-36 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
-              {journalDistribution.map((j) => (
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                {locale === 'fr' ? 'Détail des revues' : locale === 'es' ? 'Detalle de revistas' : 'Journal Summary'}
+              </h3>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                {allJournalDistribution.length}{' '}
+                {locale === 'fr'
+                  ? (allJournalDistribution.length > 1 ? 'revues représentées' : 'revue représentée')
+                  : locale === 'es'
+                  ? 'revistas'
+                  : (allJournalDistribution.length > 1 ? 'journals represented' : 'journal represented')}
+              </span>
+            </div>
+            <div className="max-h-48 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
+              {allJournalDistribution.map((j) => (
                 <div key={j.name} className="py-1.5 flex items-center justify-between text-xs">
                   <span className="font-medium text-zinc-800 dark:text-zinc-200 truncate pr-3">{j.name}</span>
-                  <span className="font-bold text-zinc-600 dark:text-zinc-400">{j.count}</span>
+                  <span className="font-bold text-zinc-600 dark:text-zinc-400">{formatNum(j.count)}</span>
                 </div>
               ))}
             </div>
@@ -324,41 +391,44 @@ export default function InstitutionSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Thématiques' : 'Research Topics'}
+                  {locale === 'fr' ? 'Thématiques' : locale === 'es' ? 'Temáticas' : 'Research Topics'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Vue d’ensemble & Domaines scientifiques' : 'Topic Overview & Fields'}
+                  {locale === 'fr' ? 'Vue d’ensemble & Domaines scientifiques' : locale === 'es' ? 'Resumen y dominios científicos' : 'Topic Overview & Fields'}
                 </p>
               </div>
             </div>
 
             {/* Toggle controls */}
-            <div className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+            <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des thématiques' : locale === 'es' ? 'Modo de visualización de temas' : 'Topic view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
               <button
                 type="button"
                 onClick={() => setTopicView('treemap')}
+                aria-pressed={topicView === 'treemap'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   topicView === 'treemap'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Treemap' : 'Treemap'}
+                {locale === 'fr' ? 'Treemap' : locale === 'es' ? 'Treemap' : 'Treemap'}
               </button>
               <button
                 type="button"
                 onClick={() => setTopicView('network')}
+                aria-pressed={topicView === 'network'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   topicView === 'network'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Réseau' : 'Network'}
+                {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
               </button>
               <button
                 type="button"
                 onClick={() => setTopicView('msc')}
+                aria-pressed={topicView === 'msc'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   topicView === 'msc'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
@@ -388,10 +458,10 @@ export default function InstitutionSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Financeurs' : 'Research Funders'}
+                  {locale === 'fr' ? 'Financeurs' : locale === 'es' ? 'Financiadores' : 'Research Funders'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Évolution & Volume par financeurs' : 'Funding Timeline & Funder Volume'}
+                  {locale === 'fr' ? 'Évolution & Volume par financeurs' : locale === 'es' ? 'Evolución y volumen por financiador' : 'Funding Timeline & Funder Volume'}
                 </p>
               </div>
             </div>
@@ -400,7 +470,7 @@ export default function InstitutionSection() {
           {/* Funder Storyline */}
           <div className="space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Évolution temporelle des financements' : 'Grants Timeline'}
+              {locale === 'fr' ? 'Évolution temporelle des financements' : locale === 'es' ? 'Evolución temporal de la financiación' : 'Grants Timeline'}
             </h3>
             <FunderStoryline data={filteredData} />
           </div>
@@ -408,7 +478,7 @@ export default function InstitutionSection() {
           {/* Funder List */}
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Bailleurs finançant les travaux de l’institution' : 'Funding Bodies'}
+              {locale === 'fr' ? 'Bailleurs finançant les travaux de l’institution' : locale === 'es' ? 'Organismos que financian el trabajo de la institución' : 'Funding Bodies'}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {funderData.slice(0, 6).map((f) => (

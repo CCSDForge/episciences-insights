@@ -31,6 +31,7 @@ export interface InstitutionItem {
   ror: string | null;
   country: string | null;
   count: number;
+  affiliationsCount: number;
 }
 
 export interface PeerReviewDelayStats {
@@ -354,23 +355,26 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
   }, [initialData]);
 
   const journals = useMemo(() => {
-    const nameToId = new Map<string, string>();
-    // First pass: register journals with their canonical code
-    initialData.forEach(p => {
+    const idToNames = new Map<string, Map<string, number>>();
+
+    initialData.forEach((p) => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name && p.journal.code) {
-        nameToId.set(name, p.journal.code);
+      if (!name) return;
+      const id = p.journal.code || p.journal.issn || name;
+      if (!idToNames.has(id)) {
+        idToNames.set(id, new Map());
       }
+      const counts = idToNames.get(id)!;
+      counts.set(name, (counts.get(name) || 0) + 1);
     });
-    // Second pass: fallback for any journal lacking a code
-    initialData.forEach(p => {
-      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name && !nameToId.has(name)) {
-        nameToId.set(name, p.journal.issn || name);
-      }
-    });
-    return Array.from(nameToId.entries())
-      .map(([name, id]) => [id, name] as [string, string])
+
+    return Array.from(idToNames.entries())
+      .map(([id, counts]) => {
+        const bestName = Array.from(counts.entries()).sort(
+          (a, b) => b[1] - a[1] || b[0].length - a[0].length
+        )[0][0];
+        return [id, bestName] as [string, string];
+      })
       .sort((a, b) => a[1].localeCompare(b[1]));
   }, [initialData]);
 
@@ -406,20 +410,36 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
   }, [filteredData]);
 
   const institutionsList = useMemo(() => {
-    const counts: Record<string, InstitutionItem> = {};
+    const map = new Map<string, InstitutionItem>();
     initialData.forEach(p => {
+      const seenInPub = new Set<string>();
       p.authors.forEach(a => {
         a.institutions.forEach(inst => {
           const id = inst.ror || inst.name;
           if (!id) return;
-          if (!counts[id]) {
-            counts[id] = { id, name: inst.name, ror: inst.ror, country: inst.country, count: 0 };
+          let entry = map.get(id);
+          if (!entry) {
+            entry = {
+              id,
+              name: inst.name,
+              ror: inst.ror,
+              country: inst.country,
+              count: 0,
+              affiliationsCount: 0,
+            };
+            map.set(id, entry);
           }
-          counts[id].count += 1;
+          entry.affiliationsCount += 1;
+          if (!seenInPub.has(id)) {
+            seenInPub.add(id);
+            entry.count += 1;
+          }
         });
       });
     });
-    return Object.values(counts).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    return Array.from(map.values()).sort(
+      (a, b) => b.count - a.count || b.affiliationsCount - a.affiliationsCount || a.name.localeCompare(b.name)
+    );
   }, [initialData]);
 
   const platformFilteredData = useMemo(() => initialData.filter(p => {

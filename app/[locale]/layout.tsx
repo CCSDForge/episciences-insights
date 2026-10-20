@@ -1,5 +1,5 @@
 import React from 'react';
-import { Locale } from '@/lib/i18n/translations';
+import { Locale, translations } from '@/lib/i18n/translations';
 import { LanguageProvider } from '@/lib/i18n/LanguageContext';
 import { DashboardProvider } from '@/components/DashboardContext';
 import AppHeader from '@/components/AppHeader';
@@ -31,7 +31,7 @@ export default async function LocaleLayout({
       <DashboardProvider initialData={publications} usageSummary={kpiSummary} funders={funders}>
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col transition-colors">
           <a href="#main-content" className="skip-link">
-            Aller au contenu principal
+            {translations[validLocale].common.skipToContent}
           </a>
 
           <AppHeader />

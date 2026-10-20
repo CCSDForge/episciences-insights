@@ -87,8 +87,7 @@ export default function AppHeader() {
 
           {/* Navigation Links (Desktop) */}
           <nav
-            role="navigation"
-            aria-label="Sections du tableau de bord"
+            aria-label={locale === 'fr' ? 'Sections du tableau de bord' : locale === 'es' ? 'Secciones del panel' : 'Dashboard sections'}
             className="hidden md:flex items-center gap-1 lg:gap-1.5 overflow-x-auto scrollbar-hide py-1"
           >
             {NAV_ITEMS.map((item) => {
@@ -118,6 +117,7 @@ export default function AppHeader() {
             <Link
               href={`/${locale}/network`}
               title={t.header.networkExplorerBtn}
+              aria-label={t.header.networkExplorerBtn}
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                 isNetworkPage
                   ? 'bg-[var(--episciences-cyan-03)] text-white dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)]'
@@ -135,8 +135,7 @@ export default function AppHeader() {
 
         {/* Mobile Navigation Row */}
         <nav
-          role="navigation"
-          aria-label="Sections du tableau de bord (mobile)"
+          aria-label={locale === 'fr' ? 'Sections du tableau de bord (mobile)' : locale === 'es' ? 'Secciones del panel (móvil)' : 'Dashboard sections (mobile)'}
           className="flex md:hidden items-center gap-1.5 overflow-x-auto scrollbar-hide py-2 border-t border-zinc-100 dark:border-zinc-800"
         >
           {NAV_ITEMS.map((item) => {

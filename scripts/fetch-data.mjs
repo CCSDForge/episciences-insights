@@ -121,7 +121,10 @@ async function run() {
 
   const rawResults = await pMap(dois, async (doi, i) => {
     const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//i, '').trim().toLowerCase();
-    const docid = doiToDocid.get(cleanDoi);
+    let docid = doiToDocid.get(cleanDoi);
+    if (docid === undefined) {
+      docid = await episciencesClient.resolveDocid(cleanDoi);
+    }
 
     // Fetch from OpenAlex, OpenAIRE and Episciences concurrently for this DOI
     const [openAlexData, openAireResult, episciencesExport] = await Promise.all([
@@ -148,7 +151,7 @@ async function run() {
         logNotFound('Episciences', doi);
       }
 
-      itemResult = mergePublication(openAlexData, openAireResult, episciencesExport);
+      itemResult = mergePublication(openAlexData, openAireResult, episciencesExport, doi);
     }
 
     processedCount++;

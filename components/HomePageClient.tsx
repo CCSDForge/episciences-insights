@@ -185,7 +185,7 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
             className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors whitespace-nowrap"
           >
             <span>{locale === 'fr' ? 'Consulter la méthodologie' : locale === 'es' ? 'Ver metodología' : 'View methodology'}</span>
-            <ExternalLink size={14} />
+            <ExternalLink size={14} aria-hidden="true" />
           </Link>
         </div>
 
@@ -211,7 +211,7 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label="CCSD - Centre pour la Communication Scientifique Directe"
+              aria-label={`CCSD - Centre pour la Communication Scientifique Directe (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
             >
               <Image
                 src="/ccsd-logo-light.svg"
@@ -230,30 +230,107 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
             </a>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-80 transition-opacity hover:opacity-100">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                {locale === 'fr' ? 'Tutelles :' : locale === 'es' ? 'Tutelas:' : 'Supervisory bodies:'}
-              </span>
-            </div>
-            <div className="flex items-center gap-6">
-              <span className="font-heading font-black tracking-tight text-zinc-800 dark:text-zinc-200 text-sm">
-                CNRS
-              </span>
-              <span className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
-              <span className="font-heading font-black tracking-tight text-zinc-800 dark:text-zinc-200 text-sm">
-                INRAE
-              </span>
-              <span className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
-              <span className="font-heading font-black tracking-tight text-zinc-800 dark:text-zinc-200 text-sm">
-                Inria
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            {/* MESRE */}
+            <a
+              href="https://www.enseignementsup-recherche.gouv.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
+              aria-label={`Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
+            >
+              <Image
+                src="/tutelles/mesre-light.png"
+                alt="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
+                width={180}
+                height={150}
+                className="h-16 sm:h-20 w-auto dark:hidden"
+              />
+              <Image
+                src="/tutelles/mesre-dark.png"
+                alt="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
+                width={180}
+                height={150}
+                className="hidden h-16 sm:h-20 w-auto dark:block"
+              />
+            </a>
+
+            {/* CNRS */}
+            <a
+              href="https://www.cnrs.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
+              aria-label={`CNRS - Centre national de la recherche scientifique (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
+            >
+              <Image
+                src="/tutelles/cnrs-light.svg"
+                alt="CNRS - Centre national de la recherche scientifique"
+                width={100}
+                height={100}
+                className="h-9 w-auto dark:hidden"
+              />
+              <Image
+                src="/tutelles/cnrs-dark.svg"
+                alt="CNRS - Centre national de la recherche scientifique"
+                width={100}
+                height={100}
+                className="hidden h-9 w-auto dark:block"
+              />
+            </a>
+
+            {/* Inria */}
+            <a
+              href="https://www.inria.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
+              aria-label={`Inria - Institut national de recherche en sciences et technologies du numérique (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
+            >
+              <Image
+                src="/tutelles/inria-light.svg"
+                alt="Inria"
+                width={120}
+                height={35}
+                className="h-7 w-auto dark:hidden"
+              />
+              <Image
+                src="/tutelles/inria-dark.svg"
+                alt="Inria"
+                width={120}
+                height={35}
+                className="hidden h-7 w-auto dark:block"
+              />
+            </a>
+
+            {/* INRAE */}
+            <a
+              href="https://www.inrae.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
+              aria-label={`INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
+            >
+              <Image
+                src="/tutelles/inrae-light.png"
+                alt="INRAE"
+                width={120}
+                height={32}
+                className="h-6 w-auto dark:hidden"
+              />
+              <Image
+                src="/tutelles/inrae-dark.png"
+                alt="INRAE"
+                width={120}
+                height={32}
+                className="hidden h-6 w-auto dark:block"
+              />
+            </a>
           </div>
         </div>
 
         {formattedDate && (
-          <p className="text-center text-xs font-medium text-zinc-400 dark:text-zinc-500 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+          <p className="text-center text-xs font-medium text-zinc-600 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-800">
             {t.footer.lastUpdated.replace('{date}', formattedDate)}
           </p>
         )}

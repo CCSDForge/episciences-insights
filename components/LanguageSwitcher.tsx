@@ -131,7 +131,7 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
                 <span>{option.label}</span>
                 <span className="flex items-center gap-1.5">
                   <span className="text-[10px] uppercase font-mono text-zinc-400">{option.shortLabel}</span>
-                  {isSelected && <Check size={13} className="text-[var(--primary-text)] shrink-0" />}
+                  {isSelected && <Check size={13} className="text-[var(--primary-text)] shrink-0" aria-hidden="true" />}
                 </span>
               </button>
             );

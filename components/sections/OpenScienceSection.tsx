@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
 import ResearchLineage from '@/components/ResearchLineage';
 import LicenseSpectrum from '@/components/LicenseSpectrum';
+import ChartExportMenu from '@/components/ChartExportMenu';
 
 export default function OpenScienceSection() {
   const { t } = useTranslation();
@@ -57,11 +58,28 @@ export default function OpenScienceSection() {
               </p>
             </div>
           </div>
-          {openScienceStats.totalLicenseMentions > 0 && (
-            <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 max-w-sm text-right">
-              {formatNum(openScienceStats.totalLicenseMentions)} {t.dashboard.licenseDeclarations}
-            </p>
-          )}
+          <div className="flex flex-wrap items-center gap-3">
+            {openScienceStats.totalLicenseMentions > 0 && (
+              <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 max-w-sm text-right">
+                {formatNum(openScienceStats.totalLicenseMentions)} {t.dashboard.licenseDeclarations}
+              </p>
+            )}
+            {openScienceStats.topLicenses.length > 0 && (
+              <ChartExportMenu
+                data={openScienceStats.topLicenses.map((l) => ({
+                  license: l.name,
+                  count: l.count,
+                  percentage: `${((l.count / openScienceStats.totalLicenseMentions) * 100).toFixed(1)}%`,
+                }))}
+                filename="episciences-open-access-licenses"
+                csvColumns={[
+                  { key: 'license', header: 'License' },
+                  { key: 'count', header: 'Declarations_Count' },
+                  { key: 'percentage', header: 'Percentage' },
+                ]}
+              />
+            )}
+          </div>
         </div>
 
         {openScienceStats.totalLicenseMentions === 0 ? (

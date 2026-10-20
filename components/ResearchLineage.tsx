@@ -25,7 +25,7 @@ interface ResearchLineageProps {
 }
 
 export default function ResearchLineage({ data }: ResearchLineageProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [selectedPaper, setSelectedPaper] = useState<Publication | null>(data[0] || null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -130,10 +130,12 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
               aria-hidden="true"
             />
             <input
+              id="lineage-search-input"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t.lineage.searchPlaceholder}
+              aria-label={t.lineage.searchPlaceholder}
               className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#0aa0be] focus:border-transparent transition-all"
             />
             {searchQuery && (
@@ -143,7 +145,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                 aria-label={t.lineage.clearSearch}
               >
-                <X size={14} />
+                <X size={14} aria-hidden="true" />
               </button>
             )}
           </div>
@@ -306,6 +308,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                     href={getDoiUrl(selectedPaper.doi)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={`${t.lineage.viewArticle} (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#005fb9] hover:bg-[#0aa0be] text-white font-bold transition-colors shrink-0 shadow-sm"
                   >
                     <span>{t.lineage.viewArticle}</span>

@@ -282,7 +282,7 @@ export default function CountryInstitutionsExplorer({
               <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
                 {t.countryInstitutions.title}
               </h3>
-              <p className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mt-1">
+              <p className="text-xs font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-[0.2em] mt-1">
                 {t.countryInstitutions.subtitle}
               </p>
             </div>
@@ -292,28 +292,32 @@ export default function CountryInstitutionsExplorer({
         {/* View Mode & Country Selector dropdown */}
         <div className="flex flex-wrap items-center gap-3">
           {/* View Mode Toggle */}
-          <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+          <div role="group" aria-label={locale === 'fr' ? "Mode d'affichage" : locale === 'es' ? "Modo de visualización" : "View mode"} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
             <button
+              type="button"
               onClick={() => setViewMode('treemap')}
               aria-label="Treemap view"
+              aria-pressed={viewMode === 'treemap'}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 viewMode === 'treemap'
                   ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
-              <LayoutGrid size={14} /> {t.countryInstitutions.treemap}
+              <LayoutGrid size={14} aria-hidden="true" /> {t.countryInstitutions.treemap}
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('bars')}
               aria-label="Bar chart view"
+              aria-pressed={viewMode === 'bars'}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 viewMode === 'bars'
                   ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
-              <BarChart2 size={14} /> {t.countryInstitutions.barChart}
+              <BarChart2 size={14} aria-hidden="true" /> {t.countryInstitutions.barChart}
             </button>
           </div>
 
@@ -321,7 +325,7 @@ export default function CountryInstitutionsExplorer({
           <div className="relative">
             <select
               id="country-affiliation-select"
-              aria-label="Select Country"
+              aria-label={t.common.country}
               value={activeCountry}
               onChange={(e) => handleSelectCountry(e.target.value)}
               className="appearance-none rounded-xl border border-zinc-300 bg-white pl-4 pr-10 py-2 text-sm font-bold text-zinc-900 shadow-sm focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 outline-none cursor-pointer"
@@ -342,15 +346,17 @@ export default function CountryInstitutionsExplorer({
 
       {/* Quick Select Country Pills */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-black text-zinc-400 uppercase tracking-widest mr-2 flex items-center gap-1.5">
-          <Globe size={13} /> {t.countryInstitutions.quickSelect}
+        <span className="text-xs font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mr-2 flex items-center gap-1.5">
+          <Globe size={13} aria-hidden="true" /> {t.countryInstitutions.quickSelect}
         </span>
         {quickCountries.map((c) => {
           const isSelected = c.code === activeCountry;
           return (
             <button
               key={c.code}
+              type="button"
               onClick={() => handleSelectCountry(c.code)}
+              aria-pressed={isSelected}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
                 isSelected
                   ? 'bg-blue-600 text-white shadow-blue-500/25 ring-2 ring-blue-600'
@@ -379,20 +385,22 @@ export default function CountryInstitutionsExplorer({
         </div>
         <div className="flex items-center gap-6 text-xs font-bold text-zinc-600 dark:text-zinc-300">
           <div>
-            <span className="text-zinc-400 font-normal">{t.countryInstitutions.publications} </span>
+            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{t.countryInstitutions.publications} </span>
             <span className="font-black text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{formatNum(totalCountryPubs)}</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-normal">{t.countryInstitutions.identifiedInstitutions} </span>
+            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{t.countryInstitutions.identifiedInstitutions} </span>
             <span className="font-black text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{formatNum(institutions.length)}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-zinc-400 font-normal">{t.countryInstitutions.limit} </span>
+            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{t.countryInstitutions.limit} </span>
             <div className="flex bg-white dark:bg-zinc-800 rounded-lg p-0.5 shadow-sm border border-zinc-200 dark:border-zinc-700">
               {([15, 30, 50] as const).map((l) => (
                 <button
                   key={l}
+                  type="button"
                   onClick={() => setLimit(l)}
+                  aria-label={`${t.countryInstitutions.limit} ${l}`}
                   className={`px-2 py-0.5 text-[10px] font-black rounded ${
                     limit === l ? 'bg-blue-600 text-white' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
                   }`}
@@ -507,7 +515,7 @@ export default function CountryInstitutionsExplorer({
 
       {/* Top Institutions Grid Cards */}
       <div className="space-y-4">
-        <h4 className="text-sm font-black text-zinc-400 uppercase tracking-widest">
+        <h4 className="text-sm font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">
           Ranked Institutions in {activeCountryName} ({Math.min(limit, institutions.length)} of {institutions.length})
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -538,10 +546,10 @@ export default function CountryInstitutionsExplorer({
                       title={`View ${inst.name} on ROR`}
                     >
                       {inst.ror.split('/').pop()}
-                      <ExternalLink size={10} />
+                      <ExternalLink size={10} aria-hidden="true" />
                     </a>
                   ) : (
-                    <span className="text-[9px] text-zinc-400 font-mono uppercase tracking-tighter shrink-0">
+                    <span className="text-[9px] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-tighter shrink-0">
                       No ROR
                     </span>
                   )}
@@ -551,7 +559,7 @@ export default function CountryInstitutionsExplorer({
                 </p>
                 <div className="flex items-center justify-between pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs">
                   <span className="font-black text-zinc-900 dark:text-zinc-100">
-                    {formatNum(inst.count)} <span className="text-[10px] font-normal text-zinc-400">pubs</span>
+                    {formatNum(inst.count)} <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400">pubs</span>
                   </span>
                   <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full text-[10px]">
                     {inst.percentage}%

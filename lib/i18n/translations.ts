@@ -432,10 +432,29 @@ export interface Translations {
     licenseDesc: string;
     reproTitle: string;
     reproDesc: string;
+    reproCommands: string;
     downloadPubs: string;
     downloadFunders: string;
     sec7Title: string;
     references: string[];
+  };
+  export: {
+    exportButton: string;
+    exportMenu: string;
+    exportVisualization: string;
+    exportData: string;
+    png: string;
+    pngDesc: string;
+    svg: string;
+    svgDesc: string;
+    csv: string;
+    csvDesc: string;
+    json: string;
+    jsonDesc: string;
+    downloading: string;
+    success: string;
+    error: string;
+    noSvgFound: string;
   };
 }
 
@@ -872,6 +891,7 @@ export const translations: Record<Locale, Translations> = {
           "licenseDesc": "The source code is licensed under GNU GPL v3. Harmonized datasets are distributed under Creative Commons Attribution 4.0 International (CC-BY 4.0).",
           "reproTitle": "Reproduce the Collection Pipeline",
           "reproDesc": "The full data collection and build pipeline can be reproduced locally with Node.js:",
+          "reproCommands": "# 1. Clone the repository (GPL v3)\ngit clone https://github.com/CCSDForge/episciences-insights.git\ncd episciences-insights && npm install\n\n# 2. Sync DOIs from the Episciences API\nnpm run sync:dois\n\n# 3. Fetch and merge metadata\nnpm run collect\n\n# Optional: fetch Scholix links (datasets and software)\nnpm run collect:links\n\n# 4. Generate the static site\nnpm run build",
           "downloadPubs": "Download publications dataset (JSON)",
           "downloadFunders": "Download funders dataset (JSON)",
           "sec7Title": "7. Links and Documentation",
@@ -881,6 +901,24 @@ export const translations: Record<Locale, Translations> = {
               "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
               "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
           ]
+      },
+      "export": {
+          "exportButton": "Export",
+          "exportMenu": "Export options",
+          "exportVisualization": "Visualization",
+          "exportData": "Data",
+          "png": "PNG image",
+          "pngDesc": "High resolution (2x retina)",
+          "svg": "SVG vector",
+          "svgDesc": "Vector publication quality",
+          "csv": "CSV spreadsheet",
+          "csvDesc": "Filtered data table for Excel / Calc",
+          "json": "JSON raw data",
+          "jsonDesc": "Structured data format",
+          "downloading": "Generating export...",
+          "success": "Export downloaded successfully",
+          "error": "Export failed",
+          "noSvgFound": "No visual chart found to export"
       }
   },
   fr: {
@@ -1315,6 +1353,7 @@ export const translations: Record<Locale, Translations> = {
           "licenseDesc": "Le code source est publié sous licence GNU GPL v3. Les jeux de données consolidés sont diffusés sous licence CC-BY 4.0.",
           "reproTitle": "Reproduire la collecte",
           "reproDesc": "L'ensemble du traitement peut être relancé localement avec Node.js :",
+          "reproCommands": "# 1. Cloner le dépôt (GPL v3)\ngit clone https://github.com/CCSDForge/episciences-insights.git\ncd episciences-insights && npm install\n\n# 2. Récupérer la liste des DOI depuis l'API Episciences\nnpm run sync:dois\n\n# 3. Collecter et fusionner les métadonnées\nnpm run collect\n\n# Optionnel : collecter les liens Scholix (données et logiciels)\nnpm run collect:links\n\n# 4. Générer le site statique\nnpm run build",
           "downloadPubs": "Télécharger les publications (JSON)",
           "downloadFunders": "Télécharger les financeurs (JSON)",
           "sec7Title": "7. Liens et documentation",
@@ -1324,6 +1363,24 @@ export const translations: Record<Locale, Translations> = {
               "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
               "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
           ]
+      },
+      "export": {
+          "exportButton": "Exporter",
+          "exportMenu": "Options d'export",
+          "exportVisualization": "Visualisation",
+          "exportData": "Données",
+          "png": "Image PNG",
+          "pngDesc": "Haute résolution (2x retina)",
+          "svg": "Vecteur SVG",
+          "svgDesc": "Qualité publication vectorielle",
+          "csv": "Tableur CSV",
+          "csvDesc": "Tableau de données filtrées pour Excel / Calc",
+          "json": "Données brutes JSON",
+          "jsonDesc": "Format de données structurées",
+          "downloading": "Génération de l'export...",
+          "success": "Export téléchargé avec succès",
+          "error": "Échec de l'export",
+          "noSvgFound": "Aucun graphique visuel détecté pour l'export"
       }
   },
   es: {
@@ -1758,6 +1815,7 @@ export const translations: Record<Locale, Translations> = {
           "licenseDesc": "El código fuente se distribuye bajo licencia GNU GPL v3. Los conjuntos de datos consolidados se difunden bajo licencia Creative Commons Atribución 4.0 Internacional (CC-BY 4.0).",
           "reproTitle": "Reproducir la recolección",
           "reproDesc": "Todo el pipeline puede ejecutarse localmente con Node.js:",
+          "reproCommands": "# 1. Clonar el repositorio (GPL v3)\ngit clone https://github.com/CCSDForge/episciences-insights.git\ncd episciences-insights && npm install\n\n# 2. Sincronizar los DOI desde la API de Episciences\nnpm run sync:dois\n\n# 3. Recolectar y fusionar los metadatos\nnpm run collect\n\n# Opcional: recolectar enlaces Scholix (datos y software)\nnpm run collect:links\n\n# 4. Generar el sitio estático\nnpm run build",
           "downloadPubs": "Descargar las publicaciones (JSON)",
           "downloadFunders": "Descargar los financiadores (JSON)",
           "sec7Title": "7. Enlaces y documentación",
@@ -1767,6 +1825,24 @@ export const translations: Record<Locale, Translations> = {
               "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
               "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
           ]
+      },
+      "export": {
+          "exportButton": "Exportar",
+          "exportMenu": "Opciones de exportación",
+          "exportVisualization": "Visualización",
+          "exportData": "Datos",
+          "png": "Imagen PNG",
+          "pngDesc": "Alta resolución (2x retina)",
+          "svg": "Vector SVG",
+          "svgDesc": "Calidad de publicación vectorial",
+          "csv": "Hoja de cálculo CSV",
+          "csvDesc": "Tabla de datos filtrados para Excel / Calc",
+          "json": "Datos en bruto JSON",
+          "jsonDesc": "Formato de datos estructurados",
+          "downloading": "Generando exportación...",
+          "success": "Exportación descargada con éxito",
+          "error": "Error en la exportación",
+          "noSvgFound": "No se detectó ningún gráfico visual para exportar"
       }
   },
 };

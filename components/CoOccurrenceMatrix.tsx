@@ -127,20 +127,22 @@ export default function CoOccurrenceMatrix({
     <div className="w-full bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-xl p-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-6 dark:border-zinc-800">
         <div className="flex items-center gap-3">
-          <div className={`p-2.5 text-white rounded-2xl shadow-lg ${theme.iconBg}`}>
+          <div className={`p-2.5 text-white rounded-2xl shadow-lg ${theme.iconBg}`} aria-hidden="true">
             {icon}
           </div>
           <div>
             <h3 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">{title}</h3>
-            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">{subtitle}</p>
+            <p className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mt-1">{subtitle}</p>
           </div>
         </div>
         <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
           {([15, 25, 40] as TopN[]).map((n) => (
             <button
               key={n}
+              type="button"
               onClick={() => setTopN(n)}
               aria-label={`Top ${n} ${entityLabelPlural}`}
+              aria-pressed={topN === n}
               className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all first:rounded-l-lg last:rounded-r-lg border-r last:border-r-0 border-zinc-200 dark:border-zinc-600 ${
                 topN === n ? `bg-white dark:bg-zinc-700 shadow-sm ${theme.activeText}` : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
@@ -219,8 +221,8 @@ export default function CoOccurrenceMatrix({
             .replace('{label}', entityLabelPlural)
             .replace('{max}', formatNum(maxPair))}
         </p>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mr-1">{t.common.fewer}</span>
+        <div className="flex items-center gap-1.5" aria-hidden="true">
+          <span className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mr-1">{t.common.fewer}</span>
           {ramp.map((color) => (
             <span
               key={color}
@@ -228,7 +230,7 @@ export default function CoOccurrenceMatrix({
               style={{ backgroundColor: color }}
             />
           ))}
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">{t.common.more}</span>
+          <span className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t.common.more}</span>
         </div>
       </div>
 

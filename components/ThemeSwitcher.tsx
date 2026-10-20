@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useSyncExternalStore } from 'react';
+import React, { useState, useRef, useEffect, useSyncExternalStore, useMemo } from 'react';
 import { Sun, Moon, Monitor, ChevronDown, Check } from 'lucide-react';
 import { useTheme, Theme } from './ThemeProvider';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface ThemeOption {
   value: Theme;
@@ -11,37 +12,38 @@ interface ThemeOption {
   icon: React.ComponentType<{ size?: number; className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
 }
 
-const THEME_OPTIONS: ThemeOption[] = [
-  {
-    value: 'light',
-    label: 'Clair',
-    ariaLabel: 'Light theme',
-    icon: Sun,
-  },
-  {
-    value: 'dark',
-    label: 'Sombre',
-    ariaLabel: 'Dark theme',
-    icon: Moon,
-  },
-  {
-    value: 'system',
-    label: 'Système',
-    ariaLabel: 'System theme',
-    icon: Monitor,
-  },
-];
-
 const emptySubscribe = () => () => {};
 
 export default function ThemeSwitcher({ className = '' }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const { locale } = useTranslation();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const currentOption = THEME_OPTIONS.find((opt) => opt.value === theme) || THEME_OPTIONS[2];
+  const themeOptions = useMemo<ThemeOption[]>(() => [
+    {
+      value: 'light',
+      label: locale === 'fr' ? 'Clair' : locale === 'es' ? 'Claro' : 'Light',
+      ariaLabel: locale === 'fr' ? 'Thème clair' : locale === 'es' ? 'Tema claro' : 'Light theme',
+      icon: Sun,
+    },
+    {
+      value: 'dark',
+      label: locale === 'fr' ? 'Sombre' : locale === 'es' ? 'Oscuro' : 'Dark',
+      ariaLabel: locale === 'fr' ? 'Thème sombre' : locale === 'es' ? 'Tema oscuro' : 'Dark theme',
+      icon: Moon,
+    },
+    {
+      value: 'system',
+      label: locale === 'fr' ? 'Système' : locale === 'es' ? 'Sistema' : 'System',
+      ariaLabel: locale === 'fr' ? 'Thème système' : locale === 'es' ? 'Tema del sistema' : 'System theme',
+      icon: Monitor,
+    },
+  ], [locale]);
+
+  const currentOption = themeOptions.find((opt) => opt.value === theme) || themeOptions[2];
   const CurrentIcon = currentOption.icon;
 
   const selectTheme = (nextTheme: Theme) => {
@@ -81,7 +83,7 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
         onClick={() => setIsOpen(!isOpen)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-label="Changer le thème d'affichage"
+        aria-label={locale === 'fr' ? "Changer le thème d'affichage" : locale === 'es' ? "Cambiar tema de visualización" : "Change display theme"}
         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-bold transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-focus)] ${
           isOpen
             ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50 ring-1 ring-zinc-300 dark:ring-zinc-700'
@@ -99,10 +101,10 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
       {isOpen && (
         <div
           role="listbox"
-          aria-label="Thème d'affichage"
+          aria-label={locale === 'fr' ? "Thème d'affichage" : locale === 'es' ? "Tema de visualización" : "Display theme"}
           className="absolute right-0 z-50 mt-1.5 w-36 origin-top-right rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 animate-in fade-in zoom-in-95 duration-150"
         >
-          {THEME_OPTIONS.map((option) => {
+          {themeOptions.map((option) => {
             const isSelected = theme === option.value;
             const Icon = option.icon;
             return (
@@ -111,6 +113,7 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
                 type="button"
                 role="option"
                 aria-selected={isSelected}
+                aria-label={option.ariaLabel}
                 onClick={() => selectTheme(option.value)}
                 className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition-colors cursor-pointer ${
                   isSelected
@@ -122,7 +125,7 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
                   <Icon size={14} className="shrink-0" aria-hidden="true" />
                   <span>{option.label}</span>
                 </span>
-                {isSelected && <Check size={13} className="text-[var(--primary-text)] shrink-0" />}
+                {isSelected && <Check size={13} className="text-[var(--primary-text)] shrink-0" aria-hidden="true" />}
               </button>
             );
           })}

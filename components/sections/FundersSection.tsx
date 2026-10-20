@@ -25,6 +25,7 @@ import FunderCofundingMatrix from '@/components/FunderCofundingMatrix';
 import FunderCofundingClusterNetwork from '@/components/FunderCofundingClusterNetwork';
 import FunderSankey from '@/components/FunderSankey';
 import FullscreenModal from '@/components/FullscreenModal';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import ViewSegmentedControl, { ViewOption } from '@/components/ViewSegmentedControl';
 
 const FunderGeographicFlowMap = dynamic(
@@ -52,6 +53,8 @@ export default function FundersSection() {
   const [funderSearch, setFunderSearch] = useState('');
   const funderButtonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const funderVolumeChartRef = useRef<HTMLDivElement>(null);
+  const relationalViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isFunderOpen) return;
@@ -197,7 +200,7 @@ export default function FundersSection() {
               type="button"
               onClick={() => setFunderFilter('all')}
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-400 dark:hover:bg-rose-950/50 rounded-xl transition-colors whitespace-nowrap cursor-pointer"
-              title="Reset funder filter"
+              title={t.common.resetFilters}
             >
               <RotateCcw className="h-3 w-3" />
               <span>{t.common.reset}</span>
@@ -221,25 +224,36 @@ export default function FundersSection() {
                   {t.dashboard.funderVolumeDesc}
                 </p>
               </div>
-              <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
-                {([50, 100, 500] as const).map((limit) => (
-                  <button
-                    key={limit}
-                    type="button"
-                    onClick={() => setFunderLimit(limit)}
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                      funderLimit === limit
-                        ? 'bg-white dark:bg-zinc-700 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shadow-xs'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-                    }`}
-                  >
-                    Top {limit}
-                  </button>
-                ))}
+              <div className="flex items-center gap-3">
+                <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+                  {([50, 100, 500] as const).map((limit) => (
+                    <button
+                      key={limit}
+                      type="button"
+                      onClick={() => setFunderLimit(limit)}
+                      className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                        funderLimit === limit
+                          ? 'bg-white dark:bg-zinc-700 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shadow-xs'
+                          : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                      }`}
+                    >
+                      Top {limit}
+                    </button>
+                  ))}
+                </div>
+                <ChartExportMenu
+                  targetRef={funderVolumeChartRef}
+                  data={funderData}
+                  filename={`episciences-funders-volume-top-${funderLimit}`}
+                  csvColumns={[
+                    { key: 'name', header: 'Funder_Name' },
+                    { key: 'value', header: 'Publications_Count' },
+                  ]}
+                />
               </div>
             </div>
 
-            <div className="overflow-y-auto overflow-x-hidden pr-2 border border-zinc-100 rounded-xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30" style={{ height: '520px' }}>
+            <div ref={funderVolumeChartRef} className="overflow-y-auto overflow-x-hidden pr-2 border border-zinc-100 rounded-xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30" style={{ height: '520px' }}>
               <div style={{ height: `${Math.max(400, funderData.length * 40)}px`, width: '100%' }}>
                 <ChartContainer width="100%" height="100%">
                   <BarChart data={funderData} layout="vertical" margin={{ left: 20, right: 40, top: 20, bottom: 20 }}>
@@ -270,7 +284,11 @@ export default function FundersSection() {
       {/* Relational Views */}
       {activeView !== 'overview' && (
         <div className="space-y-4 animate-in fade-in duration-300">
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-2">
+            <ChartExportMenu
+              targetRef={relationalViewRef}
+              filename={`episciences-funders-${activeView}`}
+            />
             <button
               type="button"
               onClick={() => setIsFullscreen(true)}
@@ -282,7 +300,7 @@ export default function FundersSection() {
               <span className="hidden sm:inline">{t.common.fullscreen}</span>
             </button>
           </div>
-          <div>
+          <div ref={relationalViewRef}>
             {activeView === 'network' && <FunderCofundingNetwork data={funderFilteredData} />}
             {activeView === 'matrix' && <FunderCofundingMatrix data={funderFilteredData} />}
             {activeView === 'cluster' && <FunderCofundingClusterNetwork data={funderFilteredData} />}

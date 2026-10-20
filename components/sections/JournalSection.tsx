@@ -181,7 +181,7 @@ export default function JournalSection() {
                 <BookOpen size={20} />
               </span>
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {locale === 'fr' ? 'Statistiques à l’usage des revues' : 'Journal Dashboard'}
+                {locale === 'fr' ? 'Statistiques à l’usage des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Dashboard'}
               </span>
             </div>
             <h1 id="journal-section-heading" className="font-heading text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
@@ -190,6 +190,8 @@ export default function JournalSection() {
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-4xl leading-relaxed font-medium">
               {locale === 'fr'
                 ? 'Cet espace est conçu pour les comités éditoriaux et les équipes de revues hébergées sur Episciences. Il permet de suivre l’audience de vos articles (lectorat), la diversité géographique de vos auteurs (autorat), le paysage thématique et les financeurs des projets soutenant vos publications.'
+                : locale === 'es'
+                ? 'Este espacio está diseñado para comités editoriales y equipos de revistas alojadas en Episciences. Permite seguir la audiencia de sus artículos (lectores), la diversidad geográfica de sus autores (autoría), el panorama temático y los financiadores de proyectos que apoyan sus publicaciones.'
                 : 'This section is designed for editorial boards and journal teams hosted on Episciences. It provides readership insights (downloads and views), geographical authorship reach, topic landscapes, and associated research funders.'}
             </p>
           </div>
@@ -199,6 +201,8 @@ export default function JournalSection() {
             <span>
               {locale === 'fr'
                 ? 'Sources : API Episciences, métriques de téléchargement internes, OpenAlex, OpenAIRE & zbMATH Open.'
+                : locale === 'es'
+                ? 'Fuentes: API Episciences, métricas de descarga internas, OpenAlex, OpenAIRE y zbMATH Open.'
                 : 'Sources: Episciences API, platform usage analytics, OpenAlex, OpenAIRE & zbMATH Open.'}
             </span>
           </div>
@@ -218,7 +222,7 @@ export default function JournalSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Lectorat' : 'Readership'}
+                  {locale === 'fr' ? 'Lectorat' : locale === 'es' ? 'Lectores' : 'Readership'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   {locale === 'fr' ? 'Dynamique d’usage & Géographie du lectorat' : locale === 'es' ? 'Dinámica de uso y geografía del lectorado' : 'Usage trends & Readership geography'}
@@ -231,7 +235,7 @@ export default function JournalSection() {
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                {locale === 'fr' ? 'Dynamique des consultations' : 'Consultation Trends'}
+                {locale === 'fr' ? 'Dynamique des consultations' : locale === 'es' ? 'Dinámica de consultas' : 'Consultation Trends'}
               </h3>
               <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                 <span className="inline-block w-3.5 h-0.5 border-t-2 border-dashed border-amber-500" />
@@ -289,8 +293,8 @@ export default function JournalSection() {
                             const isDl = String(item.dataKey).toLowerCase().includes('download');
                             const color = isDl ? '#0aa0be' : '#57bec3';
                             const title = isDl
-                              ? locale === 'fr' ? 'Téléchargements' : 'Downloads'
-                              : locale === 'fr' ? 'Vues des résumés' : 'Abstract Views';
+                              ? locale === 'fr' ? 'Téléchargements' : locale === 'es' ? 'Descargas' : 'Downloads'
+                              : locale === 'fr' ? 'Vues des résumés' : locale === 'es' ? 'Vistas de resúmenes' : 'Abstract Views';
                             return (
                               <div key={String(item.dataKey)} className="flex items-center justify-between gap-4">
                                 <span className="flex items-center gap-1.5 font-medium text-zinc-600 dark:text-zinc-300">
@@ -407,7 +411,7 @@ export default function JournalSection() {
           {topArticles.length > 0 && (
             <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
               <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                {locale === 'fr' ? 'Articles les plus consultés' : 'Most Consulted Articles'}
+                {locale === 'fr' ? 'Articles les plus consultés' : locale === 'es' ? 'Artículos más consultados' : 'Most Consulted Articles'}
               </h3>
               <ul className="space-y-2 text-xs divide-y divide-zinc-100 dark:divide-zinc-800">
                 {topArticles.slice(0, 3).map((art) => (
@@ -439,10 +443,10 @@ export default function JournalSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Autorat' : 'Authorship'}
+                  {locale === 'fr' ? 'Autorat' : locale === 'es' ? 'Autoría' : 'Authorship'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Affiliations auteurs & Pays contributeurs' : 'Author affiliations & Contributing countries'}
+                  {locale === 'fr' ? 'Affiliations auteurs & Pays contributeurs' : locale === 'es' ? 'Afiliaciones de autores y países contribuyentes' : 'Author affiliations & Contributing countries'}
                 </p>
               </div>
             </div>
@@ -451,7 +455,7 @@ export default function JournalSection() {
           {/* Geographic author footprint map */}
           <div className="space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Origine géographique des auteurs' : 'Geographic Reach of Authors'}
+              {locale === 'fr' ? 'Origine géographique des auteurs' : locale === 'es' ? 'Origen geográfico de autores' : 'Geographic Reach of Authors'}
             </h3>
             <div className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
               <WorldMap data={countryData} tooltipId="authorship-world-map-tooltip" />
@@ -461,7 +465,7 @@ export default function JournalSection() {
           {/* Contributing Institutions */}
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Top établissements d’affiliation' : 'Top Author Institutions'}
+              {locale === 'fr' ? 'Top établissements d’affiliation' : locale === 'es' ? 'Principales instituciones de afiliación' : 'Top Author Institutions'}
             </h3>
             <CountryInstitutionsExplorer data={filteredData} />
           </div>
@@ -472,16 +476,18 @@ export default function JournalSection() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                    {locale === 'fr' ? 'Entrepôts d’origine (Revues en épi / Overlay)' : 'Source Preprint Repositories (Overlay)'}
+                    {locale === 'fr' ? 'Entrepôts d’origine (Revues en épi / Overlay)' : locale === 'es' ? 'Repositorios de origen (Revistas superpuestas / Overlay)' : 'Source Preprint Repositories (Overlay)'}
                   </h3>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                     {locale === 'fr'
                       ? 'Archives ouvertes hébergeant les manuscrits évalués par les pairs et publiés sur Episciences.'
+                      : locale === 'es'
+                      ? 'Repositorios abiertos que alojan los manuscritos revisados por pares y publicados en Episciences.'
                       : 'Open repositories hosting the manuscripts peer-reviewed and published on Episciences.'}
                   </p>
                 </div>
                 <span className="text-[11px] text-zinc-500 font-medium shrink-0">
-                  {formatNum(totalOverlayRepos)} {locale === 'fr' ? 'articles répertoriés' : 'indexed articles'}
+                  {formatNum(totalOverlayRepos)} {locale === 'fr' ? 'articles répertoriés' : locale === 'es' ? 'artículos registrados' : 'indexed articles'}
                 </span>
               </div>
               <OverlayRepositorySpectrum repositories={hostingRepositories} total={totalOverlayRepos} />
@@ -500,41 +506,44 @@ export default function JournalSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Thématiques' : 'Research Topics'}
+                  {locale === 'fr' ? 'Thématiques' : locale === 'es' ? 'Temáticas' : 'Research Topics'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Vue d’ensemble & Co-thématiques' : 'Topic Overview & Co-occurrences'}
+                  {locale === 'fr' ? 'Vue d’ensemble & Co-thématiques' : locale === 'es' ? 'Resumen y cotemáticas' : 'Topic Overview & Co-occurrences'}
                 </p>
               </div>
             </div>
 
             {/* Toggle controls */}
-            <div className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+            <div role="group" aria-label={locale === 'fr' ? "Mode d'affichage des thématiques" : locale === 'es' ? "Modo de visualización de temas" : "Topic view mode"} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
               <button
                 type="button"
                 onClick={() => setTopicView('treemap')}
+                aria-pressed={topicView === 'treemap'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   topicView === 'treemap'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Treemap' : 'Treemap'}
+                {locale === 'fr' ? 'Treemap' : locale === 'es' ? 'Treemap' : 'Treemap'}
               </button>
               <button
                 type="button"
                 onClick={() => setTopicView('network')}
+                aria-pressed={topicView === 'network'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   topicView === 'network'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                 }`}
               >
-                {locale === 'fr' ? 'Réseau' : 'Network'}
+                {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
               </button>
               <button
                 type="button"
                 onClick={() => setTopicView('msc')}
+                aria-pressed={topicView === 'msc'}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   topicView === 'msc'
                     ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
@@ -566,10 +575,10 @@ export default function JournalSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Financeurs' : 'Research Funders'}
+                  {locale === 'fr' ? 'Financeurs' : locale === 'es' ? 'Financiadores' : 'Research Funders'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Évolution temporelle & Volume par bailleur' : 'Grants Timeline & Funder Breakdown'}
+                  {locale === 'fr' ? 'Évolution temporelle & Volume par bailleur' : locale === 'es' ? 'Evolución temporal y volumen por financiador' : 'Grants Timeline & Funder Breakdown'}
                 </p>
               </div>
             </div>
@@ -578,7 +587,7 @@ export default function JournalSection() {
           {/* Funder Storyline */}
           <div className="space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Évolution chronologique des financements' : 'Funding Timeline'}
+              {locale === 'fr' ? 'Évolution chronologique des financements' : locale === 'es' ? 'Evolución cronológica de la financiación' : 'Funding Timeline'}
             </h3>
             <FunderStoryline data={filteredData} />
           </div>
@@ -586,7 +595,7 @@ export default function JournalSection() {
           {/* Funder Top Breakdown */}
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Principaux organismes financeurs' : 'Top Funding Agencies'}
+              {locale === 'fr' ? 'Principaux organismes financeurs' : locale === 'es' ? 'Principales organismos financiadores' : 'Top Funding Agencies'}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {funderData.slice(0, 6).map((f) => (

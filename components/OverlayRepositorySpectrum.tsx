@@ -85,7 +85,7 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
       <div
         className="flex items-center gap-1.5 w-full p-1.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/90 ring-1 ring-zinc-300 dark:ring-zinc-600 shadow-inner"
         role="progressbar"
-        aria-label={locale === 'fr' ? 'Répartition des entrepôts sources' : 'Distribution of source repositories'}
+        aria-label={locale === 'fr' ? 'Répartition des entrepôts sources' : locale === 'es' ? 'Distribución de repositorios fuentes' : 'Distribution of source repositories'}
         aria-valuemin={0}
         aria-valuemax={100}
       >
@@ -93,7 +93,7 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
           const meta = REPO_META[repo.name] || DEFAULT_META;
           const pct = (repo.count / total) * 100;
           const label = `${repo.name} : ${formatNum(repo.count)} ${
-            locale === 'fr' ? 'articles' : 'articles'
+            locale === 'fr' ? 'articles' : locale === 'es' ? 'artículos' : 'articles'
           } (${pct.toFixed(1)}%)`;
 
           return (
@@ -164,7 +164,7 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
                 <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   {formatNum(repo.count)}{' '}
                   <span className="text-[10px] text-zinc-400 font-normal">
-                    {locale === 'fr' ? 'articles' : 'articles'}
+                    {locale === 'fr' ? 'articles' : locale === 'es' ? 'artículos' : 'articles'}
                   </span>
                 </div>
               </div>

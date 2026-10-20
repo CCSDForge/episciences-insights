@@ -39,6 +39,67 @@ function normalizeAwardCode(code) {
  */
 const NON_JOURNAL_NAME_PATTERN = /\b(HAL|DOAJ|arXiv|RePEc|Repository|Archiv|Portal|IRIS|Orbit|Scholar|Bibliography|Explorer|institutional research information system)\b/i;
 
+/**
+ * Authoritative list of Episciences hosted journals (from api.episciences.org/api/journals/).
+ * Used to ensure external aggregator misattributions (e.g. Wiley's "Journal of Graph Theory")
+ * are detected and repaired into their legitimate Episciences journal.
+ */
+const EPISCIENCES_CANONICAL_JOURNALS = [
+  { code: 'afm', name: 'Annals of Formalized Mathematics' },
+  { code: 'arcs', name: 'Analyse de réseaux pour les sciences sociales' },
+  { code: 'arima', name: 'Revue Africaine de Recherche en Informatique et Mathématiques Appliquées' },
+  { code: 'asrm', name: 'Archéologies. Sociétés, réseaux, matériaux' },
+  { code: 'cm', name: 'Communications in Mathematics' },
+  { code: 'compositionality', name: 'Compositionality' },
+  { code: 'cst', name: 'Les Cahiers Scientifiques du Transport - Scientific Papers in Transportation' },
+  { code: 'dc', name: 'Data & Corpus' },
+  { code: 'detours', name: 'Détours' },
+  { code: 'dmtcs', name: 'Discrete Mathematics & Theoretical Computer Science' },
+  { code: 'eid', name: 'Environnement, Ingénierie & Développement' },
+  { code: 'elpub', name: 'ElPub - ELectronic PUBlishing' },
+  { code: 'entics', name: 'Electronic Notes in Theoretical Informatics and Computer Science' },
+  { code: 'epidemes', name: 'epiDEMES' },
+  { code: 'epiga', name: 'Épijournal de Géométrie Algébrique' },
+  { code: 'fajpc', name: 'French Academic Journal of Primary Care' },
+  { code: 'fi', name: 'Fundamenta Informaticae' },
+  { code: 'gcc', name: 'journal of Groups, complexity, cryptology' },
+  { code: 'hrj', name: 'Hardy-Ramanujan Journal' },
+  { code: 'jdmdh', name: 'Journal of Data Mining & Digital Humanities' },
+  { code: 'jfp', name: 'Journal of Functional Programming' },
+  { code: 'jft', name: 'Journal francophone de tribologie' },
+  { code: 'jimis', name: 'Journal of Interdisciplinary Methodologies and Issues in Sciences' },
+  { code: 'jips', name: "JIPS - Journal d'Interaction Personne-Système" },
+  { code: 'jnsao', name: 'Journal of Nonsmooth Analysis and Optimization' },
+  { code: 'jodakiss', name: 'JoDaKISS - Journal of Data- and Knowledge-integrated Simulation Science' },
+  { code: 'jonas', name: 'JoNAS - Journal of Non-Associative Structures' },
+  { code: 'jpe', name: 'Journal of Philosophical Economics' },
+  { code: 'jsat', name: 'Journal on Satisfiability, Boolean Modeling and Computation' },
+  { code: 'jsedi', name: 'Journal of Studies of Earth’s Deep Interior' },
+  { code: 'jtcam', name: 'Journal of Theoretical, Computational and Applied Mechanics' },
+  { code: 'lmcs', name: 'Logical Methods in Computer Science' },
+  { code: 'mbj', name: 'Multidisciplinary Biomechanics Journal' },
+  { code: 'mna', name: 'Mathematical Neuroscience and Applications' },
+  { code: 'mos', name: 'Management et Organisations du Sport' },
+  { code: 'mscs', name: 'Mathematical Structures in Computer Science' },
+  { code: 'mss', name: 'Movement & Sport Sciences - Science & Motricité' },
+  { code: 'ocnmp', name: 'Open Communications in Nonlinear Mathematical Physics' },
+  { code: 'ops', name: 'Open Plasma Science' },
+  { code: 'pspa', name: 'Le Partenariat de soin avec le patient' },
+  { code: 'raspa', name: '[RASPA] Revue africaine de santé et de productions animales' },
+  { code: 'rdm', name: 'Recherches en Didactique des Mathématiques' },
+  { code: 'slovo', name: 'Slovo' },
+  { code: 'societes-plurielles', name: 'Sociétés plurielles' },
+  { code: 'theoretics', name: 'TheoretiCS' },
+  { code: 'toc', name: 'Theory of Computing' },
+  { code: 'transformations', name: 'Transformations' },
+];
+
+const EPISCIENCES_BY_CODE = new Map(EPISCIENCES_CANONICAL_JOURNALS.map((j) => [j.code.toLowerCase(), j]));
+const EPISCIENCES_BY_NAME = new Map();
+for (const j of EPISCIENCES_CANONICAL_JOURNALS) {
+  EPISCIENCES_BY_NAME.set(stripAccentsLower(j.name), j);
+}
+
 const KNOWN_CODES_BY_JOURNAL_NAME = {
   'logical methods in computer science': 'lmcs',
 };
@@ -50,43 +111,73 @@ function cleanText(str) {
 /**
  * Repairs `journal.{name,issn,code}` when OpenAlex's source resolution
  * produced a repository name instead of the actual journal, or produced
- * nothing at all.
+ * nothing at all, or resolved to an external third-party publisher.
  *
  * Episciences' own `database.current.journal` (the platform of record) is
  * preferred *unconditionally* whenever it's available — not just when the
- * OpenAlex name "looks wrong". A first version of this function only
- * repaired names matching NON_JOURNAL_NAME_PATTERN below, on the assumption
- * that was the bulk of the damage; measured on the real corpus it missed
- * 1746/7826 publications (22.3%) whose OpenAlex name was still wrong but
- * didn't match the pattern — either a subtler mismatch with the real
- * Episciences name (missing accent/subtitle/apostrophe, wrong
- * capitalization: "journal of Groups complexity cryptology" vs "Groups
- * Complexity Cryptology") or a genuine repository name the pattern didn't
- * anticipate (e.g. "Padua Research Archive (University of Padova)",
- * "Centrum Wiskunde & Informatica (CWI)..."). OpenAIRE's `container` is
- * only used as a fallback when no Episciences export exists at all.
- *
- * `code` (the Episciences rvcode, e.g. "dmtcs") is a much more stable
- * per-journal identity than `issn` for the frontend to key on: OpenAlex's
- * source misresolution routinely drags along a *wrong* ISSN too (e.g.
- * DMTCS's own articles have been observed carrying 5 different ISSNs
- * across the corpus, one of them a completely unrelated journal's), so
- * `issn` cannot be trusted to dedupe by journal on its own.
+ * OpenAlex name "looks wrong".
  */
-function repairJournal(journal, openAireResult, episciencesExport) {
+function repairJournal(journal, openAireResult, episciencesExport, sourceDoi) {
   const episciencesJournal = episciencesExport?.database?.current?.journal;
   const container = openAireResult?.container;
-  const issn = journal.issn || container?.issnOnline || container?.issnPrinted || container?.issnLinking;
+  const containerIssn = container?.issnOnline || container?.issnPrinted || container?.issnLinking;
 
   if (episciencesJournal?.name) {
-    return { ...journal, name: cleanText(episciencesJournal.name), code: episciencesJournal.code, issn };
+    const isDifferentJournal = journal.name && stripAccentsLower(journal.name) !== stripAccentsLower(episciencesJournal.name);
+    return {
+      name: cleanText(episciencesJournal.name),
+      code: episciencesJournal.code,
+      issn: isDifferentJournal ? (containerIssn || journal.issn) : (journal.issn || containerIssn),
+      id: isDifferentJournal ? undefined : journal.id,
+    };
   }
 
-  const looksWrong = !journal.name || NON_JOURNAL_NAME_PATTERN.test(journal.name);
-  const name = looksWrong && container?.name ? cleanText(container.name) : journal.name;
-  const code = journal.code || (name ? KNOWN_CODES_BY_JOURNAL_NAME[name.toLowerCase().trim()] : undefined);
+  // Check if current journal is an actual Episciences journal
+  const knownByCode = journal.code ? EPISCIENCES_BY_CODE.get(journal.code.toLowerCase()) : undefined;
+  const knownByName = journal.name ? EPISCIENCES_BY_NAME.get(stripAccentsLower(journal.name)) : undefined;
+  const isKnownEpisciencesJournal = Boolean(knownByCode || knownByName);
 
-  return { ...journal, name, code, issn };
+  const looksWrong = !isKnownEpisciencesJournal || !journal.name || NON_JOURNAL_NAME_PATTERN.test(journal.name);
+
+  let candidateName = journal.name;
+  let candidateCode = journal.code;
+
+  if (looksWrong) {
+    const containerClean = container?.name ? cleanText(container.name.replace(/&amp;/g, '&')) : undefined;
+    const containerMatch = containerClean ? EPISCIENCES_BY_NAME.get(stripAccentsLower(containerClean)) : undefined;
+
+    if (containerMatch) {
+      candidateName = containerMatch.name;
+      candidateCode = containerMatch.code;
+    } else {
+      // Try resolving from DOI prefix (e.g. 10.46298/dmtcs.3444 -> dmtcs)
+      const cleanDoi = (sourceDoi || '').replace(/^https?:\/\/doi\.org\//i, '').trim();
+      const doiCodeMatch = cleanDoi.match(/^10\.46298\/([a-z0-9_-]+)[.-]/i);
+      if (doiCodeMatch) {
+        const doiCode = doiCodeMatch[1].toLowerCase();
+        const journalFromDoi = EPISCIENCES_BY_CODE.get(doiCode);
+        if (journalFromDoi) {
+          candidateName = journalFromDoi.name;
+          candidateCode = journalFromDoi.code;
+        }
+      }
+    }
+
+    if (!candidateCode && containerClean) {
+      candidateName = containerClean;
+      candidateCode = KNOWN_CODES_BY_JOURNAL_NAME[containerClean.toLowerCase().trim()];
+    }
+  }
+
+  const finalCode = candidateCode || (candidateName ? KNOWN_CODES_BY_JOURNAL_NAME[candidateName.toLowerCase().trim()] : undefined);
+  const isDifferentJournal = journal.name && candidateName && stripAccentsLower(journal.name) !== stripAccentsLower(candidateName);
+
+  return {
+    name: candidateName ? cleanText(candidateName) : journal.name,
+    code: finalCode,
+    issn: isDifferentJournal ? (containerIssn || journal.issn) : (journal.issn || containerIssn),
+    id: isDifferentJournal ? undefined : journal.id,
+  };
 }
 
 /**
@@ -417,11 +508,23 @@ function extractOpenScience(openAireResult) {
  * Combines a raw OpenAlex work, an (optional) raw OpenAIRE
  * research-product, and the (optional) Episciences platform export into
  * the final Publication record.
+ *
+ * @param {object} openAlexData
+ * @param {object} [openAireResult]
+ * @param {object} [episciencesExport]
+ * @param {string} [sourceDoi] The canonical Episciences DOI being collected
  */
-export function mergePublication(openAlexData, openAireResult, episciencesExport) {
+export function mergePublication(openAlexData, openAireResult, episciencesExport, sourceDoi) {
   const base = transformOpenAlex(openAlexData);
 
-  base.journal = repairJournal(base.journal, openAireResult, episciencesExport);
+  // Preserve the requested canonical Episciences DOI if provided,
+  // preventing OpenAlex from replacing it with an external publisher's DOI (e.g. Wiley).
+  if (sourceDoi) {
+    const cleanDoi = sourceDoi.replace(/^https?:\/\/doi\.org\//i, '').trim();
+    base.doi = `https://doi.org/${cleanDoi}`;
+  }
+
+  base.journal = repairJournal(base.journal, openAireResult, episciencesExport, sourceDoi);
   base.awards = mergeAwards(base.awards, openAireResult?.projects);
   base.authors = enrichOrcids(base.authors, openAireResult?.authors);
   base.authors = mergeEpisciencesAffiliations(base.authors, episciencesExport);

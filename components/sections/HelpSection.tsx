@@ -580,21 +580,7 @@ export default function HelpSection({ corpusStats }: HelpSectionProps = {}) {
             {m.reproDesc}
           </p>
           <pre className="rounded-xl bg-zinc-950 p-4 text-[11px] font-mono text-zinc-200 overflow-x-auto border border-zinc-800 leading-relaxed">
-{`# 1. Cloner le dépôt (GPL v3)
-git clone https://github.com/CCSDForge/episciences-insights.git
-cd episciences-insights && npm install
-
-# 2. Récupérer la liste des DOI depuis l'API Episciences
-npm run sync:dois
-
-# 3. Collecter et fusionner les métadonnées
-npm run collect
-
-# Optionnel : collecter les liens Scholix (données et logiciels)
-npm run collect:links
-
-# 4. Générer le site statique
-npm run build`}
+            {m.reproCommands}
           </pre>
         </div>
       </section>

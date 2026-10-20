@@ -27,6 +27,8 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
     }).format(date);
   }, [lastUpdated, locale]);
 
+  const newTabNotice = locale === 'fr' ? '(ouvre un nouvel onglet)' : locale === 'es' ? '(abre una nueva pestaña)' : '(opens in a new tab)';
+
   if (isHome) {
     return null;
   }
@@ -39,7 +41,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="CCSD - Centre pour la Communication Scientifique Directe"
+          aria-label={`CCSD - Centre pour la Communication Scientifique Directe ${newTabNotice}`}
         >
           {/* Logo CCSD pour thème clair */}
           <Image
@@ -68,7 +70,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
+          aria-label={`Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace ${newTabNotice}`}
         >
           <Image
             src="/tutelles/mesre-light.png"
@@ -92,7 +94,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="CNRS - Centre national de la recherche scientifique"
+          aria-label={`CNRS - Centre national de la recherche scientifique ${newTabNotice}`}
         >
           <Image
             src="/tutelles/cnrs-light.svg"
@@ -116,7 +118,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="Inria - Institut national de recherche en sciences et technologies du numérique"
+          aria-label={`Inria - Institut national de recherche en sciences et technologies du numérique ${newTabNotice}`}
         >
           <Image
             src="/tutelles/inria-light.svg"
@@ -140,7 +142,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement"
+          aria-label={`INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement ${newTabNotice}`}
         >
           <Image
             src="/tutelles/inrae-light.png"

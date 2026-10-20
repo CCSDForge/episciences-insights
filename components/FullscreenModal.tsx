@@ -109,7 +109,7 @@ export default function FullscreenModal({
             aria-label={t.common.exitFullscreen}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
       </header>

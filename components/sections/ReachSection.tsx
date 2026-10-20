@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Globe,
@@ -14,6 +14,7 @@ import {
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import WorldMap from '@/components/WorldMap';
 import CountryInstitutionsExplorer from '@/components/CountryInstitutionsExplorer';
@@ -51,6 +52,10 @@ export default function ReachSection() {
   const [activeView, setActiveView] = useState<ReachView>('overview');
   const [selectedCountry, setSelectedCountry] = useState<string>('FR');
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const authorAffiliationsMapRef = useRef<HTMLDivElement>(null);
+  const topCountriesChartRef = useRef<HTMLDivElement>(null);
+  const relationalReachRef = useRef<HTMLDivElement>(null);
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
@@ -145,8 +150,17 @@ export default function ReachSection() {
                   {t.dashboard.authorAffiliationsSubtitle.replace('{count}', formatNum(globalReachStats.totalCountries))}
                 </span>
               </div>
+              <ChartExportMenu
+                targetRef={authorAffiliationsMapRef}
+                data={countryData}
+                filename="episciences-author-affiliations-map"
+                csvColumns={[
+                  { key: 'name', header: 'Country_Code' },
+                  { key: 'value', header: 'Publications_Count' },
+                ]}
+              />
             </div>
-            <div className="h-[600px] w-full border border-zinc-100 rounded-xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30">
+            <div ref={authorAffiliationsMapRef} className="h-[600px] w-full border border-zinc-100 rounded-xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30">
               <WorldMap
                 data={countryData}
                 selectedCountry={selectedCountry}
@@ -173,25 +187,36 @@ export default function ReachSection() {
                   {t.dashboard.rankedByPubs}
                 </span>
               </div>
-              <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
-                {([10, 25, 50] as const).map((limit) => (
-                  <button
-                    key={limit}
-                    type="button"
-                    onClick={() => setCountryLimit(limit)}
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                      countryLimit === limit
-                        ? 'bg-white dark:bg-zinc-700 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shadow-xs'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-                    }`}
-                  >
-                    Top {limit}
-                  </button>
-                ))}
+              <div className="flex items-center gap-3">
+                <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+                  {([10, 25, 50] as const).map((limit) => (
+                    <button
+                      key={limit}
+                      type="button"
+                      onClick={() => setCountryLimit(limit)}
+                      className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                        countryLimit === limit
+                          ? 'bg-white dark:bg-zinc-700 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shadow-xs'
+                          : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                      }`}
+                    >
+                      Top {limit}
+                    </button>
+                  ))}
+                </div>
+                <ChartExportMenu
+                  targetRef={topCountriesChartRef}
+                  data={topCountriesData.slice(0, countryLimit)}
+                  filename={`episciences-top-countries-${countryLimit}`}
+                  csvColumns={[
+                    { key: 'name', header: 'Country' },
+                    { key: 'value', header: 'Publications_Count' },
+                  ]}
+                />
               </div>
             </div>
 
-            <div className="h-[380px] w-full mb-8">
+            <div ref={topCountriesChartRef} className="h-[380px] w-full mb-8">
               <ChartContainer width="100%" height="100%">
                 <BarChart
                   data={topCountriesData.slice(0, countryLimit)}
@@ -354,19 +379,25 @@ export default function ReachSection() {
                 )}
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsFullscreen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer shrink-0 self-end sm:self-auto"
-              title={t.common.fullscreen}
-              aria-label={t.common.fullscreen}
-            >
-              <Maximize2 size={13} aria-hidden="true" />
-              <span className="hidden sm:inline">{t.common.fullscreen}</span>
-            </button>
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <ChartExportMenu
+                targetRef={relationalReachRef}
+                filename={`episciences-reach-${activeView}`}
+              />
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-700 shadow-xs border border-zinc-200/80 dark:border-zinc-700 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
+                title={t.common.fullscreen}
+                aria-label={t.common.fullscreen}
+              >
+                <Maximize2 size={13} aria-hidden="true" />
+                <span className="hidden sm:inline">{t.common.fullscreen}</span>
+              </button>
+            </div>
           </div>
 
-          <div>
+          <div ref={relationalReachRef}>
             {activeView === 'flows' && <CountryGeographicFlowMap data={filteredData} />}
             {activeView === 'country-network' && <CountryCollaborationNetwork data={filteredData} />}
             {activeView === 'institution-network' && <CollaborationWeb data={filteredData} />}
