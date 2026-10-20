@@ -25,6 +25,10 @@
   --primary-focus: #008cc3;      /* Cyan 02 */
   --primary-bg-subtle: #edf8f9;  /* Teinte très douce */
   
+  --map-empty-fill: #f1f5f9;
+  --map-empty-stroke: #cbd5e1;
+  --map-empty-hover: #e2e8f0;
+  
   --font-sans: var(--font-noto-sans), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
@@ -54,6 +58,9 @@
   --primary-border: #0aa0be;     /* Cyan 01 */
   --primary-focus: #57bec3;      /* Cyan 00 */
   --primary-bg-subtle: rgba(87, 190, 195, 0.12);
+  --map-empty-fill: #cbd5e1;
+  --map-empty-stroke: #94a3b8;
+  --map-empty-hover: #e2e8f0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -67,6 +74,9 @@
     --primary-border: #0aa0be;
     --primary-focus: #57bec3;
     --primary-bg-subtle: rgba(87, 190, 195, 0.12);
+    --map-empty-fill: #cbd5e1;
+    --map-empty-stroke: #94a3b8;
+    --map-empty-hover: #e2e8f0;
   }
 }
 
@@ -124,7 +134,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Focus styles for keyboard navigation */
 [role="tab"]:focus-visible {
-  outline: 2px solid var(--primary-teal);
+  outline: 2px solid var(--primary-focus);
   outline-offset: -4px;
   border-radius: 9999px;
 }

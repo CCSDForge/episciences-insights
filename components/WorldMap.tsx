@@ -97,12 +97,26 @@ export default function WorldMap({
                       onSelectCountry(countryCode.toUpperCase());
                     }
                   }}
-                  fill={isSelected ? '#1d4ed8' : value > 0 ? colorScale(value) : "#f1f5f9"}
-                  stroke={isSelected ? '#172554' : "#cbd5e1"}
+                  fill={isSelected ? '#1d4ed8' : value > 0 ? colorScale(value) : "var(--map-empty-fill)"}
+                  stroke={isSelected ? '#172554' : "var(--map-empty-stroke)"}
                   strokeWidth={isSelected ? 1.8 : 0.5}
                   style={{
                     default: { outline: "none" },
-                    hover: { fill: colorRange[1], outline: "none", cursor: isInteractive ? "pointer" : "default" },
+                    hover: {
+                      fill: isSelected
+                        ? '#1d4ed8'
+                        : value > 0
+                          ? colorScale(value)
+                          : "var(--map-empty-hover, var(--map-empty-fill))",
+                      stroke: isSelected
+                        ? '#172554'
+                        : value > 0
+                          ? colorRange[1]
+                          : "var(--map-empty-stroke)",
+                      strokeWidth: value > 0 ? 1.5 : 0.5,
+                      outline: "none",
+                      cursor: isInteractive ? "pointer" : "default",
+                    },
                     pressed: { outline: "none" },
                   }}
                   className="focus-visible:stroke-teal-500 focus-visible:stroke-2 focus-visible:outline-none"
