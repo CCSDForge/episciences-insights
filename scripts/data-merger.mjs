@@ -39,6 +39,10 @@ function normalizeAwardCode(code) {
  */
 const NON_JOURNAL_NAME_PATTERN = /\b(HAL|DOAJ|arXiv|RePEc|Repository|Archiv|Portal|IRIS|Orbit|Scholar|Bibliography|Explorer|institutional research information system)\b/i;
 
+const KNOWN_CODES_BY_JOURNAL_NAME = {
+  'logical methods in computer science': 'lmcs',
+};
+
 function cleanText(str) {
   return str?.replace(/\s+/g, ' ').trim();
 }
@@ -78,12 +82,11 @@ function repairJournal(journal, openAireResult, episciencesExport) {
     return { ...journal, name: cleanText(episciencesJournal.name), code: episciencesJournal.code, issn };
   }
 
-  if (!container) return { ...journal, issn };
-
   const looksWrong = !journal.name || NON_JOURNAL_NAME_PATTERN.test(journal.name);
-  const name = looksWrong && container.name ? cleanText(container.name) : journal.name;
+  const name = looksWrong && container?.name ? cleanText(container.name) : journal.name;
+  const code = journal.code || (name ? KNOWN_CODES_BY_JOURNAL_NAME[name.toLowerCase().trim()] : undefined);
 
-  return { ...journal, name, issn };
+  return { ...journal, name, code, issn };
 }
 
 /**

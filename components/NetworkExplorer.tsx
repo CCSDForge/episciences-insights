@@ -109,19 +109,40 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
   );
 
   const journals = useMemo(() => {
-    const unique = new Map<string, string>();
+    const nameToId = new Map<string, string>();
     data.forEach((p) => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name) unique.set(p.journal.code || p.journal.issn || name, name);
+      if (name && p.journal.code) {
+        nameToId.set(name, p.journal.code);
+      }
     });
-    return Array.from(unique.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+    data.forEach((p) => {
+      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
+      if (name && !nameToId.has(name)) {
+        nameToId.set(name, p.journal.issn || name);
+      }
+    });
+    return Array.from(nameToId.entries())
+      .map(([name, id]) => [id, name] as [string, string])
+      .sort((a, b) => a[1].localeCompare(b[1]));
   }, [data]);
+
+  const selectedJournalName = useMemo(() => {
+    if (journalFilter === 'all') return null;
+    const found = journals.find(([id]) => id === journalFilter);
+    return found ? found[1] : null;
+  }, [journalFilter, journals]);
 
   const filteredData = useMemo(() => data.filter((p) => {
     const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
-    const journalMatch = journalFilter === 'all' || p.journal.code === journalFilter || p.journal.issn === journalFilter || p.journal.name === journalFilter;
+    const journalMatch =
+      journalFilter === 'all' ||
+      p.journal.code === journalFilter ||
+      p.journal.issn === journalFilter ||
+      p.journal.name === journalFilter ||
+      (selectedJournalName && p.journal.name?.replace(/\s+/g, ' ').trim() === selectedJournalName);
     return yearMatch && journalMatch;
-  }), [data, yearFilter, journalFilter]);
+  }), [data, yearFilter, journalFilter, selectedJournalName]);
 
   const countryOptions = useMemo(() => {
     const codes = new Set<string>();

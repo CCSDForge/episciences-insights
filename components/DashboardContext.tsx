@@ -207,14 +207,34 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
     setInstitutionFilter('all');
   }, []);
 
-  const filteredData = useMemo(() => initialData.filter(p => {
-    const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
-    const journalMatch = journalFilter === 'all' || p.journal.code === journalFilter || p.journal.issn === journalFilter || p.journal.name === journalFilter;
-    const institutionMatch = institutionFilter === 'all' || p.authors.some(a =>
-      a.institutions.some(inst => (inst.ror && inst.ror === institutionFilter) || inst.name === institutionFilter)
-    );
-    return yearMatch && journalMatch && institutionMatch;
-  }), [initialData, yearFilter, journalFilter, institutionFilter]);
+  // Map of journal code/issn to canonical name
+  const journalIdToName = useMemo(() => {
+    const map = new Map<string, string>();
+    initialData.forEach(p => {
+      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
+      if (!name) return;
+      if (p.journal.code) map.set(p.journal.code, name);
+      if (p.journal.issn) map.set(p.journal.issn, name);
+    });
+    return map;
+  }, [initialData]);
+
+  const filteredData = useMemo(() => {
+    const selectedJournalName = journalFilter !== 'all' ? journalIdToName.get(journalFilter) : null;
+    return initialData.filter(p => {
+      const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
+      const journalMatch =
+        journalFilter === 'all' ||
+        p.journal.code === journalFilter ||
+        p.journal.issn === journalFilter ||
+        p.journal.name === journalFilter ||
+        (selectedJournalName && p.journal.name?.replace(/\s+/g, ' ').trim() === selectedJournalName);
+      const institutionMatch = institutionFilter === 'all' || p.authors.some(a =>
+        a.institutions.some(inst => (inst.ror && inst.ror === institutionFilter) || inst.name === institutionFilter)
+      );
+      return yearMatch && journalMatch && institutionMatch;
+    });
+  }, [initialData, yearFilter, journalFilter, institutionFilter, journalIdToName]);
 
   const stats = useMemo(() => ({
     totalPubs: filteredData.length,
@@ -334,12 +354,24 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
   }, [initialData]);
 
   const journals = useMemo(() => {
-    const unique = new Map<string, string>();
+    const nameToId = new Map<string, string>();
+    // First pass: register journals with their canonical code
     initialData.forEach(p => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name) unique.set(p.journal.code || p.journal.issn || name, name);
+      if (name && p.journal.code) {
+        nameToId.set(name, p.journal.code);
+      }
     });
-    return Array.from(unique.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+    // Second pass: fallback for any journal lacking a code
+    initialData.forEach(p => {
+      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
+      if (name && !nameToId.has(name)) {
+        nameToId.set(name, p.journal.issn || name);
+      }
+    });
+    return Array.from(nameToId.entries())
+      .map(([name, id]) => [id, name] as [string, string])
+      .sort((a, b) => a[1].localeCompare(b[1]));
   }, [initialData]);
 
   const openScienceStats = useMemo(() => {
