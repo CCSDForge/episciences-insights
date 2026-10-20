@@ -19,7 +19,7 @@ interface CountryGeographicFlowMapProps {
 }
 
 const TOOLTIP_ID = 'country-flow-map-tooltip';
-const DEFAULT_MAX_NODES = 20;
+const DEFAULT_MAX_NODES = 25;
 const MIN_NODES = 10;
 const MAX_NODES_LIMIT = 50;
 const NODE_STEP = 5;
