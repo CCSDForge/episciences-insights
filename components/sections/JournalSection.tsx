@@ -8,7 +8,6 @@ import {
   Library,
   Wallet,
   Info,
-  Globe,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
@@ -222,7 +221,7 @@ export default function JournalSection() {
                   {locale === 'fr' ? 'Lectorat' : 'Readership'}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Dynamique d’usage & Pays du lectorat' : 'Usage trends & Readership geography'}
+                  {locale === 'fr' ? 'Dynamique d’usage & Géographie du lectorat' : locale === 'es' ? 'Dinámica de uso y geografía del lectorado' : 'Usage trends & Readership geography'}
                 </p>
               </div>
             </div>
@@ -367,13 +366,13 @@ export default function JournalSection() {
                   {locale === 'fr' ? 'Origine géographique du lectorat' : locale === 'es' ? 'Origen geográfico del lectorado' : 'Geographic Reach of Readership'}
                 </h3>
                 <span className="text-[11px] text-zinc-500 font-medium">
-                  {formatNum(readershipMapData.length)} {locale === 'fr' ? 'pays actifs' : locale === 'es' ? 'países activos' : 'active countries'}
+                  {formatNum(readershipMapData.length)} {locale === 'fr' ? 'pays et territoires actifs' : locale === 'es' ? 'países y territorios activos' : 'active countries and territories'}
                 </span>
               </div>
               <div className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
                 <WorldMap
                   data={readershipMapData}
-                  legendLabel={locale === 'fr' ? 'Consultations par pays' : locale === 'es' ? 'Consultas por país' : 'Readership by Country'}
+                  legendLabel={locale === 'fr' ? 'Consultations par pays ou territoire' : locale === 'es' ? 'Consultas por país o territorio' : 'Readership by Country or Territory'}
                   valueUnit={locale === 'fr' ? 'consultations' : locale === 'es' ? 'consultas' : 'consultations'}
                   colorRange={['#e0f7f8', '#0aa0be']}
                   tooltipId="readership-world-map-tooltip"
@@ -382,13 +381,13 @@ export default function JournalSection() {
             </div>
           )}
 
-          {/* Readership top countries */}
+          {/* Readership top countries and territories */}
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Top pays du lectorat' : 'Top Readership Countries'}
+              {locale === 'fr' ? 'Top 10 pays et territoires du lectorat' : locale === 'es' ? 'Top 10 países y territorios del lectorado' : 'Top 10 Readership Countries and Territories'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {readershipCountries.slice(0, 20).map((c) => (
+              {readershipCountries.slice(0, 10).map((c) => (
                 <div key={c.code} className="rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-2.5 text-center">
                   <div className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 truncate" title={c.name}>
                     {c.name}
