@@ -25,12 +25,58 @@ export function getThemeBackgroundColor(): string {
 }
 
 /**
- * Finds the primary SVG element within a container, or returns the element itself if it is an SVG.
+ * Finds the primary chart SVG element within a container, or returns the element itself if it is an SVG.
+ * Intentionally ignores small UI icons (e.g. Lucide icons <= 48px).
  */
 export function findSvgElement(container: HTMLElement | SVGSVGElement | null): SVGSVGElement | null {
   if (!container) return null;
   if (container instanceof SVGSVGElement) return container;
-  return container.querySelector('svg');
+
+  const allSvgs = Array.from(container.querySelectorAll<SVGSVGElement>('svg'));
+  if (allSvgs.length === 0) return null;
+
+  // Filter out UI icons (e.g. Lucide icons or small controls)
+  const chartSvgs = allSvgs.filter((svg) => {
+    if (svg.classList.contains('lucide') || svg.getAttribute('data-lucide') != null) {
+      return false;
+    }
+    const rect = svg.getBoundingClientRect();
+    // Chart SVGs have substantial dimensions
+    return rect.width > 60 && rect.height > 60;
+  });
+
+  if (chartSvgs.length > 0) {
+    // Return the largest candidate SVG by area
+    let largest = chartSvgs[0];
+    let maxArea = 0;
+    for (const svg of chartSvgs) {
+      const rect = svg.getBoundingClientRect();
+      const area = rect.width * rect.height;
+      if (area > maxArea) {
+        maxArea = area;
+        largest = svg;
+      }
+    }
+    return largest;
+  }
+
+  // Fallback: pick the largest SVG overall, but strictly ignore if it's icon-sized (<= 48x48)
+  let largest: SVGSVGElement | null = null;
+  let maxArea = 0;
+  for (const svg of allSvgs) {
+    const rect = svg.getBoundingClientRect();
+    const area = rect.width * rect.height;
+    if (area > maxArea) {
+      maxArea = area;
+      largest = svg;
+    }
+  }
+
+  if (maxArea <= 48 * 48) {
+    return null;
+  }
+
+  return largest;
 }
 
 /**

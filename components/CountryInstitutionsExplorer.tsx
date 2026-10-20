@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Publication } from '@/lib/types';
 import { getCountryName } from '@/lib/countryNames';
 import { COMMUNITY_COLORS } from '@/lib/colorRamps';
@@ -8,6 +8,7 @@ import {
   BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Treemap,
 } from 'recharts';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import { Building2, LayoutGrid, BarChart2, Globe, ExternalLink, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
@@ -268,6 +269,7 @@ export default function CountryInstitutionsExplorer({
   }, [institutions, limit]);
 
   const activeCountryName = getCountryName(activeCountry);
+  const chartAreaRef = useRef<HTMLDivElement>(null);
 
   return (
     <div id="country-affiliations-explorer" className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8 scroll-mt-6">
@@ -341,6 +343,27 @@ export default function CountryInstitutionsExplorer({
               className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
             />
           </div>
+
+          <ChartExportMenu
+            targetRef={chartAreaRef}
+            data={institutions.slice(0, limit).map((inst) => ({
+              countryCode: activeCountry,
+              countryName: activeCountryName,
+              institution: inst.name,
+              rorId: inst.ror || '',
+              publications: inst.count,
+              shareOfCountry: `${inst.percentage}%`,
+            }))}
+            filename={`episciences-institutions-${activeCountry.toLowerCase()}-${viewMode}`}
+            csvColumns={[
+              { key: 'countryCode', header: 'Country_Code' },
+              { key: 'countryName', header: 'Country_Name' },
+              { key: 'institution', header: 'Institution_Name' },
+              { key: 'rorId', header: 'ROR_ID' },
+              { key: 'publications', header: 'Publications_Count' },
+              { key: 'shareOfCountry', header: 'Share_Of_Country' },
+            ]}
+          />
         </div>
       </div>
 
@@ -414,77 +437,37 @@ export default function CountryInstitutionsExplorer({
       </div>
 
       {/* Main Visualization Area */}
-      {institutions.length === 0 ? (
-        <div className="h-[400px] flex items-center justify-center text-zinc-400 italic bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
-          {t.countryInstitutions.noAffiliation.replace('{country}', activeCountryName)}
-        </div>
-      ) : viewMode === 'treemap' ? (
-        /* Treemap View */
-        <div className="h-[560px] min-h-[560px] w-full bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800">
-          <ChartContainer width="100%" height="100%">
-            <Treemap
-              data={treeData}
-              dataKey="size"
-              aspectRatio={16 / 9}
-              stroke="none"
-              isAnimationActive={false}
-              content={(cellProps: Record<string, unknown>) => {
-                const payload = cellProps.payload as { count?: number; name?: string; color?: string } | undefined;
-                const size = typeof cellProps.size === 'number' ? cellProps.size : 0;
-                const name = typeof cellProps.name === 'string' ? cellProps.name : (payload?.name || '');
-                const color = typeof cellProps.color === 'string' ? cellProps.color : (payload?.color || '#3b82f6');
-                const count = payload?.count ?? size;
-                return (
-                  <TreemapCell
-                    {...(cellProps as TreemapContentProps)}
-                    count={count}
-                    name={name}
-                    color={color}
-                  />
-                );
-              }}
-            >
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload || !payload.length) return null;
-                  const item = payload[0].payload;
+      <div ref={chartAreaRef}>
+        {institutions.length === 0 ? (
+          <div className="h-[400px] flex items-center justify-center text-zinc-400 italic bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
+            {t.countryInstitutions.noAffiliation.replace('{country}', activeCountryName)}
+          </div>
+        ) : viewMode === 'treemap' ? (
+          /* Treemap View */
+          <div className="h-[560px] min-h-[560px] w-full bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800">
+            <ChartContainer width="100%" height="100%">
+              <Treemap
+                data={treeData}
+                dataKey="size"
+                aspectRatio={16 / 9}
+                stroke="none"
+                isAnimationActive={false}
+                content={(cellProps: Record<string, unknown>) => {
+                  const payload = cellProps.payload as { count?: number; name?: string; color?: string } | undefined;
+                  const size = typeof cellProps.size === 'number' ? cellProps.size : 0;
+                  const name = typeof cellProps.name === 'string' ? cellProps.name : (payload?.name || '');
+                  const color = typeof cellProps.color === 'string' ? cellProps.color : (payload?.color || '#3b82f6');
+                  const count = payload?.count ?? size;
                   return (
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl text-white font-sans space-y-1 z-50">
-                      <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{activeCountryName}</p>
-                      <p className="text-sm font-bold text-white max-w-sm">{item.name}</p>
-                      <div className="pt-2 border-t border-zinc-800 flex items-center justify-between gap-4 text-xs">
-                        <span className="font-black text-teal-400">{formatNum(item.count)} publications</span>
-                        <span className="font-bold text-zinc-400">{item.percentage}% of country</span>
-                      </div>
-                      {item.ror && (
-                        <p className="text-[10px] font-mono text-zinc-400 pt-1">ROR: {item.ror}</p>
-                      )}
-                    </div>
+                    <TreemapCell
+                      {...(cellProps as TreemapContentProps)}
+                      count={count}
+                      name={name}
+                      color={color}
+                    />
                   );
                 }}
-              />
-            </Treemap>
-          </ChartContainer>
-        </div>
-      ) : (
-        /* Bar Chart View */
-        <div className="border border-zinc-100 rounded-2xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30">
-          <div style={{ height: `${Math.max(380, Math.min(limit, institutions.length) * 34)}px`, width: '100%' }}>
-            <ChartContainer width="100%" height="100%">
-              <BarChart
-                data={institutions.slice(0, limit)}
-                layout="vertical"
-                margin={{ left: 20, right: 40, top: 10, bottom: 10 }}
               >
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  width={240}
-                  tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload || !payload.length) return null;
@@ -497,21 +480,63 @@ export default function CountryInstitutionsExplorer({
                           <span className="font-black text-teal-400">{formatNum(item.count)} publications</span>
                           <span className="font-bold text-zinc-400">{item.percentage}% of country</span>
                         </div>
+                        {item.ror && (
+                          <p className="text-[10px] font-mono text-zinc-400 pt-1">ROR: {item.ror}</p>
+                        )}
                       </div>
                     );
                   }}
-                  cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
                 />
-                <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={20}>
-                  {institutions.slice(0, limit).map((inst, idx) => (
-                    <Cell key={inst.ror || inst.name || idx} fill={COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
+              </Treemap>
             </ChartContainer>
           </div>
-        </div>
-      )}
+        ) : (
+          /* Bar Chart View */
+          <div className="border border-zinc-100 rounded-2xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30">
+            <div style={{ height: `${Math.max(380, Math.min(limit, institutions.length) * 34)}px`, width: '100%' }}>
+              <ChartContainer width="100%" height="100%">
+                <BarChart
+                  data={institutions.slice(0, limit)}
+                  layout="vertical"
+                  margin={{ left: 20, right: 40, top: 10, bottom: 10 }}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={240}
+                    tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload || !payload.length) return null;
+                      const item = payload[0].payload;
+                      return (
+                        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl text-white font-sans space-y-1 z-50">
+                          <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{activeCountryName}</p>
+                          <p className="text-sm font-bold text-white max-w-sm">{item.name}</p>
+                          <div className="pt-2 border-t border-zinc-800 flex items-center justify-between gap-4 text-xs">
+                            <span className="font-black text-teal-400">{formatNum(item.count)} publications</span>
+                            <span className="font-bold text-zinc-400">{item.percentage}% of country</span>
+                          </div>
+                        </div>
+                      );
+                    }}
+                    cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
+                  />
+                  <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={20}>
+                    {institutions.slice(0, limit).map((inst, idx) => (
+                      <Cell key={inst.ror || inst.name || idx} fill={COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Top Institutions Grid Cards */}
       <div className="space-y-4">

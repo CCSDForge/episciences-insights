@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Building2,
   Users,
@@ -13,6 +13,7 @@ import {
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import CountryCollaborationNetwork from '@/components/CountryCollaborationNetwork';
 import CountryCollaborationMatrix from '@/components/CountryCollaborationMatrix';
 import CountryGeographicFlowMap from '@/components/CountryGeographicFlowMap';
@@ -32,6 +33,11 @@ export default function InstitutionSection() {
   const [collabView, setCollabView] = useState<'network' | 'matrix' | 'flow'>('network');
   const [topicView, setTopicView] = useState<'treemap' | 'network' | 'msc'>('treemap');
   const [journalLimit, setJournalLimit] = useState<'all' | '10'>('all');
+
+  const collabRef = useRef<HTMLDivElement>(null);
+  const journalsChartRef = useRef<HTMLDivElement>(null);
+  const topicsRef = useRef<HTMLDivElement>(null);
+  const fundersRef = useRef<HTMLDivElement>(null);
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
@@ -188,48 +194,55 @@ export default function InstitutionSection() {
             </div>
 
             {/* Toggle views */}
-            <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des coopérations' : locale === 'es' ? 'Modo de visualización de cooperaciones' : 'Collaboration view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
-              <button
-                type="button"
-                onClick={() => setCollabView('network')}
-                aria-pressed={collabView === 'network'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  collabView === 'network'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setCollabView('matrix')}
-                aria-pressed={collabView === 'matrix'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  collabView === 'matrix'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Matrice' : locale === 'es' ? 'Matriz' : 'Matrix'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setCollabView('flow')}
-                aria-pressed={collabView === 'flow'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  collabView === 'flow'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Flux' : locale === 'es' ? 'Flujos' : 'Flows'}
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des coopérations' : locale === 'es' ? 'Modo de visualización de cooperaciones' : 'Collaboration view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+                <button
+                  type="button"
+                  onClick={() => setCollabView('network')}
+                  aria-pressed={collabView === 'network'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    collabView === 'network'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCollabView('matrix')}
+                  aria-pressed={collabView === 'matrix'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    collabView === 'matrix'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Matrice' : locale === 'es' ? 'Matriz' : 'Matrix'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCollabView('flow')}
+                  aria-pressed={collabView === 'flow'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    collabView === 'flow'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Flux' : locale === 'es' ? 'Flujos' : 'Flows'}
+                </button>
+              </div>
+
+              <ChartExportMenu
+                targetRef={collabRef}
+                filename={`episciences-institution-collab-${collabView}-${institutionFilter}`}
+              />
             </div>
           </div>
 
           {/* Network display */}
-          <div className="min-h-[300px]">
+          <div ref={collabRef} className="min-h-[300px]">
             {collabView === 'network' && <CountryCollaborationNetwork data={filteredData} />}
             {collabView === 'matrix' && <CountryCollaborationMatrix data={filteredData} />}
             {collabView === 'flow' && <CountryGeographicFlowMap data={filteredData} />}
@@ -290,40 +303,51 @@ export default function InstitutionSection() {
                   ? `Revistas que publican artículos de la institución (${displayedJournals.length})`
                   : `Publishing Journals (${displayedJournals.length})`}
               </h3>
-              {allJournalDistribution.length > 10 && (
-                <div
-                  role="group"
-                  aria-label={locale === 'fr' ? 'Nombre de revues à afficher' : locale === 'es' ? 'Número de revistas para mostrar' : 'Number of journals to show'}
-                  className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg shadow-inner"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setJournalLimit('all')}
-                    aria-pressed={journalLimit === 'all'}
-                    className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors cursor-pointer ${
-                      journalLimit === 'all'
-                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                    }`}
+              <div className="flex items-center gap-2">
+                {allJournalDistribution.length > 10 && (
+                  <div
+                    role="group"
+                    aria-label={locale === 'fr' ? 'Nombre de revues à afficher' : locale === 'es' ? 'Número de revistas para mostrar' : 'Number of journals to show'}
+                    className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg shadow-inner"
                   >
-                    {locale === 'fr' ? `Toutes (${allJournalDistribution.length})` : locale === 'es' ? `Todas (${allJournalDistribution.length})` : `All (${allJournalDistribution.length})`}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setJournalLimit('10')}
-                    aria-pressed={journalLimit === '10'}
-                    className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors cursor-pointer ${
-                      journalLimit === '10'
-                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                    }`}
-                  >
-                    Top 10
-                  </button>
-                </div>
-              )}
+                    <button
+                      type="button"
+                      onClick={() => setJournalLimit('all')}
+                      aria-pressed={journalLimit === 'all'}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors cursor-pointer ${
+                        journalLimit === 'all'
+                          ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                      }`}
+                    >
+                      {locale === 'fr' ? `Toutes (${allJournalDistribution.length})` : locale === 'es' ? `Todas (${allJournalDistribution.length})` : `All (${allJournalDistribution.length})`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setJournalLimit('10')}
+                      aria-pressed={journalLimit === '10'}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors cursor-pointer ${
+                        journalLimit === '10'
+                          ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                      }`}
+                    >
+                      Top 10
+                    </button>
+                  </div>
+                )}
+                <ChartExportMenu
+                  targetRef={journalsChartRef}
+                  data={allJournalDistribution}
+                  filename={`episciences-institution-journals-${institutionFilter}`}
+                  csvColumns={[
+                    { key: 'name', header: 'Journal_Name' },
+                    { key: 'count', header: 'Publications_Count' },
+                  ]}
+                />
+              </div>
             </div>
-            <div className="w-full max-h-[540px] overflow-y-auto pr-1">
+            <div ref={journalsChartRef} className="w-full max-h-[540px] overflow-y-auto pr-1">
               <div style={{ height: `${journalChartHeight}px` }} className="w-full">
                 <ChartContainer minHeight={380}>
                   <BarChart
@@ -400,47 +424,54 @@ export default function InstitutionSection() {
             </div>
 
             {/* Toggle controls */}
-            <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des thématiques' : locale === 'es' ? 'Modo de visualización de temas' : 'Topic view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
-              <button
-                type="button"
-                onClick={() => setTopicView('treemap')}
-                aria-pressed={topicView === 'treemap'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  topicView === 'treemap'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Treemap' : locale === 'es' ? 'Treemap' : 'Treemap'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTopicView('network')}
-                aria-pressed={topicView === 'network'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  topicView === 'network'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTopicView('msc')}
-                aria-pressed={topicView === 'msc'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  topicView === 'msc'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                MSC 2020
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des thématiques' : locale === 'es' ? 'Modo de visualización de temas' : 'Topic view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+                <button
+                  type="button"
+                  onClick={() => setTopicView('treemap')}
+                  aria-pressed={topicView === 'treemap'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    topicView === 'treemap'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Treemap' : locale === 'es' ? 'Treemap' : 'Treemap'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTopicView('network')}
+                  aria-pressed={topicView === 'network'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    topicView === 'network'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTopicView('msc')}
+                  aria-pressed={topicView === 'msc'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    topicView === 'msc'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  MSC 2020
+                </button>
+              </div>
+
+              <ChartExportMenu
+                targetRef={topicsRef}
+                filename={`episciences-institution-topics-${topicView}-${institutionFilter}`}
+              />
             </div>
           </div>
 
-          <div className="min-h-[480px] w-full">
+          <div ref={topicsRef} className="min-h-[480px] w-full">
             {topicView === 'treemap' && <TopicTreeMap data={filteredData} />}
             {topicView === 'network' && <TopicCoOccurrenceNetwork data={filteredData} />}
             {topicView === 'msc' && <MscCoOccurrenceNetwork data={filteredData} />}
@@ -465,10 +496,20 @@ export default function InstitutionSection() {
                 </p>
               </div>
             </div>
+
+            <ChartExportMenu
+              targetRef={fundersRef}
+              data={funderData}
+              filename={`episciences-institution-funders-${institutionFilter}`}
+              csvColumns={[
+                { key: 'name', header: 'Funder_Name' },
+                { key: 'value', header: 'Publications_Count' },
+              ]}
+            />
           </div>
 
           {/* Funder Storyline */}
-          <div className="space-y-2">
+          <div ref={fundersRef} className="space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               {locale === 'fr' ? 'Évolution temporelle des financements' : locale === 'es' ? 'Evolución temporal de la financiación' : 'Grants Timeline'}
             </h3>

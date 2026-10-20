@@ -408,8 +408,6 @@ export interface Translations {
     usageWarning: string;
     lineageTitle: string;
     lineageP1: string;
-    citationsTitle?: string;
-    citationsP1?: string;
     topicsTitle?: string;
     topicsP1?: string;
     reachMethodTitle?: string;
@@ -867,8 +865,6 @@ export const translations: Record<Locale, Translations> = {
           "usageWarning": "These counts only track interactions on Episciences portals. Downloads occurring directly on open repositories (HAL, arXiv...) are not included. Total actual readership is therefore higher.",
           "lineageTitle": "References and Related Works",
           "lineageP1": "For each publication, the dashboard displays cited reference counts and related works suggested by OpenAlex. It also surfaces associated research datasets and software via OpenAIRE Scholix links.",
-          "citationsTitle": "Citations and Impact",
-          "citationsP1": "Citation counts are retrieved from OpenAlex. They reflect citations indexed by open scholarly infrastructures, providing a transparent and verifiable lower bound without relying on closed metrics.",
           "topicsTitle": "Research Topics and Classifications",
           "topicsP1": "Disciplinary distribution relies on the OpenAlex hierarchical taxonomy (domains, subfields, fields, and topics modeled through citation graph clustering). For mathematics journals, this view is enriched with official MSC 2020 codes from zbMATH Open, and JEL codes for economics.",
           "reachMethodTitle": "Geographic Reach and Co-authorship",
@@ -1329,8 +1325,6 @@ export const translations: Record<Locale, Translations> = {
           "usageWarning": "Ces chiffres ne comptent que les consultations sur Episciences. Les téléchargements effectués directement sur les archives ouvertes (HAL, arXiv...) ne sont pas inclus. La consultation réelle des articles est donc plus élevée.",
           "lineageTitle": "Références et travaux liés",
           "lineageP1": "Pour chaque article, le tableau de bord indique le nombre de références qu'il cite et liste les travaux liés proposés par OpenAlex. Il signale aussi les jeux de données et logiciels associés, à partir des liens Scholix d'OpenAIRE.",
-          "citationsTitle": "Citations reçues et impact",
-          "citationsP1": "Le nombre de citations affiché pour chaque publication provient d'OpenAlex. Il reflète les citations captées par les indexeurs académiques ouverts, constituant une mesure minimale vérifiable et exempte d'indicateurs propriétaires ou opaques.",
           "topicsTitle": "Thématiques et classifications scientifiques",
           "topicsP1": "La répartition thématique s'appuie sur la taxonomie hiérarchique d'OpenAlex (domaines, sous-domaines, champs et thèmes de recherche modélisés par analyse de graphes de citations). Pour les revues de mathématiques, cette vue est enrichie des codes officiels MSC 2020 (Mathematics Subject Classification) issus de zbMATH Open, et des codes JEL pour l'économie.",
           "reachMethodTitle": "Portée géographique et co-publications",
@@ -1791,8 +1785,6 @@ export const translations: Record<Locale, Translations> = {
           "usageWarning": "Estas cifras solo contabilizan las consultas en Episciences. Las descargas realizadas directamente en los repositorios abiertos (HAL, arXiv...) no están incluidas. La consulta real de los artículos es, por tanto, más elevada.",
           "lineageTitle": "Referencias y trabajos relacionados",
           "lineageP1": "Para cada artículo, el panel indica el número de referencias citadas y enumera los trabajos relacionados sugeridos por OpenAlex. También señala los conjuntos de datos y software asociados a partir de los enlaces Scholix de OpenAIRE.",
-          "citationsTitle": "Citas recibidas e impacto",
-          "citationsP1": "El número de citas procede de OpenAlex. Refleja las citas indexadas por infraestructuras académicas abiertas, garantizando una medida mínima verificable y exenta de métricas propietarias u opacas.",
           "topicsTitle": "Temáticas y clasificaciones científicas",
           "topicsP1": "La distribución temática se apoya en la taxonomía jerárquica de OpenAlex (dominios, subdominios, campos y temas modelados mediante análisis de grafos de citas). Para las revistas de matemáticas, esta vista se enriquece con los códigos oficiales MSC 2020 de zbMATH Open, y con códigos JEL en economía.",
           "reachMethodTitle": "Alcance geográfico y coautorías",

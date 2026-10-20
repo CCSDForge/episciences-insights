@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Globe,
   Clock,
@@ -15,6 +15,7 @@ import {
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import TopicTreeMap from '@/components/TopicTreeMap';
 import SdgRadar from '@/components/SdgRadar';
 import FunderCofundingNetwork from '@/components/FunderCofundingNetwork';
@@ -44,6 +45,20 @@ export default function PlatformSection() {
   const [networkTab, setNetworkTab] = useState<'funders' | 'sankey' | 'collab'>('funders');
   const [impactTab, setImpactTab] = useState<'sdg' | 'topics' | 'lineage'>('sdg');
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
+
+  const yearlyPubsRef = useRef<HTMLDivElement>(null);
+  const cumulativeJournalsRef = useRef<HTMLDivElement>(null);
+  const disciplinaryRef = useRef<HTMLDivElement>(null);
+  const networksRef = useRef<HTMLDivElement>(null);
+  const impactRef = useRef<HTMLDivElement>(null);
+
+  const peerReviewBinsData = useMemo(() => {
+    return (peerReviewStats.byRange || []).map((r) => ({
+      range: r.range,
+      count: r.count,
+      percentage: `${r.percentage}%`,
+    }));
+  }, [peerReviewStats]);
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
@@ -164,16 +179,25 @@ export default function PlatformSection() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
                 {formatNum(filteredData.length)} {locale === 'fr' ? 'articles au total' : locale === 'es' ? 'artículos en total' : 'total articles'}
               </span>
+              <ChartExportMenu
+                targetRef={yearlyPubsRef}
+                data={yearlyPubsData}
+                filename="episciences-platform-yearly-publications"
+                csvColumns={[
+                  { key: 'year', header: 'Year' },
+                  { key: 'count', header: 'Publications_Count' },
+                ]}
+              />
             </div>
           </div>
 
           {/* Yearly publications bar chart */}
           <div className="space-y-2">
-            <div className="h-64 w-full">
+            <div ref={yearlyPubsRef} className="h-64 w-full">
               <ChartContainer>
                 <BarChart data={yearlyPubsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#88888820" />
@@ -225,13 +249,24 @@ export default function PlatformSection() {
               </div>
             </div>
 
-            <div className="flex items-baseline gap-1.5 self-start sm:self-auto">
-              <span className="text-3xl font-black text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)]">
-                {peerReviewStats.medianMonths}
-              </span>
-              <span className="text-xs font-bold text-zinc-500">
-                {locale === 'fr' ? 'mois (médiane)' : locale === 'es' ? 'meses (mediana)' : 'months (median)'}
-              </span>
+            <div className="flex items-center gap-3 self-start sm:self-auto">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-black text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)]">
+                  {peerReviewStats.medianMonths}
+                </span>
+                <span className="text-xs font-bold text-zinc-500">
+                  {locale === 'fr' ? 'mois (médiane)' : locale === 'es' ? 'meses (mediana)' : 'months (median)'}
+                </span>
+              </div>
+              <ChartExportMenu
+                data={peerReviewBinsData}
+                filename="episciences-peer-review-delays"
+                csvColumns={[
+                  { key: 'range', header: 'Range' },
+                  { key: 'count', header: 'Count' },
+                  { key: 'percentage', header: 'Percentage' },
+                ]}
+              />
             </div>
           </div>
 
@@ -292,10 +327,21 @@ export default function PlatformSection() {
 
           {/* Cumulative journals evolution */}
           <div className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Évolution cumulée des revues hébergées' : locale === 'es' ? 'Evolución acumulada de revistas alojadas' : 'Cumulative Hosted Journals Evolution'}
-            </h3>
-            <div className="h-60 w-full">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                {locale === 'fr' ? 'Évolution cumulée des revues hébergées' : locale === 'es' ? 'Evolución acumulada de revistas alojadas' : 'Cumulative Hosted Journals Evolution'}
+              </h3>
+              <ChartExportMenu
+                targetRef={cumulativeJournalsRef}
+                data={cumulativeJournalsPerYear}
+                filename="episciences-cumulative-hosted-journals"
+                csvColumns={[
+                  { key: 'year', header: 'Year' },
+                  { key: 'count', header: 'Cumulative_Journals' },
+                ]}
+              />
+            </div>
+            <div ref={cumulativeJournalsRef} className="h-60 w-full">
               <ChartContainer>
                 <AreaChart data={cumulativeJournalsPerYear} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
@@ -334,10 +380,21 @@ export default function PlatformSection() {
 
           {/* Disciplinary breakdown chart */}
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              {locale === 'fr' ? 'Répartition disciplinaire des publications' : locale === 'es' ? 'Distribución disciplinaria de publicaciones' : 'Disciplinary Breakdown'}
-            </h3>
-            <div className="h-56 w-full">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                {locale === 'fr' ? 'Répartition disciplinaire des publications' : locale === 'es' ? 'Distribución disciplinaria de publicaciones' : 'Disciplinary Breakdown'}
+              </h3>
+              <ChartExportMenu
+                targetRef={disciplinaryRef}
+                data={disciplinaryData}
+                filename="episciences-platform-disciplinary-distribution"
+                csvColumns={[
+                  { key: 'name', header: 'Field' },
+                  { key: 'count', header: 'Publications_Count' },
+                ]}
+              />
+            </div>
+            <div ref={disciplinaryRef} className="h-56 w-full">
               <ChartContainer>
                 <BarChart
                   data={disciplinaryData}
@@ -385,7 +442,7 @@ export default function PlatformSection() {
             </div>
 
             {/* Toggle controls */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des réseaux' : locale === 'es' ? 'Modo de visualización de redes' : 'Network view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
                 <button
                   type="button"
@@ -425,13 +482,18 @@ export default function PlatformSection() {
                 </button>
               </div>
 
+              <ChartExportMenu
+                targetRef={networksRef}
+                filename={`episciences-platform-network-${networkTab}`}
+              />
+
               {/* Fullscreen Explorer Button */}
               <button
                 type="button"
                 onClick={() => setIsNetworkModalOpen(true)}
                 aria-label={locale === 'fr' ? "Ouvrir l'explorateur immersif de graphe" : locale === 'es' ? "Abrir explorador inmersivo de grafos" : "Open immersive graph explorer"}
                 title={locale === 'fr' ? "Ouvrir l'explorateur immersif de graphe" : locale === 'es' ? "Abrir explorador inmersivo de grafos" : "Open immersive graph explorer"}
-                className="flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors"
+                className="flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
               >
                 <Network size={14} aria-hidden="true" />
                 <span className="hidden sm:inline">{locale === 'fr' ? 'Graphe' : locale === 'es' ? 'Grafo' : 'Graph'}</span>
@@ -440,7 +502,7 @@ export default function PlatformSection() {
           </div>
 
           {/* Network display */}
-          <div className="min-h-[340px]">
+          <div ref={networksRef} className="min-h-[340px]">
             {networkTab === 'funders' && <FunderCofundingNetwork data={filteredData} />}
             {networkTab === 'sankey' && <FunderSankey data={filteredData} funders={funders} />}
             {networkTab === 'collab' && <CountryGeographicFlowMap data={filteredData} />}
@@ -467,48 +529,55 @@ export default function PlatformSection() {
             </div>
 
             {/* Toggle controls */}
-            <div role="group" aria-label={locale === 'fr' ? "Mode d'impact" : locale === 'es' ? "Modo de impacto" : "Impact mode"} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
-              <button
-                type="button"
-                onClick={() => setImpactTab('sdg')}
-                aria-pressed={impactTab === 'sdg'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  impactTab === 'sdg'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'ODD' : locale === 'es' ? 'ODS' : 'SDGs'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setImpactTab('topics')}
-                aria-pressed={impactTab === 'topics'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  impactTab === 'topics'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Thématiques' : locale === 'es' ? 'Temáticas' : 'Topics'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setImpactTab('lineage')}
-                aria-pressed={impactTab === 'lineage'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  impactTab === 'lineage'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Filiation' : locale === 'es' ? 'Filiación' : 'Lineage'}
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div role="group" aria-label={locale === 'fr' ? "Mode d'impact" : locale === 'es' ? "Modo de impacto" : "Impact mode"} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+                <button
+                  type="button"
+                  onClick={() => setImpactTab('sdg')}
+                  aria-pressed={impactTab === 'sdg'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    impactTab === 'sdg'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'ODD' : locale === 'es' ? 'ODS' : 'SDGs'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImpactTab('topics')}
+                  aria-pressed={impactTab === 'topics'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    impactTab === 'topics'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Thématiques' : locale === 'es' ? 'Temáticas' : 'Topics'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImpactTab('lineage')}
+                  aria-pressed={impactTab === 'lineage'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    impactTab === 'lineage'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Filiation' : locale === 'es' ? 'Filiación' : 'Lineage'}
+                </button>
+              </div>
+
+              <ChartExportMenu
+                targetRef={impactRef}
+                filename={`episciences-platform-impact-${impactTab}`}
+              />
             </div>
           </div>
 
           {/* Impact display */}
-          <div className="min-h-[480px] w-full">
+          <div ref={impactRef} className="min-h-[480px] w-full">
             {impactTab === 'sdg' && <SdgRadar data={filteredData.flatMap((p) => p.sdgs)} />}
             {impactTab === 'topics' && <TopicTreeMap data={filteredData} />}
             {impactTab === 'lineage' && <ResearchLineage data={filteredData} />}

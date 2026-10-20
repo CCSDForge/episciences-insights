@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   BookOpen,
   Eye,
@@ -12,6 +12,7 @@ import {
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import WorldMap from '@/components/WorldMap';
 import CountryInstitutionsExplorer from '@/components/CountryInstitutionsExplorer';
 import TopicTreeMap from '@/components/TopicTreeMap';
@@ -30,6 +31,12 @@ export default function JournalSection() {
 
   // View state for topics quadrant
   const [topicView, setTopicView] = useState<'treemap' | 'network' | 'msc'>('treemap');
+
+  const usageTimelineRef = useRef<HTMLDivElement>(null);
+  const readershipMapRef = useRef<HTMLDivElement>(null);
+  const authorshipMapRef = useRef<HTMLDivElement>(null);
+  const topicsRef = useRef<HTMLDivElement>(null);
+  const fundersRef = useRef<HTMLDivElement>(null);
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
@@ -233,20 +240,32 @@ export default function JournalSection() {
 
           {/* Timeline usage chart */}
           <div className="space-y-2">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                 {locale === 'fr' ? 'Dynamique des consultations' : locale === 'es' ? 'Dinámica de consultas' : 'Consultation Trends'}
               </h3>
-              <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                <span className="inline-block w-3.5 h-0.5 border-t-2 border-dashed border-amber-500" />
-                {locale === 'fr'
-                  ? `* ${currentYearStr} estimation de fin d'année`
-                  : locale === 'es'
-                  ? `* ${currentYearStr} estimación de fin de año`
-                  : `* ${currentYearStr} year-end estimate`}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <span className="inline-block w-3.5 h-0.5 border-t-2 border-dashed border-amber-500" />
+                  {locale === 'fr'
+                    ? `* ${currentYearStr} estimation de fin d'année`
+                    : locale === 'es'
+                    ? `* ${currentYearStr} estimación de fin de año`
+                    : `* ${currentYearStr} year-end estimate`}
+                </span>
+                <ChartExportMenu
+                  targetRef={usageTimelineRef}
+                  data={usageTimelineData}
+                  filename={`episciences-journal-usage-${journalFilter}`}
+                  csvColumns={[
+                    { key: 'year', header: 'Year' },
+                    { key: 'downloads', header: 'Downloads' },
+                    { key: 'views', header: 'Views' },
+                  ]}
+                />
+              </div>
             </div>
-            <div className="h-64 w-full">
+            <div ref={usageTimelineRef} className="h-64 w-full">
               <ChartContainer>
                 <AreaChart data={usageTimelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
@@ -365,15 +384,27 @@ export default function JournalSection() {
           {/* Readership geographic footprint map */}
           {readershipMapData.length > 0 && (
             <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   {locale === 'fr' ? 'Origine géographique du lectorat' : locale === 'es' ? 'Origen geográfico del lectorado' : 'Geographic Reach of Readership'}
                 </h3>
-                <span className="text-[11px] text-zinc-500 font-medium">
-                  {formatNum(readershipMapData.length)} {locale === 'fr' ? 'pays et territoires actifs' : locale === 'es' ? 'países y territorios activos' : 'active countries and territories'}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-zinc-500 font-medium">
+                    {formatNum(readershipMapData.length)} {locale === 'fr' ? 'pays et territoires actifs' : locale === 'es' ? 'países y territorios activos' : 'active countries and territories'}
+                  </span>
+                  <ChartExportMenu
+                    targetRef={readershipMapRef}
+                    data={readershipMapData}
+                    filename={`episciences-journal-readership-map-${journalFilter}`}
+                    csvColumns={[
+                      { key: 'name', header: 'Country_Code' },
+                      { key: 'name', header: 'Country_Name', formatter: (v) => (v ? getCountryName(String(v)) : '') },
+                      { key: 'value', header: 'Consultations' },
+                    ]}
+                  />
+                </div>
               </div>
-              <div className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+              <div ref={readershipMapRef} className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
                 <WorldMap
                   data={readershipMapData}
                   legendLabel={locale === 'fr' ? 'Consultations par pays ou territoire' : locale === 'es' ? 'Consultas por país o territorio' : 'Readership by Country or Territory'}
@@ -450,6 +481,20 @@ export default function JournalSection() {
                 </p>
               </div>
             </div>
+            <ChartExportMenu
+              targetRef={authorshipMapRef}
+              data={countryData.map((c) => ({
+                countryCode: c.name,
+                countryName: getCountryName(c.name),
+                publications: c.value,
+              }))}
+              filename={`episciences-journal-authorship-countries-${journalFilter}`}
+              csvColumns={[
+                { key: 'countryCode', header: 'Country_Code' },
+                { key: 'countryName', header: 'Country_Name' },
+                { key: 'publications', header: 'Publications_Count' },
+              ]}
+            />
           </div>
 
           {/* Geographic author footprint map */}
@@ -457,7 +502,7 @@ export default function JournalSection() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               {locale === 'fr' ? 'Origine géographique des auteurs' : locale === 'es' ? 'Origen geográfico de autores' : 'Geographic Reach of Authors'}
             </h3>
-            <div className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+            <div ref={authorshipMapRef} className="w-full aspect-[16/9] min-h-[360px] md:min-h-[460px] rounded-2xl overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 bg-zinc-50 dark:bg-zinc-950">
               <WorldMap data={countryData} tooltipId="authorship-world-map-tooltip" />
             </div>
           </div>
@@ -486,9 +531,24 @@ export default function JournalSection() {
                       : 'Open repositories hosting the manuscripts peer-reviewed and published on Episciences.'}
                   </p>
                 </div>
-                <span className="text-[11px] text-zinc-500 font-medium shrink-0">
-                  {formatNum(totalOverlayRepos)} {locale === 'fr' ? 'articles répertoriés' : locale === 'es' ? 'artículos registrados' : 'indexed articles'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-zinc-500 font-medium shrink-0">
+                    {formatNum(totalOverlayRepos)} {locale === 'fr' ? 'articles répertoriés' : locale === 'es' ? 'artículos registrados' : 'indexed articles'}
+                  </span>
+                  <ChartExportMenu
+                    data={hostingRepositories.map((r) => ({
+                      repository: r.name,
+                      count: r.count,
+                      percentage: `${((r.count / (totalOverlayRepos || 1)) * 100).toFixed(1)}%`,
+                    }))}
+                    filename={`episciences-journal-overlay-repositories-${journalFilter}`}
+                    csvColumns={[
+                      { key: 'repository', header: 'Repository' },
+                      { key: 'count', header: 'Count' },
+                      { key: 'percentage', header: 'Percentage' },
+                    ]}
+                  />
+                </div>
               </div>
               <OverlayRepositorySpectrum repositories={hostingRepositories} total={totalOverlayRepos} />
             </div>
@@ -515,49 +575,56 @@ export default function JournalSection() {
             </div>
 
             {/* Toggle controls */}
-            <div role="group" aria-label={locale === 'fr' ? "Mode d'affichage des thématiques" : locale === 'es' ? "Modo de visualización de temas" : "Topic view mode"} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
-              <button
-                type="button"
-                onClick={() => setTopicView('treemap')}
-                aria-pressed={topicView === 'treemap'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  topicView === 'treemap'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Treemap' : locale === 'es' ? 'Treemap' : 'Treemap'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTopicView('network')}
-                aria-pressed={topicView === 'network'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  topicView === 'network'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-              >
-                {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTopicView('msc')}
-                aria-pressed={topicView === 'msc'}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  topicView === 'msc'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
-                }`}
-                title="Mathematics Subject Classification 2020 (zbMATH Open)"
-              >
-                MSC 2020
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div role="group" aria-label={locale === 'fr' ? "Mode d'affichage des thématiques" : locale === 'es' ? "Modo de visualización de temas" : "Topic view mode"} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+                <button
+                  type="button"
+                  onClick={() => setTopicView('treemap')}
+                  aria-pressed={topicView === 'treemap'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    topicView === 'treemap'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Treemap' : locale === 'es' ? 'Treemap' : 'Treemap'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTopicView('network')}
+                  aria-pressed={topicView === 'network'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    topicView === 'network'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                >
+                  {locale === 'fr' ? 'Réseau' : locale === 'es' ? 'Red' : 'Network'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTopicView('msc')}
+                  aria-pressed={topicView === 'msc'}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    topicView === 'msc'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  }`}
+                  title="Mathematics Subject Classification 2020 (zbMATH Open)"
+                >
+                  MSC 2020
+                </button>
+              </div>
+
+              <ChartExportMenu
+                targetRef={topicsRef}
+                filename={`episciences-journal-topics-${topicView}-${journalFilter}`}
+              />
             </div>
           </div>
 
           {/* Dynamic Topics Display */}
-          <div className="min-h-[480px] w-full">
+          <div ref={topicsRef} className="min-h-[480px] w-full">
             {topicView === 'treemap' && <TopicTreeMap data={filteredData} />}
             {topicView === 'network' && <TopicCoOccurrenceNetwork data={filteredData} />}
             {topicView === 'msc' && <MscCoOccurrenceNetwork data={filteredData} />}
@@ -582,10 +649,20 @@ export default function JournalSection() {
                 </p>
               </div>
             </div>
+
+            <ChartExportMenu
+              targetRef={fundersRef}
+              data={funderData}
+              filename={`episciences-journal-funders-${journalFilter}`}
+              csvColumns={[
+                { key: 'name', header: 'Funder_Name' },
+                { key: 'value', header: 'Publications_Count' },
+              ]}
+            />
           </div>
 
           {/* Funder Storyline */}
-          <div className="space-y-2">
+          <div ref={fundersRef} className="space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               {locale === 'fr' ? 'Évolution chronologique des financements' : locale === 'es' ? 'Evolución cronológica de la financiación' : 'Funding Timeline'}
             </h3>

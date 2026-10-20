@@ -421,19 +421,7 @@ export default function HelpSection({ corpusStats }: HelpSectionProps = {}) {
           </p>
         </div>
 
-        {/* 4.5 Citations */}
-        {m.citationsTitle && (
-          <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-              {m.citationsTitle}
-            </h3>
-            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
-              {m.citationsP1}
-            </p>
-          </div>
-        )}
-
-        {/* 4.6 Topics & Classifications */}
+        {/* 4.5 Topics & Classifications */}
         {m.topicsTitle && (
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
@@ -445,7 +433,7 @@ export default function HelpSection({ corpusStats }: HelpSectionProps = {}) {
           </div>
         )}
 
-        {/* 4.7 Geographic reach */}
+        {/* 4.6 Geographic reach */}
         {m.reachMethodTitle && (
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
