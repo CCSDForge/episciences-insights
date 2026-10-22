@@ -1,5 +1,5 @@
 ---
-title: "Methodological Note and Scientometric Framework"
+title: "Methodological Note"
 subtitle: "This page details how the corpus is assembled, where data comes from, how indicators are processed, and their limitations."
 badge: "Methodology"
 institution: "CCSD (CNRS, Inria, INRAE) - Episciences Platform"

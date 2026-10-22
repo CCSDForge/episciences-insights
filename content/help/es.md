@@ -1,5 +1,5 @@
 ---
-title: "Nota metodológica y marco cienciométrico"
+title: "Nota metodológica"
 subtitle: "Esta página describe cómo se constituye el corpus, de dónde proceden los datos, cómo se procesan y cuáles son sus límites."
 badge: "Metodología"
 institution: "CCSD (CNRS, Inria, INRAE) - Plataforma Episciences"

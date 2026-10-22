@@ -1,5 +1,5 @@
 ---
-title: "Note méthodologique et cadre scientométrique"
+title: "Note méthodologique"
 subtitle: "Cette page décrit comment le corpus est constitué, d'où proviennent les données, comment elles sont traitées et quelles sont leurs limites."
 badge: "Méthodologie"
 institution: "CCSD (CNRS, Inria, INRAE) - Plateforme Episciences"
