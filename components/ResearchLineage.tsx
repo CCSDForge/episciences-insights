@@ -520,22 +520,23 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
 
                     {/* Related Works Grid */}
                     {relatedCount > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                      <div className="max-h-[260px] overflow-y-auto pr-1 space-y-2 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 pt-1">
                         {selectedPaper.related_works!.map((link, idx) => (
                           <a
                             key={idx}
                             href={link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-[#0aa0be] hover:bg-cyan-50/50 dark:hover:bg-cyan-950/20 transition-all group"
+                            aria-label={`${t.lineage.relatedWorkIndex} #${idx + 1}: ${t.lineage.consultOnOpenAlex} (${newTabSuffix})`}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-[#0aa0be] hover:bg-cyan-50/50 dark:hover:bg-cyan-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 transition-all group"
                           >
-                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-1.5 truncate pr-2">
-                              <Network size={12} className="text-[#0aa0be] shrink-0" />
-                              <span className="truncate">{t.lineage.relatedWorkIndex} #{idx + 1}</span>
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
+                              <Network size={13} className="text-[#0aa0be] shrink-0" aria-hidden="true" />
+                              <span>{t.lineage.relatedWorkIndex} #{idx + 1}</span>
                             </span>
-                            <span className="text-[10px] font-semibold text-[#005fb9] dark:text-[#57bec3] group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
-                              {t.lineage.consultOnOpenAlex}
-                              <ArrowUpRight size={11} />
+                            <span className="text-[10px] font-semibold text-[#005fb9] dark:text-[#57bec3] group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0">
+                              <span>{t.lineage.consultOnOpenAlex}</span>
+                              <ArrowUpRight size={11} aria-hidden="true" />
                             </span>
                           </a>
                         ))}
