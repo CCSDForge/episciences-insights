@@ -33,16 +33,19 @@
   --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
+@theme {
+  --color-episciences-cyan-00: #57bec3;
+  --color-episciences-cyan-01: #0aa0be;
+  --color-episciences-cyan-02: #008cc3;
+  --color-episciences-cyan-03: #005fb9;
+  --color-episciences-cyan-04: #0a32af;
+  --color-ccsd-bleu-00: #00005f;
+  --color-ccsd-bleu-01: #20208c;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-episciences-cyan-00: var(--episciences-cyan-00);
-  --color-episciences-cyan-01: var(--episciences-cyan-01);
-  --color-episciences-cyan-02: var(--episciences-cyan-02);
-  --color-episciences-cyan-03: var(--episciences-cyan-03);
-  --color-episciences-cyan-04: var(--episciences-cyan-04);
-  --color-ccsd-bleu-00: var(--ccsd-bleu-00);
-  --color-ccsd-bleu-01: var(--ccsd-bleu-01);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
 }

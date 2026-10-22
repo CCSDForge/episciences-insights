@@ -37,16 +37,16 @@ const THEMES = {
     activeColor: '#2563eb',
     activeNodeColor: '#1d4ed8',
     badgeBg: 'bg-blue-600 shadow-blue-600/30 ring-blue-600/10',
-    labelColor: 'text-blue-600',
-    statColor: 'text-blue-400',
+    labelColor: 'text-blue-600 dark:text-blue-400',
+    statColor: 'text-blue-600 dark:text-blue-400',
   },
   teal: {
     iconBg: 'bg-teal-600 shadow-teal-600/20',
     activeColor: '#0d9488',
     activeNodeColor: '#0f766e',
     badgeBg: 'bg-teal-600 shadow-teal-600/30 ring-teal-600/10',
-    labelColor: 'text-teal-600',
-    statColor: 'text-teal-400',
+    labelColor: 'text-teal-600 dark:text-teal-400',
+    statColor: 'text-teal-600 dark:text-teal-400',
   },
   indigo: {
     iconBg: 'bg-indigo-600 shadow-indigo-600/20',
@@ -54,7 +54,7 @@ const THEMES = {
     activeNodeColor: '#4338ca',
     badgeBg: 'bg-indigo-600 shadow-indigo-600/30 ring-indigo-600/10',
     labelColor: 'text-indigo-600 dark:text-indigo-400',
-    statColor: 'text-indigo-400',
+    statColor: 'text-indigo-600 dark:text-indigo-400',
   },
 } as const;
 
@@ -262,15 +262,15 @@ export default function CoOccurrenceNetwork({
           />
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-5 rounded-3xl bg-zinc-900 dark:bg-black text-white shadow-lg">
+            <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
               <p className={`text-3xl font-black ${theme.statColor}`}>{network.totalEntities}</p>
-              <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest mt-1">
+              <p className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">
                 {t.coOccurrence.totalEntities.replace('{label}', entityLabelPlural)}
               </p>
             </div>
-            <div className="p-5 rounded-3xl bg-zinc-900 dark:bg-black text-white shadow-lg">
+            <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
               <p className={`text-3xl font-black ${theme.statColor}`}>{network.totalConnections}</p>
-              <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest mt-1">{t.coOccurrence.totalConnections}</p>
+              <p className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.coOccurrence.totalConnections}</p>
             </div>
           </div>
           {network.totalEntities > maxNodes && (

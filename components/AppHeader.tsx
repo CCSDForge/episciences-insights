@@ -75,7 +75,7 @@ export default function AppHeader() {
             <div className="flex flex-col">
               <span className="font-heading text-base sm:text-lg font-black tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">
                 Episciences{' '}
-                <span className="bg-gradient-to-r from-[var(--episciences-cyan-03)] to-[var(--episciences-cyan-01)] dark:from-[var(--episciences-cyan-00)] dark:to-[var(--episciences-cyan-02)] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#005fb9] to-[#0aa0be] dark:from-[#57bec3] dark:to-[#008cc3] bg-clip-text text-transparent">
                   Insights
                 </span>
               </span>
@@ -101,7 +101,7 @@ export default function AppHeader() {
                   aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-1.5 lg:gap-2 rounded-full px-3 lg:px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[var(--primary-focus)] ${
                     isActive
-                      ? 'bg-[var(--episciences-cyan-03)] text-white shadow-sm dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)] dark:font-black'
+                      ? 'bg-[#005fb9] text-white shadow-sm dark:bg-[#57bec3] dark:text-[#00005f] dark:font-black'
                       : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -120,7 +120,7 @@ export default function AppHeader() {
               aria-label={t.header.networkExplorerBtn}
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                 isNetworkPage
-                  ? 'bg-[var(--episciences-cyan-03)] text-white dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)]'
+                  ? 'bg-[#005fb9] text-white dark:bg-[#57bec3] dark:text-[#00005f]'
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 ring-1 ring-zinc-200 dark:ring-zinc-800'
               }`}
             >
@@ -148,7 +148,7 @@ export default function AppHeader() {
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-[var(--episciences-cyan-03)] text-white dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)] dark:font-black'
+                    ? 'bg-[#005fb9] text-white dark:bg-[#57bec3] dark:text-[#00005f] dark:font-black'
                     : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:hover:text-white'
                 }`}
               >

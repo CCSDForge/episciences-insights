@@ -165,13 +165,13 @@ export default function FunderGeographicFlowMap({ data, funders }: FunderGeograp
         />
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-5 rounded-3xl bg-zinc-900 dark:bg-black text-white shadow-lg">
-            <p className="text-3xl font-black text-teal-400">{nodes.length}</p>
-            <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest mt-1">{t.flowMap.fundersShown}</p>
+          <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+            <p className="text-3xl font-black text-teal-600 dark:text-teal-400">{nodes.length}</p>
+            <p className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.flowMap.fundersShown}</p>
           </div>
-          <div className="p-5 rounded-3xl bg-zinc-900 dark:bg-black text-white shadow-lg">
-            <p className="text-3xl font-black text-teal-400">{links.length}</p>
-            <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest mt-1">{t.flowMap.fundingTies}</p>
+          <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+            <p className="text-3xl font-black text-teal-600 dark:text-teal-400">{links.length}</p>
+            <p className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.flowMap.fundingTies}</p>
           </div>
         </div>
 
