@@ -142,11 +142,11 @@ DATA_OUTPUT_PATH=./public/data/publications.json
    - Funder geolocation and canonical name normalization (`scripts/funder-enrichment.mjs`).
    - Output minification to `public/data/publications.json` and automatic pre-compression into `.gz` and `.br`.
 
-3. **(Optional) Fetch linked research data & software**:
+3. **(Optional) Fetch linked research data & software (Scholix)**:
    ```bash
    npm run collect:links
    ```
-   Retrieves Scholix relation links from the OpenAIRE Graph into `public/data/linked-outputs.json`.
+   Retrieves Scholix relation links from the OpenAIRE Graph (`/research-products/links`) into `public/data/linked-outputs.json`. Scholix is an RDA/WDS standard framework for exchanging links between scholarly literature, research data, and software.
 
 4. **Pre-compress datasets**:
    ```bash

@@ -465,7 +465,7 @@ export default function HelpSection({ corpusStats }: HelpSectionProps = {}) {
           {m.sec5P1}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="rounded-xl border border-zinc-200 p-5 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40 space-y-2">
             <h3 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
               {m.limit1Title}
@@ -490,6 +490,16 @@ export default function HelpSection({ corpusStats }: HelpSectionProps = {}) {
               {m.limit3Desc}
             </p>
           </div>
+          {m.limit4Title && m.limit4Desc && (
+            <div className="rounded-xl border border-zinc-200 p-5 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40 space-y-2">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                {m.limit4Title}
+              </h3>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                {m.limit4Desc}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

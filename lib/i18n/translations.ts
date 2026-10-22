@@ -435,6 +435,8 @@ export interface Translations {
     limit2Desc: string;
     limit3Title: string;
     limit3Desc: string;
+    limit4Title?: string;
+    limit4Desc?: string;
     sec6Title: string;
     sec6P1: string;
     ssgTitle: string;
@@ -894,7 +896,7 @@ export const translations: Record<Locale, Translations> = {
           "usageP1": "Download and page view metrics originate from Episciences platform analytics, aggregated by journal, paper, and country.",
           "usageWarning": "These counts only track interactions on Episciences portals. Downloads occurring directly on open repositories (HAL, arXiv...) are not included. Total actual readership is therefore higher.",
           "lineageTitle": "References and Related Works",
-          "lineageP1": "For each publication, the dashboard displays cited reference counts and related works suggested by OpenAlex. It also surfaces associated research datasets and software via OpenAIRE Scholix links.",
+          "lineageP1": "For each publication, the dashboard displays cited reference counts and related works suggested by OpenAlex. It also surfaces associated research datasets and source code from OpenAIRE via the Scholix standard (a joint RDA/WDS initiative connecting research publications, data, and software under FAIR principles).",
           "topicsTitle": "Research Topics and Classifications",
           "topicsP1": "Disciplinary distribution relies on the OpenAlex hierarchical taxonomy (domains, subfields, fields, and topics modeled through citation graph clustering). For mathematics journals, this view is enriched with official MSC 2020 codes from zbMATH Open, and JEL codes for economics.",
           "reachMethodTitle": "Geographic Reach and Co-authorship",
@@ -907,6 +909,8 @@ export const translations: Record<Locale, Translations> = {
           "limit2Desc": "MSC 2020 (mathematics) and JEL (economics) classification codes only apply to relevant journals. Their absence elsewhere is expected.",
           "limit3Title": "Author Affiliations",
           "limit3Desc": "Institutional affiliations come from OpenAlex, supplemented by Episciences declarations with a ROR ID. Automated affiliation parsing may contain gaps or inaccuracies.",
+          "limit4Title": "Research Artifacts (Data and Code)",
+          "limit4Desc": "Detection of linked datasets and software (Scholix) relies on metadata declarations submitted by authors in partner repositories (Dryad, Zenodo, etc.) and harvested by the OpenAIRE Graph. Only a fraction of articles currently carries formal links.",
           "sec6Title": "6. Architecture, Licenses and Reproducibility",
           "sec6P1": "The website is built as a static application compiled from pre-processed datasets.",
           "ssgTitle": "Static Site Architecture",
@@ -925,7 +929,8 @@ export const translations: Record<Locale, Translations> = {
               "DORA (2012) — [San Francisco Declaration on Research Assessment](https://sfdora.org)",
               "OpenAIRE (2024) — [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
               "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
-              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
+              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)",
+              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)"
           ]
       },
       "export": {
@@ -1369,7 +1374,7 @@ export const translations: Record<Locale, Translations> = {
           "usageP1": "Les téléchargements et les consultations de pages proviennent des statistiques de la plateforme Episciences, par revue, par article et par pays.",
           "usageWarning": "Ces chiffres ne comptent que les consultations sur Episciences. Les téléchargements effectués directement sur les archives ouvertes (HAL, arXiv...) ne sont pas inclus. La consultation réelle des articles est donc plus élevée.",
           "lineageTitle": "Références et travaux liés",
-          "lineageP1": "Pour chaque article, le tableau de bord indique le nombre de références qu'il cite et liste les travaux liés proposés par OpenAlex. Il signale aussi les jeux de données et logiciels associés, à partir des liens Scholix d'OpenAIRE.",
+          "lineageP1": "Pour chaque article, le tableau de bord indique le nombre de références qu'il cite et liste les travaux liés proposés par OpenAlex. Il signale aussi les jeux de données et codes sources associés issus d'OpenAIRE via le standard Scholix (initiative conjointe RDA/WDS reliant publications, données et logiciels de recherche selon les principes FAIR).",
           "topicsTitle": "Thématiques et classifications scientifiques",
           "topicsP1": "La répartition thématique s'appuie sur la taxonomie hiérarchique d'OpenAlex (domaines, sous-domaines, champs et thèmes de recherche modélisés par analyse de graphes de citations). Pour les revues de mathématiques, cette vue est enrichie des codes officiels MSC 2020 (Mathematics Subject Classification) issus de zbMATH Open, et des codes JEL pour l'économie.",
           "reachMethodTitle": "Portée géographique et co-publications",
@@ -1382,6 +1387,8 @@ export const translations: Record<Locale, Translations> = {
           "limit2Desc": "Les codes MSC 2020 (mathématiques) et JEL (économie) ne concernent que certaines revues. Leur absence ailleurs est normale.",
           "limit3Title": "Affiliations",
           "limit3Desc": "Les établissements des auteurs proviennent d'OpenAlex, complétés par les affiliations déclarées sur Episciences avec un identifiant ROR. Le rattachement automatique d'OpenAlex peut contenir des erreurs, et une partie des auteurs reste sans établissement connu.",
+          "limit4Title": "Artefacts de recherche (données et code)",
+          "limit4Desc": "La détection des jeux de données et logiciels liés (Scholix) dépend des déclarations effectuées par les auteurs dans des entrepôts partenaires (Dryad, Zenodo, etc.) et moissonnées par OpenAIRE Graph. Seule une fraction des articles dispose de ces liens formalisés.",
           "sec6Title": "6. Architecture, licences et reproductibilité",
           "sec6P1": "Le site est un ensemble de fichiers statiques, générés à partir de données préparées à l'avance.",
           "ssgTitle": "Site statique",
@@ -1400,7 +1407,8 @@ export const translations: Record<Locale, Translations> = {
               "DORA (2012) — [San Francisco Declaration on Research Assessment](https://sfdora.org)",
               "OpenAIRE (2024) — [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
               "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
-              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
+              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)",
+              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)"
           ]
       },
       "export": {
@@ -1844,7 +1852,7 @@ export const translations: Record<Locale, Translations> = {
           "usageP1": "Las descargas y visualizaciones proceden de las estadísticas de la plataforma Episciences, por revista, por artículo y por país.",
           "usageWarning": "Estas cifras solo contabilizan las consultas en Episciences. Las descargas realizadas directamente en los repositorios abiertos (HAL, arXiv...) no están incluidas. La consulta real de los artículos es, por tanto, más elevada.",
           "lineageTitle": "Referencias y trabajos relacionados",
-          "lineageP1": "Para cada artículo, el panel indica el número de referencias citadas y enumera los trabajos relacionados sugeridos por OpenAlex. También señala los conjuntos de datos y software asociados a partir de los enlaces Scholix de OpenAIRE.",
+          "lineageP1": "Para cada artículo, el panel indica el número de referencias citadas y enumera los trabajos relacionados sugeridos por OpenAlex. También señala los conjuntos de datos y códigos fuente asociados de OpenAIRE mediante el estándar Scholix (iniciativa conjunta de RDA/WDS que vincula publicaciones, datos y software de investigación según los principios FAIR).",
           "topicsTitle": "Temáticas y clasificaciones científicas",
           "topicsP1": "La distribución temática se apoya en la taxonomía jerárquica de OpenAlex (dominios, subdominios, campos y temas modelados mediante análisis de grafos de citas). Para las revistas de matemáticas, esta vista se enriquece con los códigos oficiales MSC 2020 de zbMATH Open, y con códigos JEL en economía.",
           "reachMethodTitle": "Alcance geográfico y coautorías",
@@ -1857,6 +1865,8 @@ export const translations: Record<Locale, Translations> = {
           "limit2Desc": "Los códigos MSC 2020 (matemáticas) y JEL (economía) solo corresponden a las revistas pertinentes. Su ausencia en otros campos es normal.",
           "limit3Title": "Afiliaciones institucionales",
           "limit3Desc": "Las afiliaciones de los autores proceden de OpenAlex, complementadas por las declaraciones en Episciences con identificador ROR. La asignación automática de OpenAlex puede contener imprecisiones.",
+          "limit4Title": "Artefactos de investigación (datos y código)",
+          "limit4Desc": "La detección de conjuntos de datos y software vinculados (Scholix) depende de las declaraciones realizadas en repositorios asociados (Dryad, Zenodo, etc.) y recolectadas por OpenAIRE Graph. Solo una fracción de los artículos cuenta con estos enlaces formalizados.",
           "sec6Title": "6. Arquitectura, licencias y reproducibilidad",
           "sec6P1": "El sitio es un conjunto de archivos estáticos, generados a partir de datos procesados previamente.",
           "ssgTitle": "Sitio estático",
@@ -1875,7 +1885,8 @@ export const translations: Record<Locale, Translations> = {
               "DORA (2012) — [San Francisco Declaration on Research Assessment](https://sfdora.org)",
               "OpenAIRE (2024) — [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
               "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
-              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
+              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)",
+              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)"
           ]
       },
       "export": {
