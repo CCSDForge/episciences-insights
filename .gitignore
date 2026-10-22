@@ -57,3 +57,7 @@ GEMINI.md
 /public/data/*.gz
 /public/data/*.br
 !/public/data/.gitkeep
+
+# Generated geo assets from world-atlas
+/public/geo/*
+!/public/geo/.gitkeep
