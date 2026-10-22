@@ -5,10 +5,11 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Client for the ROR REST API (https://ror.readme.io/docs/rest-api),
- * used solely to geolocate funders — OpenAlex's funder entity already
- * gives a `country_code` (see openalex-funders-client.mjs) but no
- * coordinates. Institutions don't need this client: `Institution.country`
- * is already populated from OpenAlex's `authorships[].institutions[].country_code`.
+ * used to geolocate funders — OpenAlex's funder entity already gives a
+ * `country_code` (see openalex-funders-client.mjs) but no coordinates —
+ * and to resolve the country of author institutions declared on
+ * Episciences (ROR id only, no country) that OpenAlex never returned
+ * anywhere in the corpus (see affiliation-enrichment.mjs).
  *
  * No auth required today. Documented rate limit: 2000 req/5min per IP,
  * generous enough for the few hundred distinct funders in this corpus.
@@ -100,7 +101,7 @@ export class RorClient {
   }
 
   /**
-   * Returns `{ country_code, country_name, lat, lng }` read from the
+   * Returns `{ name, country_code, country_name, lat, lng }` read from the
    * first `locations[]` entry of a ROR organization (short id, e.g.
    * "04hrrh248", or a full https://ror.org/... URL) — organizations with
    * several sites (e.g. the European Commission) only expose one point
@@ -115,6 +116,7 @@ export class RorClient {
     return this._get(url, cleanId, (data) => {
       const details = data.locations?.[0]?.geonames_details;
       return details ? {
+        name: data.names?.find((n) => n.types?.includes('ror_display'))?.value || null,
         country_code: details.country_code || null,
         country_name: details.country_name || null,
         lat: typeof details.lat === 'number' ? details.lat : null,

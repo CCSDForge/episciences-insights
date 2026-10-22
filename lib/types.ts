@@ -37,7 +37,8 @@ export type KpiFile = {
 export type Institution = {
   name: string;
   ror: string | null;
-  country: string;
+  // null when neither OpenAlex nor ROR gives a country (rare).
+  country: string | null;
 };
 
 export type Author = {

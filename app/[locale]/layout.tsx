@@ -1,8 +1,12 @@
 import React from 'react';
-import { Locale } from '@/lib/i18n/translations';
+import { Locale, translations } from '@/lib/i18n/translations';
 import { LanguageProvider } from '@/lib/i18n/LanguageContext';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
+import { DashboardProvider } from '@/components/DashboardContext';
+import AppHeader from '@/components/AppHeader';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
+import PageFooter from '@/components/PageFooter';
+import { getPublications, getFunders, getLastUpdated } from '@/lib/data';
+import { getKpiSummary } from '@/lib/dashboardData';
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'fr' }, { locale: 'es' }];
@@ -18,13 +22,30 @@ export default async function LocaleLayout({
   const { locale } = await params;
   const validLocale = (locale === 'fr' || locale === 'es' ? locale : 'en') as Locale;
 
+  const [publications, funders] = await Promise.all([getPublications(), getFunders()]);
+  const lastUpdated = getLastUpdated();
+  const kpiSummary = await getKpiSummary(publications);
+
   return (
     <LanguageProvider initialLocale={validLocale}>
-      <div className="fixed top-4 right-4 z-50 sm:top-6 sm:right-6 flex items-center gap-2 print:hidden">
-        <LanguageSwitcher />
-        <ThemeSwitcher />
-      </div>
-      {children}
+      <DashboardProvider initialData={publications} usageSummary={kpiSummary} funders={funders}>
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col transition-colors">
+          <a href="#main-content" className="skip-link">
+            {translations[validLocale].common.skipToContent}
+          </a>
+
+          <AppHeader />
+
+          <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1">
+            <GlobalFilterBar />
+            <main id="main-content">
+              {children}
+            </main>
+          </div>
+
+          <PageFooter lastUpdated={lastUpdated} />
+        </div>
+      </DashboardProvider>
     </LanguageProvider>
   );
 }

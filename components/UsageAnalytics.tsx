@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useDashboard } from './DashboardContext';
 import { 
   XAxis, YAxis, Tooltip, 
   CartesianGrid, AreaChart, Area
 } from 'recharts';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import { Download, MousePointerClick, Globe, Star, Zap, BarChart3, Filter } from 'lucide-react';
 import WorldMap from './WorldMap';
 import { UsageStats, TopPaper } from '@/lib/types';
@@ -18,6 +19,9 @@ export default function UsageAnalytics() {
   const { state, data } = useDashboard();
   const { journalFilter, yearFilter } = state;
   const { usageSummary } = data;
+
+  const pulseChartRef = useRef<HTMLDivElement>(null);
+  const mapChartRef = useRef<HTMLDivElement>(null);
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
 
@@ -174,9 +178,9 @@ export default function UsageAnalytics() {
                 {t.usage.pulseSubtitle.replaceAll('{year}', String(usageSummary.currentYear))}
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
                <div className="flex items-center gap-1.5">
-                 <div className="h-3 w-3 rounded-full bg-amber-500" aria-hidden="true" />
+                 <div className="h-3 w-3 rounded-full bg-[var(--episciences-cyan-02)]" aria-hidden="true" />
                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase">{t.usage.downloads}</span>
                </div>
                <div className="flex items-center gap-1.5">
@@ -189,15 +193,27 @@ export default function UsageAnalytics() {
                  </svg>
                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase">{t.usage.estimate}</span>
                </div>
+               <ChartExportMenu
+                 targetRef={pulseChartRef}
+                 data={yearlyData}
+                 filename={`episciences-usage-pulse-${journalFilter !== 'all' ? (rvcode || journalFilter) : 'all'}-${yearFilter}`}
+                 csvColumns={[
+                   { key: 'year', header: 'Year' },
+                   { key: 'downloads', header: 'Downloads' },
+                   { key: 'views', header: 'Views' },
+                   { key: 'downloadsProjected', header: 'Downloads_Projected' },
+                   { key: 'viewsProjected', header: 'Views_Projected' },
+                 ]}
+               />
             </div>
           </div>
-          <div className="h-[350px] w-full">
+          <div ref={pulseChartRef} className="h-[350px] w-full">
             <ChartContainer width="100%" height="100%">
               <AreaChart data={yearlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorDownloads" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#d97706" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#d97706" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#0aa0be" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#0aa0be" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -214,9 +230,9 @@ export default function UsageAnalytics() {
                   labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                 />
                 <Area type="monotone" dataKey="views" name={t.usage.views} stroke="#94a3b8" fill="transparent" strokeWidth={2} dot={{ r: 4, fill: '#94a3b8' }} connectNulls={false} />
-                <Area type="monotone" dataKey="downloads" name={t.usage.downloads} stroke="#d97706" fillOpacity={1} fill="url(#colorDownloads)" strokeWidth={3} dot={{ r: 6, fill: '#d97706' }} connectNulls={false} />
+                <Area type="monotone" dataKey="downloads" name={t.usage.downloads} stroke="#0aa0be" fillOpacity={1} fill="url(#colorDownloads)" strokeWidth={3} dot={{ r: 6, fill: '#0aa0be' }} connectNulls={false} />
                 <Area type="monotone" dataKey="viewsProjected" name={`${t.usage.views} (${t.usage.estimate.toLowerCase()})`} stroke="#94a3b8" strokeDasharray="6 5" fill="transparent" strokeWidth={2} dot={{ r: 4, fill: '#94a3b8', fillOpacity: 0.4 }} connectNulls={false} legendType="none" />
-                <Area type="monotone" dataKey="downloadsProjected" name={`${t.usage.downloads} (${t.usage.estimate.toLowerCase()})`} stroke="#d97706" strokeDasharray="6 5" fill="transparent" strokeWidth={3} dot={{ r: 6, fill: '#d97706', fillOpacity: 0.4 }} connectNulls={false} legendType="none" />
+                <Area type="monotone" dataKey="downloadsProjected" name={`${t.usage.downloads} (${t.usage.estimate.toLowerCase()})`} stroke="#0aa0be" strokeDasharray="6 5" fill="transparent" strokeWidth={3} dot={{ r: 6, fill: '#0aa0be', fillOpacity: 0.4 }} connectNulls={false} legendType="none" />
               </AreaChart>
             </ChartContainer>
           </div>
@@ -230,8 +246,8 @@ export default function UsageAnalytics() {
           
           <div className="flex-1 flex flex-col justify-around">
             <div className="space-y-6">
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 transition-all border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30">
-                <div className="rounded-xl bg-amber-100 dark:bg-amber-900/30 p-3 text-amber-600 dark:text-amber-400 shrink-0" aria-hidden="true">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 transition-all border border-transparent hover:border-[var(--episciences-cyan-01)]/40">
+                <div className="rounded-xl bg-[var(--episciences-cyan-00)]/15 dark:bg-[var(--episciences-cyan-00)]/20 p-3 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] shrink-0" aria-hidden="true">
                   <Download size={22} />
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -251,12 +267,12 @@ export default function UsageAnalytics() {
               </div>
             </div>
             
-            <div className="mt-8 rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-6 border border-amber-100 dark:border-amber-900/30 text-center">
-              <BarChart3 className="h-8 w-8 text-amber-600 dark:text-amber-400 mx-auto mb-2" aria-hidden="true" />
-              <p className="text-lg font-black text-amber-700 dark:text-amber-300 uppercase tracking-tighter">
+            <div className="mt-8 rounded-2xl bg-[var(--episciences-cyan-00)]/10 dark:bg-[var(--episciences-cyan-00)]/15 p-6 border border-[var(--episciences-cyan-01)]/30 text-center">
+              <BarChart3 className="h-8 w-8 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)] mx-auto mb-2" aria-hidden="true" />
+              <p className="text-lg font-black text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] uppercase tracking-tighter">
                 {journalFilter === 'all' ? t.usage.archiveVolume : t.usage.journalVolume}
               </p>
-              <p className="text-xs font-bold text-amber-700/80 dark:text-amber-300/80 uppercase tracking-wider mt-1">{t.usage.aggregatedKpis}</p>
+              <p className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider mt-1">{t.usage.aggregatedKpis}</p>
             </div>
           </div>
         </div>
@@ -269,21 +285,32 @@ export default function UsageAnalytics() {
             <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">{t.usage.globalReadership}</h3>
             <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mt-1">{t.usage.downloadsByCountry}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
              <div className="px-4 py-2 bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-3">
                <Globe className="h-4 w-4 text-blue-500" />
                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{formatNum(geoData.length)} {t.usage.activeCountries}</span>
              </div>
+             <ChartExportMenu
+               targetRef={mapChartRef}
+               data={geoData}
+               filename={`episciences-downloads-by-country-${journalFilter !== 'all' ? (rvcode || journalFilter) : 'all'}-${yearFilter}`}
+               csvColumns={[
+                 { key: 'name', header: 'Country_Code' },
+                 { key: 'name', header: 'Country_Name', formatter: (val) => val ? getCountryName(String(val)) : '' },
+                 { key: 'value', header: 'Downloads' },
+               ]}
+             />
           </div>
         </div>
         
         {/* Map Container with responsive aspect ratio to prevent truncation */}
-        <div className="w-full border border-zinc-100 rounded-3xl dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-950/30 mb-8 relative shadow-inner group overflow-hidden">
+        <div ref={mapChartRef} className="w-full border border-zinc-100 rounded-3xl dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-950/30 mb-8 relative shadow-inner group overflow-hidden">
           <div className="aspect-[16/9] w-full min-h-[400px] md:min-h-[500px]">
             <WorldMap
               data={geoData}
               legendLabel={t.usage.mapLegend}
-              colorRange={["#fef3c7", "#d97706"]}
+              valueUnit={t.usage.downloads.toLowerCase()}
+              colorRange={["#e0f7f8", "#0aa0be"]}
             />
           </div>
         </div>
@@ -301,16 +328,28 @@ export default function UsageAnalytics() {
       {/* Top Performing Papers - Only shown if a journal is selected */}
       {rvcode && usageSummary.journalTopPapers[rvcode] && (
         <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Star className="h-6 w-6 text-amber-500" />
+              <Star className="h-6 w-6 text-[var(--episciences-cyan-02)]" aria-hidden="true" />
               <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">{t.usage.mostDownloaded}</h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{t.usage.top20Trending}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400">{t.usage.top20Trending}</span>
+              <ChartExportMenu
+                data={usageSummary.journalTopPapers[rvcode!]}
+                filename={`episciences-top-papers-${rvcode}`}
+                csvColumns={[
+                  { key: 'doi', header: 'DOI' },
+                  { key: 'title', header: 'Title' },
+                  { key: 'downloads', header: 'Downloads' },
+                  { key: 'views', header: 'Views' },
+                ]}
+              />
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {usageSummary.journalTopPapers[rvcode!].map((paper: TopPaper, idx: number) => (
-              <div key={paper.doi} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-6 ring-1 ring-zinc-200 transition-all hover:bg-white hover:shadow-xl hover:ring-amber-200 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-amber-900">
+              <div key={paper.doi} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-6 ring-1 ring-zinc-200 transition-all hover:bg-white hover:shadow-xl hover:ring-[var(--episciences-cyan-01)]/50 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-[var(--episciences-cyan-01)]/50">
                 <div className="mb-4 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-900 text-[10px] font-black text-white dark:bg-zinc-50 dark:text-zinc-900 font-sans">
@@ -318,11 +357,11 @@ export default function UsageAnalytics() {
                     </span>
                   </div>
                   <div className="flex flex-col items-end text-right">
-                    <span className="text-lg font-black text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{formatNum(paper.downloads)} <span className="text-[10px] uppercase text-zinc-400 ml-1">dl</span></span>
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">{formatNum(paper.views)} {t.common.views}</span>
+                    <span className="text-lg font-black text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{formatNum(paper.downloads)} <span className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 ml-1">dl</span></span>
+                    <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-tighter">{formatNum(paper.views)} {t.common.views}</span>
                   </div>
                 </div>
-                <h4 className="mb-4 text-sm font-bold leading-relaxed text-zinc-900 dark:text-zinc-50 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-3 min-h-[3rem]">
+                <h4 className="mb-4 text-sm font-bold leading-relaxed text-zinc-900 dark:text-zinc-50 group-hover:text-[var(--episciences-cyan-03)] dark:group-hover:text-[var(--episciences-cyan-00)] transition-colors line-clamp-3 min-h-[3rem]">
                   {paper.title}
                 </h4>
                 <div className="flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-700/50">
@@ -330,12 +369,13 @@ export default function UsageAnalytics() {
                     href={`https://doi.org/${paper.doi}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
+                    aria-label={`DOI: ${paper.doi} (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
                     className="text-[10px] font-mono font-bold text-blue-600 hover:underline truncate max-w-[180px]"
                   >
                     {paper.doi}
                   </a>
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 shrink-0">
-                    <MousePointerClick size={12} />
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 shrink-0">
+                    <MousePointerClick size={12} aria-hidden="true" />
                     {t.usage.readOnline}
                   </div>
                 </div>

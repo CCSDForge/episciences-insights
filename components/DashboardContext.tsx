@@ -1,11 +1,9 @@
 'use client';
 
-import React, { createContext, use, useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Publication, UsageSummary } from '@/lib/types';
+import React, { createContext, use, useState, useMemo, useCallback } from 'react';
+import { Publication, UsageSummary, FundersFile } from '@/lib/types';
 import { normalizeLicense } from '@/lib/licenses';
 import { getCountryName } from '@/lib/countryNames';
-
-type ActiveTab = 'funder' | 'journal' | 'raw' | 'topics' | 'lineage' | 'usage';
 
 // Near-universal on this corpus (Episciences itself, plus OpenAIRE's catch-all
 // for an instance with no resolvable host) — excluded from the repository
@@ -27,50 +25,70 @@ export interface GlobalReachStats {
   singleCountryCount: number;
 }
 
+export interface InstitutionItem {
+  id: string;
+  name: string;
+  ror: string | null;
+  country: string | null;
+  count: number;
+  affiliationsCount: number;
+}
+
+export interface PeerReviewDelayStats {
+  validCount: number;
+  medianDays: number;
+  medianMonths: number;
+  averageMonths: number;
+  byRange: { range: string; count: number; percentage: number }[];
+  byYear: { year: string; count: number; medianMonths: number }[];
+}
+
 interface DashboardState {
-  activeTab: ActiveTab;
   yearFilter: string;
   funderFilter: string;
   journalFilter: string;
+  institutionFilter: string;
   funderLimit: 50 | 100 | 500;
   institutionLimit: 100 | 500 | 1000;
   countryLimit: 10 | 25 | 50;
   topicLimit: 100 | 500;
   topicDomainFilter: string;
-  isFunderOpen: boolean;
-  funderSearch: string;
 }
 
 interface DashboardActions {
-  setActiveTab: (tab: ActiveTab) => void;
   setYearFilter: (year: string) => void;
   setFunderFilter: (funder: string) => void;
   setJournalFilter: (journal: string) => void;
+  setInstitutionFilter: (institution: string) => void;
   resetFilters: () => void;
   setFunderLimit: (limit: 50 | 100 | 500) => void;
   setInstitutionLimit: (limit: 100 | 500 | 1000) => void;
   setCountryLimit: (limit: 10 | 25 | 50) => void;
   setTopicLimit: (limit: 100 | 500) => void;
   setTopicDomainFilter: (domain: string) => void;
-  setIsFunderOpen: (open: boolean) => void;
-  setFunderSearch: (search: string) => void;
 }
 
 interface DashboardData {
   filteredData: Publication[];
   usageSummary: UsageSummary | null;
+  funders: FundersFile;
   stats: { totalPubs: number; totalSdgs: number; totalFunders: number };
   sdgData: { name: string; value: number }[];
   funderData: { name: string; value: number }[];
   institutionData: { name: string; count: number; ror: string | null }[];
+  institutionsList: InstitutionItem[];
+  peerReviewStats: PeerReviewDelayStats;
   countryData: { name: string; value: number }[];
   topCountriesData: TopCountryEntry[];
   globalReachStats: GlobalReachStats;
   topicData: { name: string; count: number; domain: string; field: string; id: string }[];
   topicDomains: string[];
   years: string[];
-  groupedFunders: Record<string, string[]>;
+  allFunders: string[];
   journals: [string, string][];
+  initialData: Publication[];
+  platformFilteredData: Publication[];
+  platformPeerReviewStats: PeerReviewDelayStats;
   openScienceStats: {
     totalLicenseMentions: number;
     topLicenses: { name: string; count: number }[];
@@ -78,15 +96,10 @@ interface DashboardData {
   };
 }
 
-interface DashboardMeta {
-  dropdownRef: React.RefObject<HTMLDivElement | null>;
-}
-
 interface DashboardContextValue {
   state: DashboardState;
   actions: DashboardActions;
   data: DashboardData;
-  meta: DashboardMeta;
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
@@ -100,44 +113,129 @@ export function useDashboard() {
 interface DashboardProviderProps {
   initialData: Publication[];
   usageSummary: UsageSummary | null;
+  funders?: FundersFile;
   children: React.ReactNode;
 }
 
-export function DashboardProvider({ initialData, usageSummary, children }: DashboardProviderProps) {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('usage');
+function computePeerReviewStats(dataset: Publication[]): PeerReviewDelayStats {
+  const valid: { days: number; months: number; year: number }[] = [];
+  dataset.forEach(p => {
+    const s = p.episciences?.first_submission_date;
+    const pub = p.episciences?.publication_date;
+    if (!s || !pub) return;
+    const ds = new Date(s).getTime();
+    const dp = new Date(pub).getTime();
+    if (isNaN(ds) || isNaN(dp) || ds > dp) return;
+    const days = Math.round((dp - ds) / (1000 * 60 * 60 * 24));
+    valid.push({ days, months: Math.round((days / 30.4375) * 10) / 10, year: p.year });
+  });
+
+  if (valid.length === 0) {
+    return {
+      validCount: 0,
+      medianDays: 0,
+      medianMonths: 0,
+      averageMonths: 0,
+      byRange: [],
+      byYear: [],
+    };
+  }
+
+  valid.sort((a, b) => a.days - b.days);
+  const medianDays = valid[Math.floor(valid.length / 2)].days;
+  const medianMonths = Math.round((medianDays / 30.4375) * 10) / 10;
+  const totalDays = valid.reduce((acc, v) => acc + v.days, 0);
+  const averageMonths = Math.round((totalDays / valid.length / 30.4375) * 10) / 10;
+
+  const rangeBins = [
+    { range: '< 3 mois', min: 0, max: 90 },
+    { range: '3-6 mois', min: 90, max: 180 },
+    { range: '6-12 mois', min: 180, max: 365 },
+    { range: '1-2 ans', min: 365, max: 730 },
+    { range: '> 2 ans', min: 730, max: Infinity },
+  ];
+
+  const byRange = rangeBins.map(bin => {
+    const count = valid.filter(v => v.days >= bin.min && v.days < bin.max).length;
+    const percentage = Math.round((count / valid.length) * 1000) / 10;
+    return { range: bin.range, count, percentage };
+  });
+
+  const yearGroups: Record<string, number[]> = {};
+  valid.forEach(v => {
+    const y = v.year.toString();
+    if (!yearGroups[y]) yearGroups[y] = [];
+    yearGroups[y].push(v.days);
+  });
+
+  const byYear = Object.entries(yearGroups)
+    .map(([year, daysList]) => {
+      daysList.sort((a, b) => a - b);
+      const mDays = daysList[Math.floor(daysList.length / 2)];
+      return {
+        year,
+        count: daysList.length,
+        medianMonths: Math.round((mDays / 30.4375) * 10) / 10,
+      };
+    })
+    .sort((a, b) => a.year.localeCompare(b.year));
+
+  return {
+    validCount: valid.length,
+    medianDays,
+    medianMonths,
+    averageMonths,
+    byRange,
+    byYear,
+  };
+}
+
+export function DashboardProvider({ initialData, usageSummary, funders = {}, children }: DashboardProviderProps) {
   const [yearFilter, setYearFilter] = useState('all');
   const [funderFilter, setFunderFilter] = useState('all');
   const [journalFilter, setJournalFilter] = useState('all');
+  const [institutionFilter, setInstitutionFilter] = useState('all');
   const [funderLimit, setFunderLimit] = useState<50 | 100 | 500>(50);
   const [institutionLimit, setInstitutionLimit] = useState<100 | 500 | 1000>(100);
   const [countryLimit, setCountryLimit] = useState<10 | 25 | 50>(10);
   const [topicLimit, setTopicLimit] = useState<100 | 500>(100);
   const [topicDomainFilter, setTopicDomainFilter] = useState('all');
-  const [isFunderOpen, setIsFunderOpen] = useState(false);
-  const [funderSearch, setFunderSearch] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const resetFilters = useCallback(() => {
     setYearFilter('all');
     setJournalFilter('all');
     setFunderFilter('all');
+    setInstitutionFilter('all');
   }, []);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsFunderOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // Map of journal code/issn to canonical name
+  const journalIdToName = useMemo(() => {
+    const map = new Map<string, string>();
+    initialData.forEach(p => {
+      const name = p.journal.name?.replace(/\s+/g, ' ').trim();
+      if (!name) return;
+      if (p.journal.code) map.set(p.journal.code, name);
+      if (p.journal.issn) map.set(p.journal.issn, name);
+    });
+    return map;
+  }, [initialData]);
 
-  const filteredData = useMemo(() => initialData.filter(p => {
-    const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
-    const journalMatch = journalFilter === 'all' || p.journal.code === journalFilter || p.journal.issn === journalFilter || p.journal.name === journalFilter;
-    return yearMatch && journalMatch;
-  }), [initialData, yearFilter, journalFilter]);
+  const filteredData = useMemo(() => {
+    const selectedJournalName = journalFilter !== 'all' ? journalIdToName.get(journalFilter) : null;
+    return initialData.filter(p => {
+      const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
+      const journalMatch =
+        journalFilter === 'all' ||
+        p.journal.code === journalFilter ||
+        p.journal.issn === journalFilter ||
+        p.journal.name === journalFilter ||
+        (selectedJournalName && p.journal.name?.replace(/\s+/g, ' ').trim() === selectedJournalName);
+      const institutionMatch = institutionFilter === 'all' || p.authors.some(a =>
+        a.institutions.some(inst => (inst.ror && inst.ror === institutionFilter) || inst.name === institutionFilter)
+      );
+      return yearMatch && journalMatch && institutionMatch;
+    });
+  }, [initialData, yearFilter, journalFilter, institutionFilter, journalIdToName]);
 
   const stats = useMemo(() => ({
     totalPubs: filteredData.length,
@@ -250,27 +348,34 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
     [initialData]
   );
 
-  const groupedFunders = useMemo(() => {
-    const uniqueFunders = Array.from(new Set(initialData.flatMap(p => p.awards.map(a => a.funder))))
+  const allFunders = useMemo(() => {
+    return Array.from(new Set(initialData.flatMap(p => p.awards.map(a => a.funder))))
       .filter(Boolean)
-      .filter(f => f.toLowerCase().includes(funderSearch.toLowerCase()))
       .sort((a, b) => a.localeCompare(b));
-    const groups: Record<string, string[]> = {};
-    uniqueFunders.forEach(f => {
-      const letter = /^[A-Z]/.test(f[0].toUpperCase()) ? f[0].toUpperCase() : '#';
-      if (!groups[letter]) groups[letter] = [];
-      groups[letter].push(f);
-    });
-    return groups;
-  }, [initialData, funderSearch]);
+  }, [initialData]);
 
   const journals = useMemo(() => {
-    const unique = new Map<string, string>();
-    initialData.forEach(p => {
+    const idToNames = new Map<string, Map<string, number>>();
+
+    initialData.forEach((p) => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name) unique.set(p.journal.code || p.journal.issn || name, name);
+      if (!name) return;
+      const id = p.journal.code || p.journal.issn || name;
+      if (!idToNames.has(id)) {
+        idToNames.set(id, new Map());
+      }
+      const counts = idToNames.get(id)!;
+      counts.set(name, (counts.get(name) || 0) + 1);
     });
-    return Array.from(unique.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+
+    return Array.from(idToNames.entries())
+      .map(([id, counts]) => {
+        const bestName = Array.from(counts.entries()).sort(
+          (a, b) => b[1] - a[1] || b[0].length - a[0].length
+        )[0][0];
+        return [id, bestName] as [string, string];
+      })
+      .sort((a, b) => a[1].localeCompare(b[1]));
   }, [initialData]);
 
   const openScienceStats = useMemo(() => {
@@ -304,12 +409,51 @@ export function DashboardProvider({ initialData, usageSummary, children }: Dashb
     return { totalLicenseMentions, topLicenses, totalRepositories: repositories.size };
   }, [filteredData]);
 
+  const institutionsList = useMemo(() => {
+    const map = new Map<string, InstitutionItem>();
+    initialData.forEach(p => {
+      const seenInPub = new Set<string>();
+      p.authors.forEach(a => {
+        a.institutions.forEach(inst => {
+          const id = inst.ror || inst.name;
+          if (!id) return;
+          let entry = map.get(id);
+          if (!entry) {
+            entry = {
+              id,
+              name: inst.name,
+              ror: inst.ror,
+              country: inst.country,
+              count: 0,
+              affiliationsCount: 0,
+            };
+            map.set(id, entry);
+          }
+          entry.affiliationsCount += 1;
+          if (!seenInPub.has(id)) {
+            seenInPub.add(id);
+            entry.count += 1;
+          }
+        });
+      });
+    });
+    return Array.from(map.values()).sort(
+      (a, b) => b.count - a.count || b.affiliationsCount - a.affiliationsCount || a.name.localeCompare(b.name)
+    );
+  }, [initialData]);
+
+  const platformFilteredData = useMemo(() => initialData.filter(p => {
+    return yearFilter === 'all' || p.year.toString() === yearFilter;
+  }), [initialData, yearFilter]);
+
+  const platformPeerReviewStats = useMemo(() => computePeerReviewStats(platformFilteredData), [platformFilteredData]);
+  const peerReviewStats = useMemo(() => computePeerReviewStats(filteredData), [filteredData]);
+
   return (
     <DashboardContext value={{
-      state: { activeTab, yearFilter, funderFilter, journalFilter, funderLimit, institutionLimit, countryLimit, topicLimit, topicDomainFilter, isFunderOpen, funderSearch },
-      actions: { setActiveTab, setYearFilter, setFunderFilter, setJournalFilter, resetFilters, setFunderLimit, setInstitutionLimit, setCountryLimit, setTopicLimit, setTopicDomainFilter, setIsFunderOpen, setFunderSearch },
-      data: { filteredData, usageSummary, stats, sdgData, funderData, institutionData, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, groupedFunders, journals, openScienceStats },
-      meta: { dropdownRef },
+      state: { yearFilter, funderFilter, journalFilter, institutionFilter, funderLimit, institutionLimit, countryLimit, topicLimit, topicDomainFilter },
+      actions: { setYearFilter, setFunderFilter, setJournalFilter, setInstitutionFilter, resetFilters, setFunderLimit, setInstitutionLimit, setCountryLimit, setTopicLimit, setTopicDomainFilter },
+      data: { initialData, filteredData, platformFilteredData, platformPeerReviewStats, usageSummary, funders, stats, sdgData, funderData, institutionData, institutionsList, peerReviewStats, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, allFunders, journals, openScienceStats },
     }}>
       {children}
     </DashboardContext>

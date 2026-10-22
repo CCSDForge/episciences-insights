@@ -74,6 +74,9 @@ export interface Translations {
     funders: string;
     lineage: string;
     usage: string;
+    journals: string;
+    institutions: string;
+    platform: string;
   };
   kpi: {
     publicationsDesc: string;
@@ -94,6 +97,7 @@ export interface Translations {
     license: string;
     source: string;
     lastUpdated: string;
+    methodologyLink: string;
   };
   lineage: {
     title: string;
@@ -115,6 +119,29 @@ export interface Translations {
     noRelated: string;
     selectPaperPrompt: string;
     selectedPublication: string;
+    searchPlaceholder: string;
+    clearSearch: string;
+    noResults: string;
+    articlesMatching: string;
+    viewArticle: string;
+    exploreOpenAlex: string;
+    relatedWorkIndex: string;
+    consultOnOpenAlex: string;
+    authors: string;
+    discipline: string;
+    openAccessDiamond: string;
+    bibliographicDepth: string;
+    deepCorpus: string;
+    standardCorpus: string;
+    targetedCorpus: string;
+    referencesHint: string;
+    citationsReceived: string;
+    citationsCount: string;
+    semanticAffinity: string;
+    semanticAffinityDesc: string;
+    loadMore: string;
+    showingCount: string;
+    openAlexLimitExplanation: string;
   };
   network: {
     title: string;
@@ -176,6 +203,7 @@ export interface Translations {
     deduplicatedRor: string;
     noRor: string;
     clickToExplore: string;
+    clickToViewAffiliations: string;
     relationalViews: string;
     topicsNetwork: string;
     topicsMatrix: string;
@@ -330,6 +358,102 @@ export interface Translations {
     reachScopedNotice: string;
     countryScopedNotice: string;
   };
+  methodology: {
+    backToDashboard: string;
+    badge: string;
+    title: string;
+    subtitle: string;
+    institution: string;
+    author: string;
+    date: string;
+    tocTitle: string;
+    tocContext: string;
+    tocSources: string;
+    tocPipeline: string;
+    tocModels: string;
+    tocLimits: string;
+    tocFair: string;
+    tocReferences: string;
+    sec1Title: string;
+    sec1P1: string;
+    sec1P2: string;
+    sec1CalloutTitle: string;
+    sec1CalloutDesc: string;
+    sec2Title: string;
+    sec2P1: string;
+    sourceThName: string;
+    sourceThAccess: string;
+    sourceThScope: string;
+    sourceThPivot: string;
+    sec3Title: string;
+    sec3P1: string;
+    step1Title: string;
+    step1Desc: string;
+    step2Title: string;
+    step2Desc: string;
+    step3Title: string;
+    step3Desc: string;
+    step4Title: string;
+    step4Desc: string;
+    step5Title: string;
+    step5Desc: string;
+    sec4Title: string;
+    sdgTitle: string;
+    sdgP1: string;
+    sdgFormulaExplanation: string;
+    networkTitle: string;
+    networkP1: string;
+    usageTitle: string;
+    usageP1: string;
+    usageWarning: string;
+    lineageTitle: string;
+    lineageP1: string;
+    topicsTitle?: string;
+    topicsP1?: string;
+    reachMethodTitle?: string;
+    reachMethodP1?: string;
+    sec5Title: string;
+    sec5P1: string;
+    limit1Title: string;
+    limit1Desc: string;
+    limit2Title: string;
+    limit2Desc: string;
+    limit3Title: string;
+    limit3Desc: string;
+    sec6Title: string;
+    sec6P1: string;
+    ssgTitle: string;
+    ssgDesc: string;
+    compressionTitle: string;
+    compressionDesc: string;
+    licenseTitle: string;
+    licenseDesc: string;
+    reproTitle: string;
+    reproDesc: string;
+    reproCommands: string;
+    downloadPubs: string;
+    downloadFunders: string;
+    sec7Title: string;
+    references: string[];
+  };
+  export: {
+    exportButton: string;
+    exportMenu: string;
+    exportVisualization: string;
+    exportData: string;
+    png: string;
+    pngDesc: string;
+    svg: string;
+    svgDesc: string;
+    csv: string;
+    csvDesc: string;
+    json: string;
+    jsonDesc: string;
+    downloading: string;
+    success: string;
+    error: string;
+    noSvgFound: string;
+  };
 }
 
 export const translations: Record<Locale, Translations> = {
@@ -406,7 +530,10 @@ export const translations: Record<Locale, Translations> = {
           "topics": "Research Landscape",
           "funders": "Funder Impact",
           "lineage": "Research Lineage & Open Science",
-          "usage": "Usage Analytics"
+          "usage": "Usage Analytics",
+          "journals": "Journal Statistics",
+          "institutions": "Institution Statistics",
+          "platform": "Platform Data"
       },
       "kpi": {
           "publicationsDesc": "Open access peer-reviewed papers",
@@ -418,15 +545,16 @@ export const translations: Record<Locale, Translations> = {
       },
       "disclaimer": {
           "title": "Data Accuracy & Source Disclaimer",
-          "metricsP1": "The scientific metrics and connections visualized in this dashboard are powered by the OpenAlex API, the OpenAIRE Graph API, the Episciences API, the zbMATH Open API (https://api.zbmath.org/), and the ROR API (https://ror.org/). Please note that these datasets may not represent the exhaustive catalog of Episciences publications, indexing latencies may occur, and external source coverage of a given publication is not guaranteed: open science indicators and subject classifications are only available where matching records exist.",
-          "metricsP2": "Certain metadata (including research topics, SDG alignment, and related works) are generated using OpenAlex automated algorithms. Funding codes and acronyms, hosting repositories, license information, citation impact indicators, and research infrastructure affiliations are sourced from OpenAIRE Graph. Mathematics Subject Classifications (MSC 2020) are sourced from zbMATH Open. Research institution and funder identification, geocoding, and disambiguation are powered by the ROR (Research Organization Registry) API. Episciences is engaged in a permanent effort to refine, verify, and enrich these datasets to provide an increasingly accurate representation of our research impact.",
+          "metricsP1": "The scientific metrics and connections visualized in this dashboard are powered by the [OpenAlex API](https://openalex.org), the [OpenAIRE Graph API](https://graph.openaire.eu), the [Episciences API](https://www.episciences.org), the [zbMATH Open API](https://zbmath.org), and the [ROR API](https://ror.org). Please note that these datasets may not represent the exhaustive catalog of Episciences publications, indexing latencies may occur, and external source coverage of a given publication is not guaranteed: open science indicators and subject classifications are only available where matching records exist.",
+          "metricsP2": "Certain metadata (including research topics, SDG alignment, and related works) are generated using [OpenAlex](https://openalex.org) automated algorithms. Funding codes and acronyms, hosting repositories, license information, citation impact indicators, and research infrastructure affiliations are sourced from [OpenAIRE Graph](https://graph.openaire.eu). Mathematics Subject Classifications (MSC 2020) are sourced from [zbMATH Open](https://zbmath.org). Research institution and funder identification, geocoding, and disambiguation are powered by the [ROR (Research Organization Registry) API](https://ror.org). [Episciences](https://www.episciences.org) is engaged in a permanent effort to refine, verify, and enrich these datasets to provide an increasingly accurate representation of our research impact.",
           "downloadsNoteTitle": "Download statistics",
           "downloadsNote": "are sourced exclusively from the Episciences platform and reflect downloads occurring directly on journal websites. They do not account for downloads from open repositories, where the same articles may also be freely available. Actual readership figures are therefore likely higher than those reported here."
       },
       "footer": {
           "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open, and ROR APIs",
-          "lastUpdated": "Data last updated: {date}"
+          "lastUpdated": "Data last updated: {date}",
+          "methodologyLink": "Methodology & Scholarly Framework"
       },
       "lineage": {
           "title": "Research Lineage",
@@ -447,7 +575,30 @@ export const translations: Record<Locale, Translations> = {
           "worksMapped": "works mapped",
           "noRelated": "No related works mapped yet in OpenAlex for this recent paper.",
           "selectPaperPrompt": "Select a paper from the list to view its lineage",
-          "selectedPublication": "Selected Publication"
+          "selectedPublication": "Selected Publication",
+          "searchPlaceholder": "Search by title, author, or keyword...",
+          "clearSearch": "Clear search",
+          "noResults": "No publications match your search.",
+          "articlesMatching": "publications",
+          "viewArticle": "View publication (DOI)",
+          "exploreOpenAlex": "Explore related network on OpenAlex",
+          "relatedWorkIndex": "Related work",
+          "consultOnOpenAlex": "View on OpenAlex",
+          "authors": "Authors",
+          "discipline": "Discipline",
+          "openAccessDiamond": "Diamond Open Access",
+          "bibliographicDepth": "Bibliographic Depth",
+          "deepCorpus": "Extensive scientific corpus (> 50 sources)",
+          "standardCorpus": "Standard scientific corpus (20–50 sources)",
+          "targetedCorpus": "Focused scientific study (< 20 sources)",
+          "referencesHint": "Full references are listed in the full-text publication on Episciences.",
+          "citationsReceived": "Recorded Citations",
+          "citationsCount": "citation(s) detected in OpenAIRE / OpenAlex",
+          "semanticAffinity": "Thematic Neighborhood & Related Works",
+          "semanticAffinityDesc": "Publications sharing co-citations and high semantic affinity in the global scientific graph.",
+          "loadMore": "Load 50 more publications",
+          "showingCount": "Showing {visible} of {total} publications",
+          "openAlexLimitExplanation": "OpenAlex computes up to 10 nearest scientific neighbors per work based on co-citation and text embeddings similarity."
       },
       "network": {
           "title": "Network Explorer - Episciences Insights",
@@ -471,7 +622,7 @@ export const translations: Record<Locale, Translations> = {
           "networksAndCoOccurrences": "Networks & Co-occurrences",
           "funderOverview": "Overview & Funders",
           "funderNetworks": "Co-funding Networks",
-          "reachOverview": "Overview & Affiliations",
+          "reachOverview": "Overview",
           "reachNetworks": "Networks & Collaborations",
           "allFunders": "All Funders",
           "filterByFunder": "Filter by funding agency",
@@ -497,18 +648,19 @@ export const translations: Record<Locale, Translations> = {
           "noLicenseData": "No license data in this selection",
           "funderVolumeTitle": "Volume by Research Funder",
           "funderVolumeDesc": "Ranked volume of acknowledgments for national, European, and international research grant sponsors.",
-          "affiliatedCountries": "Affiliated Countries",
+          "affiliatedCountries": "Affiliated Countries & Territories",
           "representedWorldwide": "represented worldwide",
           "affiliatedInstitutions": "Affiliated Institutions",
           "distinctOrganizations": "distinct research organizations",
           "authorAffiliationsTitle": "Global Reach: Author Affiliations",
-          "authorAffiliationsSubtitle": "Geographic distribution across {count} countries (log scale)",
-          "topContributingCountries": "Top Contributing Countries",
+          "authorAffiliationsSubtitle": "Geographic distribution across {count} countries & territories (log scale)",
+          "topContributingCountries": "Top Contributing Countries & Territories",
           "rankedByPubs": "Ranked by number of affiliated publications",
           "topContributingInstitutions": "Top Contributing Institutions",
           "deduplicatedRor": "Deduplicated by ROR identifier",
           "noRor": "No ROR available",
           "clickToExplore": "Click to explore affiliations in {country}",
+          "clickToViewAffiliations": "click to view affiliations",
           "relationalViews": "Relational Views & Flows",
           "topicsNetwork": "Topics Network",
           "topicsMatrix": "Topics Matrix",
@@ -517,7 +669,7 @@ export const translations: Record<Locale, Translations> = {
           "countryNetwork": "Country Network",
           "institutionNetwork": "Institution Network",
           "collaborationMatrix": "Collaboration Matrix",
-          "geographicFlows": "Global Geographic Flows",
+          "geographicFlows": "Geographic Flows",
           "topicsNetworkTitle": "Topics Co-occurrence Network",
           "topicsNetworkDesc": "Force-directed graph connecting OpenAlex research topics appearing together on the same article, highlighting interdisciplinary bridges between fields.",
           "topicsMatrixTitle": "Topics Co-occurrence Matrix",
@@ -559,9 +711,9 @@ export const translations: Record<Locale, Translations> = {
           "journalVolume": "Journal Volume",
           "aggregatedKpis": "Aggregated KPIs",
           "globalReadership": "Global Readership",
-          "downloadsByCountry": "Total downloads by country (log scale)",
-          "activeCountries": "Active Countries",
-          "mapLegend": "Full Archive PDF Downloads by Country",
+          "downloadsByCountry": "Total downloads by country & territory (log scale)",
+          "activeCountries": "Countries & territories",
+          "mapLegend": "Full Archive PDF Downloads by Country & Territory",
           "mostDownloaded": "Most Downloaded Articles",
           "top20Trending": "Top 20 Trending Papers",
           "readOnline": "Read Online",
@@ -662,6 +814,107 @@ export const translations: Record<Locale, Translations> = {
           "showingPubsCount": "{shown} of {total} publications",
           "reachScopedNotice": "Showing institutions with a co-author in {country} - {shown} of {total} publications.",
           "countryScopedNotice": "Showing collaboration ties involving {country} - {shown} of {total} publications."
+      },
+      "methodology": {
+          "backToDashboard": "Back to dashboard",
+          "badge": "Methodological note",
+          "title": "Methodology and Data Sources",
+          "subtitle": "This page explains how the corpus is built, where the data comes from, how it is processed, and its limitations.",
+          "institution": "CCSD (CNRS, Inria, INRAE) — Episciences Platform",
+          "author": "Episciences Team, CCSD",
+          "date": "October 2026",
+          "tocTitle": "Table of Contents",
+          "tocContext": "1. Context",
+          "tocSources": "2. Data Sources",
+          "tocPipeline": "3. Ingestion and Processing",
+          "tocModels": "4. Calculation Methods",
+          "tocLimits": "5. Limitations",
+          "tocFair": "6. Architecture, Licenses and Reproducibility",
+          "tocReferences": "7. Links and Documentation",
+          "sec1Title": "1. Context",
+          "sec1P1": "Episciences Insights is developed by the CCSD (Centre pour la Communication Scientifique Directe, UAR 3668). It presents indicators on publications hosted on the Episciences platform: authors, affiliations and countries, research topics, funding, open science practices, and readership metrics. The corpus gathers over {publicationsCount} publications across the platform ({journalsCount} hosted journals); updates are scheduled monthly or alongside updates to source datasets and data models.",
+          "sec1P2": "All indicators originate exclusively from open infrastructures and their calculation methodology is documented below. In accordance with DORA and CoARA principles, the dashboard excludes proprietary metrics such as journal impact factors.",
+          "sec1CalloutTitle": "The overlay journal model (Diamond Open Access)",
+          "sec1CalloutDesc": "Episciences journals operate on the [[en:overlay journals]] model: manuscripts are first deposited in an open repository (HAL, arXiv, Zenodo...), then peer-reviewed under the editorial board's authority. Both publication and reading are completely free: no fees are charged to authors (no APCs), and articles are immediately open access for all readers.",
+          "sec2Title": "2. Data Sources",
+          "sec2P1": "Data is collected from multiple sources interconnected through persistent identifiers (DOI, ROR, ORCID). The table below details what each source provides.",
+          "sourceThName": "Source",
+          "sourceThAccess": "Access",
+          "sourceThScope": "Data scope",
+          "sourceThPivot": "Link identifier",
+          "sec3Title": "3. Ingestion and Processing",
+          "sec3P1": "Data is gathered and processed upstream by a collection pipeline. The static site is then generated from these consolidated datasets.",
+          "step1Title": "Step 1 — Publication List",
+          "step1Desc": "The canonical list of publication DOIs is retrieved from the Episciences API and normalized (stripping URI prefixes, lowercase conversion).",
+          "step2Title": "Step 2 — Metadata Harvesting",
+          "step2Desc": "For each DOI, metadata is queried concurrently across OpenAlex, OpenAIRE Graph, and the Episciences export. Valid responses are cached locally for 30 days, while empty responses are cached for 24 hours to prevent redundant requests.",
+          "step3Title": "Step 3 — Journals and Affiliations",
+          "step3Desc": "Global aggregators like OpenAlex often misattribute the journal to the preprint repository (HAL, arXiv...) or report an inaccurate name. Canonical journal names and short codes (rvcode) are therefore sourced directly from Episciences. Author affiliations declared on Episciences enrich OpenAlex records when a ROR ID is available; countries are resolved via ROR.",
+          "step4Title": "Step 4 — Funding Reconciliation",
+          "step4Desc": "Grants reported by OpenAlex and OpenAIRE are merged and deduplicated. Funder names are standardized using OpenAlex. The ROR registry provides geographic coordinates and resolves orphan funders.",
+          "step5Title": "Step 5 — Asset Preparation and Compression",
+          "step5Desc": "Normalized datasets are stored in JSON and pre-compressed (Brotli and Gzip), reducing the publication payload size by more than 90%.",
+          "sec4Title": "4. Calculation Methods",
+          "sdgTitle": "Sustainable Development Goals (SDG)",
+          "sdgP1": "OpenAlex associates publications with one or more of the 17 UN SDGs, with relevance scores between 0.4 and 1.0 (scores below 0.4 are discarded). Only a portion of the corpus is covered.",
+          "sdgFormulaExplanation": "Across sets of publications, the dashboard retains the maximum score per SDG rather than the average. An average would dilute high-relevance contributions within large volumes of fundamental research.",
+          "networkTitle": "Co-funding Network (Louvain)",
+          "networkP1": "In the co-funding network, two funders are connected when they fund the same publications. Funder clusters are computed using the Louvain community detection algorithm via graphology.",
+          "usageTitle": "Readership and Views",
+          "usageP1": "Download and page view metrics originate from Episciences platform analytics, aggregated by journal, paper, and country.",
+          "usageWarning": "These counts only track interactions on Episciences portals. Downloads occurring directly on open repositories (HAL, arXiv...) are not included. Total actual readership is therefore higher.",
+          "lineageTitle": "References and Related Works",
+          "lineageP1": "For each publication, the dashboard displays cited reference counts and related works suggested by OpenAlex. It also surfaces associated research datasets and software via OpenAIRE Scholix links.",
+          "topicsTitle": "Research Topics and Classifications",
+          "topicsP1": "Disciplinary distribution relies on the OpenAlex hierarchical taxonomy (domains, subfields, fields, and topics modeled through citation graph clustering). For mathematics journals, this view is enriched with official MSC 2020 codes from zbMATH Open, and JEL codes for economics.",
+          "reachMethodTitle": "Geographic Reach and Co-authorship",
+          "reachMethodP1": "A country is credited when at least one author declares an institutional affiliation located in that country. Maps and flow diagrams illustrate international research collaborations worldwide.",
+          "sec5Title": "5. Limitations",
+          "sec5P1": "Several limitations should be kept in mind when interpreting indicators:",
+          "limit1Title": "Indexing Latency",
+          "limit1Desc": "Recent publications may not yet be fully indexed by OpenAlex or OpenAIRE, or may have partial metadata.",
+          "limit2Title": "Disciplinary Classifications",
+          "limit2Desc": "MSC 2020 (mathematics) and JEL (economics) classification codes only apply to relevant journals. Their absence elsewhere is expected.",
+          "limit3Title": "Author Affiliations",
+          "limit3Desc": "Institutional affiliations come from OpenAlex, supplemented by Episciences declarations with a ROR ID. Automated affiliation parsing may contain gaps or inaccuracies.",
+          "sec6Title": "6. Architecture, Licenses and Reproducibility",
+          "sec6P1": "The website is built as a static application compiled from pre-processed datasets.",
+          "ssgTitle": "Static Site Architecture",
+          "ssgDesc": "Built with Next.js as static HTML and JSON files. All assets, including map geometries, are self-hosted: visiting the site triggers zero third-party API calls.",
+          "compressionTitle": "Pre-compression",
+          "compressionDesc": "Datasets are pre-compressed (Brotli and Gzip), ensuring sub-second delivery and minimal data usage.",
+          "licenseTitle": "Open Licenses",
+          "licenseDesc": "The source code is licensed under GNU GPL v3. Harmonized datasets are distributed under Creative Commons Attribution 4.0 International (CC-BY 4.0).",
+          "reproTitle": "Reproduce the Collection Pipeline",
+          "reproDesc": "The full data collection and build pipeline can be reproduced locally with Node.js:",
+          "reproCommands": "# 1. Clone the repository (GPL v3)\ngit clone https://github.com/CCSDForge/episciences-insights.git\ncd episciences-insights && npm install\n\n# 2. Sync DOIs from the Episciences API\nnpm run sync:dois\n\n# 3. Fetch and merge metadata\nnpm run collect\n\n# Optional: fetch Scholix links (datasets and software)\nnpm run collect:links\n\n# 4. Generate the static site\nnpm run build",
+          "downloadPubs": "Download publications dataset (JSON)",
+          "downloadFunders": "Download funders dataset (JSON)",
+          "sec7Title": "7. Links and Documentation",
+          "references": [
+              "DORA (2012) — [San Francisco Declaration on Research Assessment](https://sfdora.org)",
+              "OpenAIRE (2024) — [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
+              "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
+              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
+          ]
+      },
+      "export": {
+          "exportButton": "Export",
+          "exportMenu": "Export options",
+          "exportVisualization": "Visualization",
+          "exportData": "Data",
+          "png": "PNG image",
+          "pngDesc": "High resolution (2x retina)",
+          "svg": "SVG vector",
+          "svgDesc": "Vector publication quality",
+          "csv": "CSV spreadsheet",
+          "csvDesc": "Filtered data table for Excel / Calc",
+          "json": "JSON raw data",
+          "jsonDesc": "Structured data format",
+          "downloading": "Generating export...",
+          "success": "Export downloaded successfully",
+          "error": "Export failed",
+          "noSvgFound": "No visual chart found to export"
       }
   },
   fr: {
@@ -737,7 +990,10 @@ export const translations: Record<Locale, Translations> = {
           "topics": "Paysage thématique",
           "funders": "Impact financeurs",
           "lineage": "Filiation & Science Ouverte",
-          "usage": "Analytique d'usage"
+          "usage": "Analytique d'usage",
+          "journals": "Statistiques des revues",
+          "institutions": "Statistiques par institution",
+          "platform": "Données de la plateforme"
       },
       "kpi": {
           "publicationsDesc": "Articles évalués par les pairs en libre accès",
@@ -749,15 +1005,16 @@ export const translations: Record<Locale, Translations> = {
       },
       "disclaimer": {
           "title": "Précision des données & Sources",
-          "metricsP1": "Les indicateurs scientifiques et relations visualisés dans ce tableau de bord sont alimentés par les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open (https://api.zbmath.org/) et ROR (https://ror.org/). Veuillez noter qu'aucun jeu de données ne constitue un catalogue exhaustif absolu des publications d'Episciences : des délais d'indexation peuvent survenir, et la couverture d'un article par les sources externes n'est pas garantie (les indicateurs de science ouverte et classifications thématiques ne sont disponibles que lorsqu'un enregistrement correspondant existe).",
-          "metricsP2": "Certaines métadonnées (notamment les thématiques de recherche, l'alignement avec les ODD et les travaux connexes) sont générées par les modèles automatisés d'OpenAlex. Les codes de financement, entrepôts d'hébergement, licences, indicateurs d'impact des citations et affiliations aux infrastructures de recherche proviennent d'OpenAIRE Graph. Les classifications mathématiques (MSC 2020) proviennent de zbMATH Open. L'identification, la géolocalisation et la désambiguïsation des institutions de recherche et des financeurs s'appuient sur l'API ROR (Research Organization Registry). Episciences s'investit continuellement pour affiner, vérifier et enrichir ces données afin d'offrir une vision toujours plus fidèle de son impact scientifique.",
+          "metricsP1": "Les indicateurs scientifiques et relations visualisés dans ce tableau de bord sont alimentés par les API [OpenAlex](https://openalex.org), [OpenAIRE Graph](https://graph.openaire.eu), [Episciences](https://www.episciences.org), [zbMATH Open](https://zbmath.org) et [ROR](https://ror.org). Veuillez noter qu'aucun jeu de données ne constitue un catalogue exhaustif absolu des publications d'Episciences : des délais d'indexation peuvent survenir, et la couverture d'un article par les sources externes n'est pas garantie (les indicateurs de science ouverte et classifications thématiques ne sont disponibles que lorsqu'un enregistrement correspondant existe).",
+          "metricsP2": "Certaines métadonnées (notamment les thématiques de recherche, l'alignement avec les ODD et les travaux connexes) sont générées par les modèles automatisés d'[OpenAlex](https://openalex.org). Les codes de financement, entrepôts d'hébergement, licences, indicateurs d'impact des citations et affiliations aux infrastructures de recherche proviennent d'[OpenAIRE Graph](https://graph.openaire.eu). Les classifications mathématiques (MSC 2020) proviennent de [zbMATH Open](https://zbmath.org). L'identification, la géolocalisation et la désambiguïsation des institutions de recherche et des financeurs s'appuient sur l'API [ROR (Research Organization Registry)](https://ror.org). [Episciences](https://www.episciences.org) s'investit continuellement pour affiner, vérifier et enrichir ces données afin d'offrir une vision toujours plus fidèle de son impact scientifique.",
           "downloadsNoteTitle": "Statistiques de téléchargement",
           "downloadsNote": "proviennent exclusivement de la plateforme Episciences et reflètent les consultations directes sur les sites des revues. Elles ne comptabilisent pas les téléchargements effectués sur les entrepôts ouverts où les mêmes articles peuvent être librement accessibles. Le lectorat effectif est donc très probablement supérieur aux chiffres présentés ici."
       },
       "footer": {
           "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
-          "lastUpdated": "Dernière mise à jour des données : {date}"
+          "lastUpdated": "Dernière mise à jour des données : {date}",
+          "methodologyLink": "Méthodologie et sources de données"
       },
       "lineage": {
           "title": "Filiation de la recherche",
@@ -778,7 +1035,30 @@ export const translations: Record<Locale, Translations> = {
           "worksMapped": "travaux cartographiés",
           "noRelated": "Aucun travail connexe cartographié pour l'instant dans OpenAlex pour cet article.",
           "selectPaperPrompt": "Sélectionnez un article dans la liste pour voir sa filiation",
-          "selectedPublication": "Publication sélectionnée"
+          "selectedPublication": "Publication sélectionnée",
+          "searchPlaceholder": "Rechercher par titre, auteur ou mot-clé...",
+          "clearSearch": "Effacer la recherche",
+          "noResults": "Aucune publication ne correspond à votre recherche.",
+          "articlesMatching": "publications",
+          "viewArticle": "Consulter la publication (DOI)",
+          "exploreOpenAlex": "Explorer le réseau connexe sur OpenAlex",
+          "relatedWorkIndex": "Publication liée",
+          "consultOnOpenAlex": "Consulter sur OpenAlex",
+          "authors": "Auteurs",
+          "discipline": "Discipline",
+          "openAccessDiamond": "Accès Ouvert Diamant",
+          "bibliographicDepth": "Profondeur bibliographique",
+          "deepCorpus": "Corpus scientifique approfondi (> 50 sources)",
+          "standardCorpus": "Corpus scientifique standard (20–50 sources)",
+          "targetedCorpus": "Étude scientifique ciblée (< 20 sources)",
+          "referencesHint": "Les références complètes sont consultables dans le texte intégral de la publication sur Episciences.",
+          "citationsReceived": "Citations reçues",
+          "citationsCount": "citation(s) recensée(s) dans OpenAIRE / OpenAlex",
+          "semanticAffinity": "Voisinage thématique & Travaux connexes",
+          "semanticAffinityDesc": "Publications partageant des co-citations et une forte proximité thématique dans le graphe scientifique mondial.",
+          "loadMore": "Afficher 50 publications de plus",
+          "showingCount": "Affichage de {visible} sur {total} publications",
+          "openAlexLimitExplanation": "OpenAlex identifie algorithmiquement jusqu'à 10 voisins scientifiques les plus proches (co-citations et similarité vectorielle)."
       },
       "network": {
           "title": "Exploration Réseau - Episciences Insights",
@@ -802,7 +1082,7 @@ export const translations: Record<Locale, Translations> = {
           "networksAndCoOccurrences": "Classification & Co-occurrences",
           "funderOverview": "Vue d'ensemble & Financeurs",
           "funderNetworks": "Réseaux de co-financement",
-          "reachOverview": "Vue d'ensemble & Affiliations",
+          "reachOverview": "Vue d'ensemble",
           "reachNetworks": "Réseaux & Collaborations",
           "allFunders": "Tous les financeurs",
           "filterByFunder": "Filtrer par organisme de financement",
@@ -828,27 +1108,28 @@ export const translations: Record<Locale, Translations> = {
           "noLicenseData": "Aucune donnée de licence dans cette sélection",
           "funderVolumeTitle": "Volume par organisme de financement",
           "funderVolumeDesc": "Classement par volume de remerciements pour les organismes de subventions nationaux, européens et internationaux.",
-          "affiliatedCountries": "Pays affiliés",
+          "affiliatedCountries": "Pays & territoires affiliés",
           "representedWorldwide": "représentés dans le monde",
           "affiliatedInstitutions": "Institutions affiliées",
           "distinctOrganizations": "organismes de recherche distincts",
           "authorAffiliationsTitle": "Rayonnement mondial : Affiliations des auteurs",
-          "authorAffiliationsSubtitle": "Distribution géographique à travers {count} pays (échelle logarithmique)",
-          "topContributingCountries": "Principaux pays contributeurs",
+          "authorAffiliationsSubtitle": "Distribution géographique à travers {count} pays & territoires (échelle logarithmique)",
+          "topContributingCountries": "Principaux pays & territoires contributeurs",
           "rankedByPubs": "Classés par nombre de publications affiliées",
           "topContributingInstitutions": "Principales institutions contributrices",
           "deduplicatedRor": "Dédoublonnées par identifiant ROR",
           "noRor": "Aucun ROR disponible",
           "clickToExplore": "Cliquer pour explorer les affiliations : {country}",
+          "clickToViewAffiliations": "cliquer pour afficher les affiliations",
           "relationalViews": "Vues relationnelles & Flux",
           "topicsNetwork": "Réseau thématique",
           "topicsMatrix": "Matrice thématique",
           "mscNetwork": "Réseau MSC",
           "mscMatrix": "Matrice MSC",
-          "countryNetwork": "Réseau par pays",
-          "institutionNetwork": "Réseau par institution",
+          "countryNetwork": "Réseau pays",
+          "institutionNetwork": "Réseau institutions",
           "collaborationMatrix": "Matrice de collaboration",
-          "geographicFlows": "Flux géographiques mondiaux",
+          "geographicFlows": "Flux géographiques",
           "topicsNetworkTitle": "Réseau de co-occurrences thématiques",
           "topicsNetworkDesc": "Graphe orienté par forces reliant les thématiques OpenAlex apparaissant ensemble sur un même article, mettant en valeur les passerelles interdisciplinaires.",
           "topicsMatrixTitle": "Matrice de co-occurrences thématiques",
@@ -890,9 +1171,9 @@ export const translations: Record<Locale, Translations> = {
           "journalVolume": "Volume de la revue",
           "aggregatedKpis": "Indicateurs agrégés",
           "globalReadership": "Lectorat mondial",
-          "downloadsByCountry": "Téléchargements totaux par pays (échelle logarithmique)",
-          "activeCountries": "Pays actifs",
-          "mapLegend": "Téléchargements PDF de l'archive par pays",
+          "downloadsByCountry": "Téléchargements totaux par pays & territoire (échelle logarithmique)",
+          "activeCountries": "Pays & territoires",
+          "mapLegend": "Téléchargements PDF de l'archive par pays & territoire",
           "mostDownloaded": "Articles les plus téléchargés",
           "top20Trending": "Top 20 des publications remarquées",
           "readOnline": "Consulter en ligne",
@@ -993,6 +1274,107 @@ export const translations: Record<Locale, Translations> = {
           "showingPubsCount": "{shown} sur {total} publications",
           "reachScopedNotice": "Affichage des institutions avec un co-auteur en {country} - {shown} sur {total} publications.",
           "countryScopedNotice": "Affichage des collaborations impliquant {country} - {shown} sur {total} publications."
+      },
+      "methodology": {
+          "backToDashboard": "Retour au tableau de bord",
+          "badge": "Note méthodologique",
+          "title": "Méthodologie et sources de données",
+          "subtitle": "Cette page décrit comment le corpus est constitué, d'où proviennent les données, comment elles sont traitées et quelles sont leurs limites.",
+          "institution": "CCSD (CNRS, Inria, INRAE) - Plateforme Episciences",
+          "author": "Équipe Episciences, CCSD",
+          "date": "Octobre 2026",
+          "tocTitle": "Sommaire",
+          "tocContext": "1. Contexte",
+          "tocSources": "2. Sources de données",
+          "tocPipeline": "3. Collecte et traitement",
+          "tocModels": "4. Méthodes de calcul",
+          "tocLimits": "5. Limites",
+          "tocFair": "6. Architecture, licences et reproductibilité",
+          "tocReferences": "7. Liens et documentation",
+          "sec1Title": "1. Contexte",
+          "sec1P1": "Episciences Insights est développé par le CCSD (Centre pour la Communication Scientifique Directe, UAR 3668). Il présente des indicateurs sur les articles publiés par les revues hébergées sur la plateforme Episciences : auteurs/autrices, affiliations et pays, thématiques de recherche, financements, pratiques de science ouverte et consultations. Le corpus rassemble plus de {publicationsCount} publications issues des revues de la plateforme ({journalsCount} revues hébergées) ; les mises à jour sont prévues mensuellement ou en fonction des évolutions des données ou modèles de données utilisés.",
+          "sec1P2": "Les indicateurs proviennent uniquement d'infrastructures ouvertes et leur mode de calcul est documenté ci-dessous. Conformément aux principes de DORA et de CoARA, le tableau de bord n'utilise pas d'indicateurs propriétaires comme le facteur d'impact.",
+          "sec1CalloutTitle": "Le modèle overlay journal (accès ouvert diamant)",
+          "sec1CalloutDesc": "Les revues Episciences fonctionnent selon le modèle des [[en:overlay journals]] : les manuscrits sont déposés au préalable dans une archive ouverte (HAL, arXiv, Zenodo...), puis évalués par les pairs sous la responsabilité du comité éditorial de la revue. La publication et la lecture sont entièrement gratuites : aucun frais n'est demandé aux auteurs/autrices (sans APC), et les articles sont en accès libre et immédiat pour l'ensemble des lecteurs/lectrices.",
+          "sec2Title": "2. Sources de données",
+          "sec2P1": "Les données proviennent de plusieurs sources, reliées entre elles par des identifiants pérennes (DOI, ROR, ORCID). Le tableau ci-dessous précise ce que fournit chacune d'elles.",
+          "sourceThName": "Source",
+          "sourceThAccess": "Accès",
+          "sourceThScope": "Données utilisées",
+          "sourceThPivot": "Identifiant de liaison",
+          "sec3Title": "3. Collecte et traitement",
+          "sec3P1": "Les données sont collectées et traitées en amont par une suite de scripts. Le site est ensuite généré à partir de ces données.",
+          "step1Title": "Étape 1 - Liste des articles",
+          "step1Desc": "La liste des DOI des articles publiés est récupérée depuis l'API Episciences, puis normalisée (préfixes supprimés, passage en minuscules).",
+          "step2Title": "Étape 2 - Collecte des métadonnées",
+          "step2Desc": "Pour chaque DOI, les métadonnées sont demandées à OpenAlex, à OpenAIRE Graph et à l'export Episciences. Les réponses sont gardées en cache local pendant 30 jours. Les réponses vides sont gardées en cache 24 heures pour éviter des requêtes répétées.",
+          "step3Title": "Étape 3 - Revues et affiliations",
+          "step3Desc": "Il arrive fréquemment qu'OpenAlex rattache l'article à l'archive de dépôt (HAL, arXiv...) ou donne un nom de revue inexact. Le nom et le code de la revue (rvcode) sont donc pris dans les données Episciences. Les affiliations des auteurs déclarées sur Episciences complètent celles d'OpenAlex lorsqu'elles comportent un identifiant ROR ; leur pays est obtenu via ROR.",
+          "step4Title": "Étape 4 - Financements",
+          "step4Desc": "Les financements indiqués par OpenAlex et par OpenAIRE sont fusionnés et dédoublonnés. Les noms des financeurs sont normalisés à l'aide d'OpenAlex. Le registre ROR fournit leur localisation et permet d'identifier ceux qu'OpenAlex ne reconnaît pas.",
+          "step5Title": "Étape 5 - Préparation des fichiers",
+          "step5Desc": "Les données sont enregistrées en JSON puis compressées (Brotli et Gzip). La taille du fichier des publications est ainsi divisée par plus de dix.",
+          "sec4Title": "4. Méthodes de calcul",
+          "sdgTitle": "Objectifs de développement durable (ODD)",
+          "sdgP1": "OpenAlex associe à certaines publications un ou plusieurs des 17 ODD de l'ONU, avec un score de pertinence compris entre 0,4 et 1 (les scores inférieurs à 0,4 ne sont pas conservés). Une partie seulement du corpus est concernée.",
+          "sdgFormulaExplanation": "Pour un ensemble de publications, le tableau de bord retient le score maximal par ODD, et non la moyenne. Avec une moyenne, les quelques articles nettement liés à un ODD disparaîtraient parmi les nombreux articles de recherche fondamentale.",
+          "networkTitle": "Réseau de cofinancement (Louvain)",
+          "networkP1": "Dans le réseau de cofinancement, deux financeurs sont reliés lorsqu'ils financent les mêmes articles. Les groupes de financeurs sont calculés avec l'algorithme de Louvain, via la bibliothèque graphology.",
+          "usageTitle": "Consultations",
+          "usageP1": "Les téléchargements et les consultations de pages proviennent des statistiques de la plateforme Episciences, par revue, par article et par pays.",
+          "usageWarning": "Ces chiffres ne comptent que les consultations sur Episciences. Les téléchargements effectués directement sur les archives ouvertes (HAL, arXiv...) ne sont pas inclus. La consultation réelle des articles est donc plus élevée.",
+          "lineageTitle": "Références et travaux liés",
+          "lineageP1": "Pour chaque article, le tableau de bord indique le nombre de références qu'il cite et liste les travaux liés proposés par OpenAlex. Il signale aussi les jeux de données et logiciels associés, à partir des liens Scholix d'OpenAIRE.",
+          "topicsTitle": "Thématiques et classifications scientifiques",
+          "topicsP1": "La répartition thématique s'appuie sur la taxonomie hiérarchique d'OpenAlex (domaines, sous-domaines, champs et thèmes de recherche modélisés par analyse de graphes de citations). Pour les revues de mathématiques, cette vue est enrichie des codes officiels MSC 2020 (Mathematics Subject Classification) issus de zbMATH Open, et des codes JEL pour l'économie.",
+          "reachMethodTitle": "Portée géographique et co-publications",
+          "reachMethodP1": "Un pays est associé à une publication dès lors qu'au moins un co-auteur déclare une affiliation institutionnelle rattachée à ce pays. Les cartes et visualisations de flux mettent ainsi en évidence la distribution des coopérations scientifiques internationales.",
+          "sec5Title": "5. Limites",
+          "sec5P1": "Plusieurs limites sont à garder à l'esprit pour interpréter les résultats :",
+          "limit1Title": "Délai d'indexation",
+          "limit1Desc": "Un article récent peut ne pas encore être indexé par OpenAlex ou OpenAIRE, ou ne l'être que partiellement.",
+          "limit2Title": "Classifications disciplinaires",
+          "limit2Desc": "Les codes MSC 2020 (mathématiques) et JEL (économie) ne concernent que certaines revues. Leur absence ailleurs est normale.",
+          "limit3Title": "Affiliations",
+          "limit3Desc": "Les établissements des auteurs proviennent d'OpenAlex, complétés par les affiliations déclarées sur Episciences avec un identifiant ROR. Le rattachement automatique d'OpenAlex peut contenir des erreurs, et une partie des auteurs reste sans établissement connu.",
+          "sec6Title": "6. Architecture, licences et reproductibilité",
+          "sec6P1": "Le site est un ensemble de fichiers statiques, générés à partir de données préparées à l'avance.",
+          "ssgTitle": "Site statique",
+          "ssgDesc": "Le site est généré avec Next.js sous forme de fichiers HTML et JSON. Toutes les ressources, y compris le fond de carte, sont servies par le site lui-même : la consultation ne déclenche aucun appel vers un service tiers.",
+          "compressionTitle": "Compression",
+          "compressionDesc": "Les données sont compressées à l'avance (Brotli et Gzip), ce qui réduit le volume à télécharger.",
+          "licenseTitle": "Licences",
+          "licenseDesc": "Le code source est publié sous licence GNU GPL v3. Les jeux de données consolidés sont diffusés sous licence CC-BY 4.0.",
+          "reproTitle": "Reproduire la collecte",
+          "reproDesc": "L'ensemble du traitement peut être relancé localement avec Node.js :",
+          "reproCommands": "# 1. Cloner le dépôt (GPL v3)\ngit clone https://github.com/CCSDForge/episciences-insights.git\ncd episciences-insights && npm install\n\n# 2. Récupérer la liste des DOI depuis l'API Episciences\nnpm run sync:dois\n\n# 3. Collecter et fusionner les métadonnées\nnpm run collect\n\n# Optionnel : collecter les liens Scholix (données et logiciels)\nnpm run collect:links\n\n# 4. Générer le site statique\nnpm run build",
+          "downloadPubs": "Télécharger les publications (JSON)",
+          "downloadFunders": "Télécharger les financeurs (JSON)",
+          "sec7Title": "7. Liens et documentation",
+          "references": [
+              "DORA (2012) — [San Francisco Declaration on Research Assessment](https://sfdora.org)",
+              "OpenAIRE (2024) — [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
+              "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
+              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
+          ]
+      },
+      "export": {
+          "exportButton": "Exporter",
+          "exportMenu": "Options d'export",
+          "exportVisualization": "Visualisation",
+          "exportData": "Données",
+          "png": "Image PNG",
+          "pngDesc": "Haute résolution (2x retina)",
+          "svg": "Vecteur SVG",
+          "svgDesc": "Qualité publication vectorielle",
+          "csv": "Tableur CSV",
+          "csvDesc": "Tableau de données filtrées pour Excel / Calc",
+          "json": "Données brutes JSON",
+          "jsonDesc": "Format de données structurées",
+          "downloading": "Génération de l'export...",
+          "success": "Export téléchargé avec succès",
+          "error": "Échec de l'export",
+          "noSvgFound": "Aucun graphique visuel détecté pour l'export"
       }
   },
   es: {
@@ -1068,7 +1450,10 @@ export const translations: Record<Locale, Translations> = {
           "topics": "Panorama temático",
           "funders": "Impacto de financiadores",
           "lineage": "Linaje & Ciencia Abierta",
-          "usage": "Analítica de uso"
+          "usage": "Analítica de uso",
+          "journals": "Estadísticas de revistas",
+          "institutions": "Estadísticas por institución",
+          "platform": "Datos de la plataforma"
       },
       "kpi": {
           "publicationsDesc": "Artículos revisados por pares en acceso abierto",
@@ -1080,15 +1465,16 @@ export const translations: Record<Locale, Translations> = {
       },
       "disclaimer": {
           "title": "Precisión de datos y Fuentes",
-          "metricsP1": "Los indicadores científicos y relaciones visualizados en este panel son proporcionados por las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open (https://api.zbmath.org/) y ROR (https://ror.org/). Tenga en cuenta que ningún conjunto de datos representa un catálogo exhaustivo absoluto de las publicaciones de Episciences: pueden producirse retrasos en la indexación y no se garantiza la cobertura de una publicación por fuentes externas (los indicadores de ciencia abierta y clasificaciones solo están disponibles donde existen registros concordantes).",
-          "metricsP2": "Ciertos metadatos (incluidos temas de investigación, alineación con ODS y obras relacionadas) son generados por modelos automatizados de OpenAlex. Los códigos de financiación, repositorios de alojamiento, licencias, indicadores de impacto de citas y afiliaciones a infraestructuras de investigación provienen de OpenAIRE Graph. Las clasificaciones matemáticas (MSC 2020) proceden de zbMATH Open. La identificación, geolocalización y desambiguación de instituciones y financiadores se basan en la API ROR (Research Organization Registry). Episciences trabaja continuamente para afinar, verificar y enriquecer estos datos y ofrecer una representación cada vez más fiel de su impacto científico.",
+          "metricsP1": "Los indicadores científicos y relaciones visualizados en este panel son proporcionados por las API de [OpenAlex](https://openalex.org), [OpenAIRE Graph](https://graph.openaire.eu), [Episciences](https://www.episciences.org), [zbMATH Open](https://zbmath.org) y [ROR](https://ror.org). Tenga en cuenta que ningún conjunto de datos representa un catálogo exhaustivo absoluto de las publicaciones de Episciences: pueden producirse retrasos en la indexación y no se garantiza la cobertura de una publicación por fuentes externas (los indicadores de ciencia abierta y clasificaciones solo están disponibles donde existen registros concordantes).",
+          "metricsP2": "Ciertos metadatos (incluidos temas de investigación, alineación con ODS y obras relacionadas) son generados por modelos automatizados de [OpenAlex](https://openalex.org). Los códigos de financiación, repositorios de alojamiento, licencias, indicadores de impacto de citas y afiliaciones a infraestructuras de investigación provienen de [OpenAIRE Graph](https://graph.openaire.eu). Las clasificaciones matemáticas (MSC 2020) proceden de [zbMATH Open](https://zbmath.org). La identificación, geolocalización y desambiguación de instituciones y financiadores se basan en la API [ROR (Research Organization Registry)](https://ror.org). [Episciences](https://www.episciences.org) trabaja continuamente para afinar, verificar y enriquecer estos datos y ofrecer una representación cada vez más fiel de su impacto científico.",
           "downloadsNoteTitle": "Estadísticas de descarga",
           "downloadsNote": "proceden exclusivamente de la plataforma Episciences y reflejan las consultas directas en los sitios de las revistas. No contabilizan descargas realizadas en repositorios abiertos donde los mismos artículos también pueden estar disponibles libremente. El número real de lectores es, por tanto, muy probablemente superior al presentado aquí."
       },
       "footer": {
           "license": "CC-BY 2026 CCSD - Episciences - Código Abierto (GPL v3)",
           "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open y ROR",
-          "lastUpdated": "Última actualización de los datos: {date}"
+          "lastUpdated": "Última actualización de los datos: {date}",
+          "methodologyLink": "Metodología y Marco científico"
       },
       "lineage": {
           "title": "Linaje de la investigación",
@@ -1109,7 +1495,30 @@ export const translations: Record<Locale, Translations> = {
           "worksMapped": "obras mapeadas",
           "noRelated": "No hay obras relacionadas mapeadas todavía en OpenAlex para este artículo reciente.",
           "selectPaperPrompt": "Seleccione un artículo de la lista para ver su linaje",
-          "selectedPublication": "Publicación seleccionada"
+          "selectedPublication": "Publicación seleccionada",
+          "searchPlaceholder": "Buscar por título, autor o palabra clave...",
+          "clearSearch": "Borrar búsqueda",
+          "noResults": "Ninguna publicación coincide con su búsqueda.",
+          "articlesMatching": "publicaciones",
+          "viewArticle": "Ver publicación (DOI)",
+          "exploreOpenAlex": "Explorar la red relacionada en OpenAlex",
+          "relatedWorkIndex": "Publicación vinculada",
+          "consultOnOpenAlex": "Ver en OpenAlex",
+          "authors": "Autores",
+          "discipline": "Disciplina",
+          "openAccessDiamond": "Acceso Abierto Diamante",
+          "bibliographicDepth": "Profundidad bibliográfica",
+          "deepCorpus": "Cuerpo científico extenso (> 50 fuentes)",
+          "standardCorpus": "Cuerpo científico estándar (20–50 fuentes)",
+          "targetedCorpus": "Estudio científico focalizado (< 20 fuentes)",
+          "referencesHint": "Las referencias completas se pueden consultar en el texto completo de la publicación en Episciences.",
+          "citationsReceived": "Citas recibidas",
+          "citationsCount": "cita(s) detectada(s) en OpenAIRE / OpenAlex",
+          "semanticAffinity": "Vecindario temático y Obras afines",
+          "semanticAffinityDesc": "Publicaciones que comparten cocitaciones y afinidad temática en el grafo científico global.",
+          "loadMore": "Cargar 50 publicaciones más",
+          "showingCount": "Mostrando {visible} de {total} publicaciones",
+          "openAlexLimitExplanation": "OpenAlex identifica algorítmicamente hasta 10 vecinos científicos más cercanos (cocitaciones y similitud vectorial)."
       },
       "network": {
           "title": "Explorador de Red - Episciences Insights",
@@ -1133,7 +1542,7 @@ export const translations: Record<Locale, Translations> = {
           "networksAndCoOccurrences": "Clasificación y Coocurrencias",
           "funderOverview": "Resumen y Financiadores",
           "funderNetworks": "Redes de cofinanciación",
-          "reachOverview": "Resumen y Afiliaciones",
+          "reachOverview": "Resumen",
           "reachNetworks": "Redes y Colaboraciones",
           "allFunders": "Todos los financiadores",
           "filterByFunder": "Filtrar por organismo de financiación",
@@ -1159,27 +1568,28 @@ export const translations: Record<Locale, Translations> = {
           "noLicenseData": "No hay datos de licencias en esta selección",
           "funderVolumeTitle": "Volumen por financiador de investigación",
           "funderVolumeDesc": "Clasificación por volumen de agradecimientos para patrocinadores nacionales, europeos e internacionales.",
-          "affiliatedCountries": "Países afiliados",
+          "affiliatedCountries": "Países y territorios afiliados",
           "representedWorldwide": "representados en el mundo",
           "affiliatedInstitutions": "Instituciones afiliadas",
           "distinctOrganizations": "organizaciones de investigación distintas",
           "authorAffiliationsTitle": "Alcance global: Afiliaciones de autores",
-          "authorAffiliationsSubtitle": "Distribución geográfica en {count} países (escala logarítmica)",
-          "topContributingCountries": "Principales países colaboradores",
+          "authorAffiliationsSubtitle": "Distribución geográfica en {count} países y territorios (escala logarítmica)",
+          "topContributingCountries": "Principales países y territorios colaboradores",
           "rankedByPubs": "Ordenados por número de publicaciones afiliadas",
           "topContributingInstitutions": "Principales instituciones colaboradoras",
           "deduplicatedRor": "Desduplicadas mediante identificador ROR",
           "noRor": "Sin ROR disponible",
           "clickToExplore": "Haga clic para explorar las afiliaciones en {country}",
+          "clickToViewAffiliations": "clic para ver las afiliaciones",
           "relationalViews": "Vistas relacionales y Flujos",
           "topicsNetwork": "Red temática",
           "topicsMatrix": "Matriz temática",
           "mscNetwork": "Red MSC",
           "mscMatrix": "Matriz MSC",
-          "countryNetwork": "Red por países",
-          "institutionNetwork": "Red por instituciones",
+          "countryNetwork": "Red países",
+          "institutionNetwork": "Red instituciones",
           "collaborationMatrix": "Matriz de colaboración",
-          "geographicFlows": "Flujos geográficos globales",
+          "geographicFlows": "Flujos geográficos",
           "topicsNetworkTitle": "Red de coocurrencia temática",
           "topicsNetworkDesc": "Grafo dirigido por fuerzas que conecta los temas de investigación de OpenAlex presentes conjuntamente en un mismo artículo, destacando puentes interdisciplinarios.",
           "topicsMatrixTitle": "Matriz de coocurrencia temática",
@@ -1221,9 +1631,9 @@ export const translations: Record<Locale, Translations> = {
           "journalVolume": "Volumen de la revista",
           "aggregatedKpis": "KPI agregados",
           "globalReadership": "Lectores globales",
-          "downloadsByCountry": "Descargas totales por país (escala logarítmica)",
-          "activeCountries": "Países activos",
-          "mapLegend": "Descargas de PDF del archivo por país",
+          "downloadsByCountry": "Descargas totales por país y territorio (escala logarítmica)",
+          "activeCountries": "Países y territorios",
+          "mapLegend": "Descargas de PDF del archivo por país y territorio",
           "mostDownloaded": "Artículos más descargados",
           "top20Trending": "Top 20 publicaciones destacadas",
           "readOnline": "Leer en línea",
@@ -1324,6 +1734,107 @@ export const translations: Record<Locale, Translations> = {
           "showingPubsCount": "{shown} de {total} publicaciones",
           "reachScopedNotice": "Mostrando instituciones con un coautor en {country} - {shown} de {total} publicaciones.",
           "countryScopedNotice": "Mostrando vínculos de colaboración que involucran a {country} - {shown} de {total} publicaciones."
+      },
+      "methodology": {
+          "backToDashboard": "Volver al panel",
+          "badge": "Nota metodológica",
+          "title": "Metodología y fuentes de datos",
+          "subtitle": "Esta página describe cómo se constituye el corpus, de dónde proceden los datos, cómo se procesan y cuáles son sus límites.",
+          "institution": "CCSD (CNRS, Inria, INRAE) — Plataforma Episciences",
+          "author": "Equipo Episciences, CCSD",
+          "date": "Octubre de 2026",
+          "tocTitle": "Sumario",
+          "tocContext": "1. Contexto",
+          "tocSources": "2. Fuentes de datos",
+          "tocPipeline": "3. Recolección y procesamiento",
+          "tocModels": "4. Métodos de cálculo",
+          "tocLimits": "5. Límites",
+          "tocFair": "6. Arquitectura, licencias y reproducibilidad",
+          "tocReferences": "7. Enlaces y documentación",
+          "sec1Title": "1. Contexto",
+          "sec1P1": "Episciences Insights es desarrollado por el CCSD (Centre pour la Communication Scientifique Directe, UAR 3668). Presenta indicadores sobre los artículos publicados en las revistas alojadas en la plataforma Episciences: autores/autoras, afiliaciones y países, temáticas de investigación, financiación, prácticas de ciencia abierta y estadísticas de consulta. El corpus reúne más de {publicationsCount} publicaciones procedentes de las revistas de la plataforma ({journalsCount} revistas alojadas); las actualizaciones están previstas mensualmente o según las evoluciones de los datos o modelos de datos utilizados.",
+          "sec1P2": "Los indicadores proceden exclusivamente de infraestructuras abiertas y su método de cálculo está documentado a continuación. De conformidad con los principios de DORA y CoARA, el panel no utiliza métricas propietarias como el factor de impacto.",
+          "sec1CalloutTitle": "El modelo overlay journal (acceso abierto diamante)",
+          "sec1CalloutDesc": "Las revistas de Episciences funcionan según el modelo de overlay journals: los manuscritos se depositan previamente en un repositorio abierto (HAL, arXiv, Zenodo...), y luego son evaluados por pares bajo la responsabilidad del comité editorial de la revista. La publicación y la lectura son totalmente gratuitas: no se exige ningún coste a los autores/autoras (sin APC), y los artículos están en acceso libre e inmediato para todos los lectores/lectoras.",
+          "sec2Title": "2. Fuentes de datos",
+          "sec2P1": "Los datos proceden de varias fuentes, conectadas entre sí mediante identificadores persistentes (DOI, ROR, ORCID). La tabla siguiente detalla lo que aporta cada una de ellas.",
+          "sourceThName": "Fuente",
+          "sourceThAccess": "Acceso",
+          "sourceThScope": "Datos utilizados",
+          "sourceThPivot": "Identificador de enlace",
+          "sec3Title": "3. Recolección y procesamiento",
+          "sec3P1": "Los datos se recopilan y procesan previamente mediante una serie de scripts. A continuación, el sitio se genera a partir de estos datos consolidados.",
+          "step1Title": "Paso 1 — Lista de artículos",
+          "step1Desc": "La lista de DOI de los artículos publicados se obtiene desde la API de Episciences y se normaliza (eliminación de prefijos, paso a minúsculas).",
+          "step2Title": "Paso 2 — Recolección de metadatos",
+          "step2Desc": "Para cada DOI, se solicitan los metadatos a OpenAlex, OpenAIRE Graph y la exportación de Episciences. Las respuestas se conservan en caché local durante 30 días, y las respuestas vacías durante 24 horas para evitar peticiones repetitivas.",
+          "step3Title": "Paso 3 — Revistas y afiliaciones",
+          "step3Desc": "A menudo, OpenAlex asocia el artículo al repositorio de depósito (HAL, arXiv...) o indica un nombre de revista inexacto. El nombre y el código de la revista (rvcode) proceden directamente de Episciences. Las afiliaciones de autores declaradas en Episciences complementan las de OpenAlex cuando disponen de un identificador ROR; sus países se obtienen mediante ROR.",
+          "step4Title": "Paso 4 — Financiación",
+          "step4Desc": "Las ayudas y proyectos de OpenAlex y OpenAIRE se combinan y deduplican. Los nombres de los financiadores se normalizan con OpenAlex. El registro ROR proporciona su localización geográfica e identifica las entidades no reconocidas por OpenAlex.",
+          "step5Title": "Paso 5 — Preparación de archivos",
+          "step5Desc": "Los datos se guardan en JSON y se comprimen previamente (Brotli y Gzip). El tamaño del archivo de publicaciones se reduce así en más de un 90 %.",
+          "sec4Title": "4. Métodos de cálculo",
+          "sdgTitle": "Objetivos de Desarrollo Sostenible (ODS)",
+          "sdgP1": "OpenAlex asocia a determinadas publicaciones uno o varios de los 17 ODS de la ONU, con una puntuación de pertinencia entre 0,4 y 1 (las puntuaciones inferiores a 0,4 se descartan). Solo una parte del corpus está cubierta.",
+          "sdgFormulaExplanation": "Para un conjunto de publicaciones, el panel conserva la puntuación máxima por ODS, y no el promedio. Con un promedio, los artículos fuertemente vinculados a un ODS quedarían diluidos entre los numerosos artículos de investigación básica.",
+          "networkTitle": "Red de cofinanciación (Louvain)",
+          "networkP1": "En la red de cofinanciación, dos entidades están conectadas cuando financian los mismos artículos. Los grupos se calculan con el algoritmo de Louvain mediante la biblioteca graphology.",
+          "usageTitle": "Consultas y lecturas",
+          "usageP1": "Las descargas y visualizaciones proceden de las estadísticas de la plataforma Episciences, por revista, por artículo y por país.",
+          "usageWarning": "Estas cifras solo contabilizan las consultas en Episciences. Las descargas realizadas directamente en los repositorios abiertos (HAL, arXiv...) no están incluidas. La consulta real de los artículos es, por tanto, más elevada.",
+          "lineageTitle": "Referencias y trabajos relacionados",
+          "lineageP1": "Para cada artículo, el panel indica el número de referencias citadas y enumera los trabajos relacionados sugeridos por OpenAlex. También señala los conjuntos de datos y software asociados a partir de los enlaces Scholix de OpenAIRE.",
+          "topicsTitle": "Temáticas y clasificaciones científicas",
+          "topicsP1": "La distribución temática se apoya en la taxonomía jerárquica de OpenAlex (dominios, subdominios, campos y temas modelados mediante análisis de grafos de citas). Para las revistas de matemáticas, esta vista se enriquece con los códigos oficiales MSC 2020 de zbMATH Open, y con códigos JEL en economía.",
+          "reachMethodTitle": "Alcance geográfico y coautorías",
+          "reachMethodP1": "Un país se asocia a una publicación cuando al menos un coautor declara una afiliación institucional ubicada en ese país. Los mapas y diagramas de flujo reflejan las colaboraciones científicas internacionales.",
+          "sec5Title": "5. Límites",
+          "sec5P1": "Conviene tener en cuenta varios límites metodológicos al interpretar los resultados:",
+          "limit1Title": "Plazo de indexación",
+          "limit1Desc": "Un artículo reciente puede no estar todavía indexado por OpenAlex o OpenAIRE, o solo de forma parcial.",
+          "limit2Title": "Clasificaciones disciplinarias",
+          "limit2Desc": "Los códigos MSC 2020 (matemáticas) y JEL (economía) solo corresponden a las revistas pertinentes. Su ausencia en otros campos es normal.",
+          "limit3Title": "Afiliaciones institucionales",
+          "limit3Desc": "Las afiliaciones de los autores proceden de OpenAlex, complementadas por las declaraciones en Episciences con identificador ROR. La asignación automática de OpenAlex puede contener imprecisiones.",
+          "sec6Title": "6. Arquitectura, licencias y reproducibilidad",
+          "sec6P1": "El sitio es un conjunto de archivos estáticos, generados a partir de datos procesados previamente.",
+          "ssgTitle": "Sitio estático",
+          "ssgDesc": "Generado con Next.js como archivos estáticos HTML y JSON. Todos los recursos, incluido el mapa base, se sirven localmente: la consulta no genera llamadas a servicios de terceros.",
+          "compressionTitle": "Compresión",
+          "compressionDesc": "Los datos se comprimen con antelación (Brotli y Gzip), lo que reduce el volumen de descarga.",
+          "licenseTitle": "Licencias",
+          "licenseDesc": "El código fuente se distribuye bajo licencia GNU GPL v3. Los conjuntos de datos consolidados se difunden bajo licencia Creative Commons Atribución 4.0 Internacional (CC-BY 4.0).",
+          "reproTitle": "Reproducir la recolección",
+          "reproDesc": "Todo el pipeline puede ejecutarse localmente con Node.js:",
+          "reproCommands": "# 1. Clonar el repositorio (GPL v3)\ngit clone https://github.com/CCSDForge/episciences-insights.git\ncd episciences-insights && npm install\n\n# 2. Sincronizar los DOI desde la API de Episciences\nnpm run sync:dois\n\n# 3. Recolectar y fusionar los metadatos\nnpm run collect\n\n# Opcional: recolectar enlaces Scholix (datos y software)\nnpm run collect:links\n\n# 4. Generar el sitio estático\nnpm run build",
+          "downloadPubs": "Descargar las publicaciones (JSON)",
+          "downloadFunders": "Descargar los financiadores (JSON)",
+          "sec7Title": "7. Enlaces y documentación",
+          "references": [
+              "DORA (2012) — [San Francisco Declaration on Research Assessment](https://sfdora.org)",
+              "OpenAIRE (2024) — [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
+              "OurResearch (2024) — [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
+              "Plique, G. — [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
+          ]
+      },
+      "export": {
+          "exportButton": "Exportar",
+          "exportMenu": "Opciones de exportación",
+          "exportVisualization": "Visualización",
+          "exportData": "Datos",
+          "png": "Imagen PNG",
+          "pngDesc": "Alta resolución (2x retina)",
+          "svg": "Vector SVG",
+          "svgDesc": "Calidad de publicación vectorial",
+          "csv": "Hoja de cálculo CSV",
+          "csvDesc": "Tabla de datos filtrados para Excel / Calc",
+          "json": "Datos en bruto JSON",
+          "jsonDesc": "Formato de datos estructurados",
+          "downloading": "Generando exportación...",
+          "success": "Exportación descargada con éxito",
+          "error": "Error en la exportación",
+          "noSvgFound": "No se detectó ningún gráfico visual para exportar"
       }
   },
 };

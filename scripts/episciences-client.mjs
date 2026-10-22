@@ -117,6 +117,38 @@ export class EpisciencesClient {
   }
 
   /**
+   * Resolves a DOI to a docid when it was not found in the pre-indexed map
+   * (e.g. newly published, or edge-case missing from papers index).
+   * Checks direct 10.46298/{code}.{docid} pattern first, then queries the API.
+   */
+  async resolveDocid(doi) {
+    if (!doi) return undefined;
+    const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//i, '').trim().toLowerCase();
+
+    // 1. Direct pattern match for 10.46298/{code}.{docid}
+    const match = cleanDoi.match(/^10\.46298\/[a-z0-9_-]+\.([0-9]+)$/i);
+    if (match) {
+      return Number(match[1]);
+    }
+
+    // 2. Query Episciences API by DOI
+    await this._waitForRateLimit();
+    try {
+      const res = await fetch(`${this.baseUrl}/papers/?doi=${encodeURIComponent(cleanDoi)}`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const member = data['hydra:member']?.[0];
+        if (member?.docid) return member.docid;
+      }
+    } catch {
+      // transient network failure; caller handles undefined
+    }
+    return undefined;
+  }
+
+  /**
    * Returns the platform's own export/json metadata for a docid, or
    * `undefined` on a transient failure (never cached, so it's retried on
    * the next run).

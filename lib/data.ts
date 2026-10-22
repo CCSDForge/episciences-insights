@@ -68,3 +68,27 @@ export function getLastUpdated(): string | null {
   }
 }
 
+export interface CorpusStats {
+  totalPublications: number;
+  totalHostedJournals: number;
+  activeJournals: number;
+  collectedAt?: string;
+}
+
+export function getCorpusStats(): CorpusStats {
+  const filePath = path.join(process.cwd(), 'public/data/corpus-stats.json');
+  if (fs.existsSync(filePath)) {
+    try {
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (e) {
+      console.error('Failed to parse corpus-stats.json', e);
+    }
+  }
+  return {
+    totalPublications: 8062,
+    totalHostedJournals: 47,
+    activeJournals: 41,
+  };
+}
+
+

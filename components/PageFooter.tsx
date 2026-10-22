@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface PageFooterProps {
@@ -10,6 +12,8 @@ interface PageFooterProps {
 
 export default function PageFooter({ lastUpdated }: PageFooterProps) {
   const { t, locale } = useTranslation();
+  const pathname = usePathname();
+  const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
 
   const formattedDate = React.useMemo(() => {
     if (!lastUpdated) return null;
@@ -23,6 +27,12 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
     }).format(date);
   }, [lastUpdated, locale]);
 
+  const newTabNotice = locale === 'fr' ? '(ouvre un nouvel onglet)' : locale === 'es' ? '(abre una nueva pestaña)' : '(opens in a new tab)';
+
+  if (isHome) {
+    return null;
+  }
+
   return (
     <footer className="mt-20 border-t border-zinc-200 py-12 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       <div className="mb-6 flex justify-center">
@@ -31,7 +41,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="CCSD - Centre pour la Communication Scientifique Directe"
+          aria-label={`CCSD - Centre pour la Communication Scientifique Directe ${newTabNotice}`}
         >
           {/* Logo CCSD pour thème clair */}
           <Image
@@ -60,7 +70,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
+          aria-label={`Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace ${newTabNotice}`}
         >
           <Image
             src="/tutelles/mesre-light.png"
@@ -84,7 +94,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="CNRS - Centre national de la recherche scientifique"
+          aria-label={`CNRS - Centre national de la recherche scientifique ${newTabNotice}`}
         >
           <Image
             src="/tutelles/cnrs-light.svg"
@@ -108,7 +118,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="Inria - Institut national de recherche en sciences et technologies du numérique"
+          aria-label={`Inria - Institut national de recherche en sciences et technologies du numérique ${newTabNotice}`}
         >
           <Image
             src="/tutelles/inria-light.svg"
@@ -132,7 +142,7 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-          aria-label="INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement"
+          aria-label={`INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement ${newTabNotice}`}
         >
           <Image
             src="/tutelles/inrae-light.png"
@@ -150,10 +160,18 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           />
         </a>
       </div>
+      <div className="mb-4 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
+        <Link
+          href={`/${locale}/help`}
+          className="text-zinc-600 hover:text-[var(--episciences-cyan-03)] dark:text-zinc-400 dark:hover:text-[var(--episciences-cyan-00)] underline underline-offset-4 transition-colors"
+        >
+          {t.footer.methodologyLink}
+        </Link>
+      </div>
       <p className="font-semibold">{t.footer.license}</p>
       <p className="mt-2">{t.footer.source}</p>
       {formattedDate && (
-        <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
           {t.footer.lastUpdated.replace('{date}', formattedDate)}
         </p>
       )}

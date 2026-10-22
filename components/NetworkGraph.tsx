@@ -110,7 +110,7 @@ function Canvas({
   const defaultGetLinkWidth = React.useMemo(() => (weight: number) => {
     if (maxWeight <= 1) return 1.5;
     const ratio = Math.log(weight + 1) / Math.log(maxWeight + 1);
-    return 1.5 + ratio * 4.5;
+    return roundCoord(1.5 + ratio * 4.5);
   }, [maxWeight]);
 
   const calcWidth = getLinkWidth ?? defaultGetLinkWidth;
@@ -131,12 +131,14 @@ function Canvas({
         const isEmphasized = isHighlighted || isNodeRelated;
         const d = `M ${src.x} ${src.y} Q ${centerX} ${centerY} ${tgt.x} ${tgt.y}`;
 
-        const baseWidth = calcWidth(link.weight);
-        const strokeWidth = isHighlighted
-          ? Math.max(6, baseWidth + 2.5)
-          : isNodeRelated
-          ? Math.max(3.5, baseWidth + 1.5)
-          : baseWidth;
+        const baseWidth = roundCoord(calcWidth(link.weight));
+        const strokeWidth = roundCoord(
+          isHighlighted
+            ? Math.max(6, baseWidth + 2.5)
+            : isNodeRelated
+            ? Math.max(3.5, baseWidth + 1.5)
+            : baseWidth
+        );
 
         const strokeOpacity = isHighlighted
           ? 1
@@ -152,7 +154,7 @@ function Canvas({
               d={d}
               fill="none"
               stroke="transparent"
-              strokeWidth={Math.max(16, strokeWidth + 8)}
+              strokeWidth={Math.max(16, roundCoord(strokeWidth + 8))}
               className="cursor-pointer"
               onMouseEnter={() => setHoveredLink({ src: link.source, tgt: link.target, weight: link.weight })}
               onMouseLeave={() => setHoveredLink(null)}

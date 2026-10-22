@@ -23,7 +23,7 @@ export default function NodeCountSlider({ value, onChange, min, max, step, label
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <label htmlFor={id} className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+        <label htmlFor={id} className="text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
           {label}
         </label>
         <span className="text-xs font-black text-zinc-700 dark:text-zinc-200">{value}</span>

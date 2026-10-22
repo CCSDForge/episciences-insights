@@ -3,6 +3,7 @@
 import React from 'react';
 import { Globe } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { renderLinkedText } from '@/lib/renderLinkedText';
 
 export default function DataDisclaimer() {
   const { t } = useTranslation();
@@ -19,10 +20,10 @@ export default function DataDisclaimer() {
           </h4>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium">
-              {t.disclaimer.metricsP1}
+              {renderLinkedText(t.disclaimer.metricsP1)}
             </p>
             <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium">
-              {t.disclaimer.metricsP2}
+              {renderLinkedText(t.disclaimer.metricsP2)}
             </p>
           </div>
           <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium border-t border-zinc-100 dark:border-zinc-700/50 pt-4 mt-2">

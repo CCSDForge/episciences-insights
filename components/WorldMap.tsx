@@ -6,9 +6,7 @@ import { scaleLog } from 'd3-scale';
 import { Tooltip } from 'react-tooltip';
 import { ISO_NUMERIC_TO_ALPHA2 } from '@/lib/isoNumericToAlpha2';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
-
-// Reliable TopoJSON source from world-atlas
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+import { WORLD_GEO_URL } from '@/lib/geo';
 
 interface WorldMapProps {
   data: { name: string; value: number }[]; // name is ISO country code (2 letters)
@@ -16,6 +14,8 @@ interface WorldMapProps {
   colorRange?: [string, string];
   selectedCountry?: string | null;
   onSelectCountry?: (code: string) => void;
+  valueUnit?: string;
+  tooltipId?: string;
 }
 
 export default function WorldMap({
@@ -24,6 +24,8 @@ export default function WorldMap({
   colorRange = ["#dbeafe", "#2563eb"],
   selectedCountry,
   onSelectCountry,
+  valueUnit,
+  tooltipId = "world-map-tooltip",
 }: WorldMapProps) {
   const { t } = useTranslation();
   const effectiveLegendLabel = legendLabel || t.dashboard.authorAffiliationsTitle;
@@ -57,9 +59,9 @@ export default function WorldMap({
         }}
         width={800}
         height={450}
-        style={{ width: "100%", height: "auto" }}
+        style={{ width: "100%", height: "100%" }}
       >
-        <Geographies geography={geoUrl}>
+        <Geographies geography={WORLD_GEO_URL}>
           {({ geographies }: { geographies: Array<{ properties: { ISO_A2?: string; iso_a2?: string; name: string }; id: string | number; rsmKey: string }> }) =>
             geographies.map((geo) => {
               const { ISO_A2, iso_a2, name } = geo.properties;
@@ -67,34 +69,54 @@ export default function WorldMap({
               const countryCode = ISO_A2 || iso_a2 || (numericId ? ISO_NUMERIC_TO_ALPHA2[numericId] : null);
               const value = countryCode ? (dataMap[countryCode.toUpperCase()] || 0) : 0;
               const isSelected = Boolean(countryCode && selectedCountry && countryCode.toUpperCase() === selectedCountry.toUpperCase());
+              const isInteractive = Boolean(countryCode && onSelectCountry && value > 0);
+              const unit = valueUnit ? ` ${valueUnit}` : '';
+              const baseLabel = `${name}: ${formatNum(value)}${unit}`;
+              const tooltipContent = isInteractive
+                ? `${baseLabel} (${t.dashboard.clickToViewAffiliations})`
+                : baseLabel;
               
               return (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  role={value > 0 ? "button" : undefined}
-                  tabIndex={value > 0 ? 0 : -1}
-                  aria-label={`${name}: ${formatNum(value)} items${value > 0 ? ' (click or press Enter to view affiliations)' : ''}`}
-                  aria-pressed={value > 0 ? isSelected : undefined}
-                  data-tooltip-id="world-map-tooltip"
-                  data-tooltip-content={`${name}: ${formatNum(value)} items${value > 0 ? ' (click to view affiliations)' : ''}`}
+                  role={isInteractive ? "button" : undefined}
+                  tabIndex={isInteractive ? 0 : -1}
+                  aria-label={tooltipContent}
+                  aria-pressed={isInteractive ? isSelected : undefined}
+                  data-tooltip-id={tooltipId}
+                  data-tooltip-content={tooltipContent}
                   onClick={() => {
-                    if (countryCode && onSelectCountry && value > 0) {
+                    if (isInteractive && countryCode && onSelectCountry) {
                       onSelectCountry(countryCode.toUpperCase());
                     }
                   }}
                   onKeyDown={(e: React.KeyboardEvent) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && countryCode && onSelectCountry && value > 0) {
+                    if ((e.key === 'Enter' || e.key === ' ') && isInteractive && countryCode && onSelectCountry) {
                       e.preventDefault();
                       onSelectCountry(countryCode.toUpperCase());
                     }
                   }}
-                  fill={isSelected ? '#1d4ed8' : value > 0 ? colorScale(value) : "#f1f5f9"}
-                  stroke={isSelected ? '#172554' : "#cbd5e1"}
+                  fill={isSelected ? '#1d4ed8' : value > 0 ? colorScale(value) : "var(--map-empty-fill)"}
+                  stroke={isSelected ? '#172554' : "var(--map-empty-stroke)"}
                   strokeWidth={isSelected ? 1.8 : 0.5}
                   style={{
                     default: { outline: "none" },
-                    hover: { fill: colorRange[1], outline: "none", cursor: value > 0 ? "pointer" : "default" },
+                    hover: {
+                      fill: isSelected
+                        ? '#1d4ed8'
+                        : value > 0
+                          ? colorScale(value)
+                          : "var(--map-empty-hover, var(--map-empty-fill))",
+                      stroke: isSelected
+                        ? '#172554'
+                        : value > 0
+                          ? colorRange[1]
+                          : "var(--map-empty-stroke)",
+                      strokeWidth: value > 0 ? 1.5 : 0.5,
+                      outline: "none",
+                      cursor: isInteractive ? "pointer" : "default",
+                    },
                     pressed: { outline: "none" },
                   }}
                   className="focus-visible:stroke-teal-500 focus-visible:stroke-2 focus-visible:outline-none"
@@ -106,7 +128,7 @@ export default function WorldMap({
       </ComposableMap>
       
       <Tooltip 
-        id="world-map-tooltip" 
+        id={tooltipId} 
         style={{ 
           backgroundColor: "#111827", 
           color: "#fff", 

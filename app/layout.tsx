@@ -45,6 +45,10 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  var p = window.location.pathname.split('/')[1];
+                  if (p === 'fr' || p === 'es' || p === 'en') {
+                    document.documentElement.lang = p;
+                  }
                   var saved = localStorage.getItem('episciences-theme');
                   var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   if (saved === 'dark' || ((!saved || saved === 'system') && prefersDark)) {

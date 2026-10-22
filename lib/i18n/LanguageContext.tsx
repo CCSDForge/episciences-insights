@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useSyncExternalStore, useState, useTransition } from 'react';
+import React, { createContext, use, useEffect, useSyncExternalStore, useState, useTransition } from 'react';
 import { Locale, Translations, translations } from './translations';
 
 interface LanguageContextType {
@@ -86,7 +86,7 @@ export function LanguageProvider({ children, initialLocale }: { children: React.
   const t = translations[locale] || translations.en;
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, t }}>
+    <LanguageContext value={{ locale, setLocale, t }}>
       {children}
       {/* Screen reader live announcement region */}
       <div
@@ -97,12 +97,12 @@ export function LanguageProvider({ children, initialLocale }: { children: React.
       >
         {announcement}
       </div>
-    </LanguageContext.Provider>
+    </LanguageContext>
   );
 }
 
 export function useTranslation() {
-  const context = useContext(LanguageContext);
+  const context = use(LanguageContext);
   if (!context) {
     throw new Error('useTranslation must be used within a LanguageProvider');
   }

@@ -61,18 +61,20 @@ interface ToggleOption<T extends string> {
 }
 
 function ViewToggle<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: ToggleOption<T>[] }) {
+  const { locale } = useTranslation();
   return (
-    <div role="group" aria-label="View mode toggle" className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+    <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation' : locale === 'es' ? 'Modo de visualización' : 'View mode toggle'} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
       {options.map((opt) => (
         <button
           key={opt.value}
+          type="button"
           onClick={() => onChange(opt.value)}
           aria-pressed={value === opt.value}
           className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all first:rounded-l-lg last:rounded-r-lg border-r last:border-r-0 border-zinc-200 dark:border-zinc-600 ${
             value === opt.value ? 'bg-white dark:bg-zinc-700 text-teal-700 dark:text-teal-400 shadow-sm' : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
           }`}
         >
-          {opt.icon} {opt.label}
+          <span aria-hidden="true">{opt.icon}</span> {opt.label}
         </button>
       ))}
     </div>
@@ -109,19 +111,45 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
   );
 
   const journals = useMemo(() => {
-    const unique = new Map<string, string>();
+    const idToNames = new Map<string, Map<string, number>>();
+
     data.forEach((p) => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
-      if (name) unique.set(p.journal.code || p.journal.issn || name, name);
+      if (!name) return;
+      const id = p.journal.code || p.journal.issn || name;
+      if (!idToNames.has(id)) {
+        idToNames.set(id, new Map());
+      }
+      const counts = idToNames.get(id)!;
+      counts.set(name, (counts.get(name) || 0) + 1);
     });
-    return Array.from(unique.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+
+    return Array.from(idToNames.entries())
+      .map(([id, counts]) => {
+        const bestName = Array.from(counts.entries()).sort(
+          (a, b) => b[1] - a[1] || b[0].length - a[0].length
+        )[0][0];
+        return [id, bestName] as [string, string];
+      })
+      .sort((a, b) => a[1].localeCompare(b[1]));
   }, [data]);
+
+  const selectedJournalName = useMemo(() => {
+    if (journalFilter === 'all') return null;
+    const found = journals.find(([id]) => id === journalFilter);
+    return found ? found[1] : null;
+  }, [journalFilter, journals]);
 
   const filteredData = useMemo(() => data.filter((p) => {
     const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
-    const journalMatch = journalFilter === 'all' || p.journal.code === journalFilter || p.journal.issn === journalFilter || p.journal.name === journalFilter;
+    const journalMatch =
+      journalFilter === 'all' ||
+      p.journal.code === journalFilter ||
+      p.journal.issn === journalFilter ||
+      p.journal.name === journalFilter ||
+      (selectedJournalName && p.journal.name?.replace(/\s+/g, ' ').trim() === selectedJournalName);
     return yearMatch && journalMatch;
-  }), [data, yearFilter, journalFilter]);
+  }), [data, yearFilter, journalFilter, selectedJournalName]);
 
   const countryOptions = useMemo(() => {
     const codes = new Set<string>();
@@ -196,30 +224,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
         </p>
       </section>
 
-      <section aria-labelledby="funders-heading" className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 id="funders-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderHeading}</h2>
-          <ViewToggle
-            value={funderView}
-            onChange={setFunderView}
-            options={[
-              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
-              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
-              { value: 'cluster', label: t.common.cluster, icon: <Orbit size={14} /> },
-            ]}
-          />
-        </div>
-        {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
-        {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
-        {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
-      </section>
-
-      <section aria-labelledby="funder-geography-heading" className="space-y-6">
-        <h2 id="funder-geography-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderGeoHeading}</h2>
-        <FunderSankey data={filteredData} funders={funders} />
-        <FunderGeographicFlowMap data={filteredData} funders={funders} />
-      </section>
-
+      {/* 1. Global Reach (Institutions) */}
       <section aria-labelledby="institutions-heading" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="institutions-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.reachHeading}</h2>
@@ -260,6 +265,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
           : <InstitutionCofundingMatrix data={reachScopedData} />}
       </section>
 
+      {/* 2. Country Collaboration & Geographic Flow Map */}
       <section aria-labelledby="countries-heading" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="countries-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.countryCollabHeading}</h2>
@@ -295,29 +301,13 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
               .replace('{total}', filteredData.length.toLocaleString(numLocale))}
           </p>
         )}
+        <CountryGeographicFlowMap data={countryScopedData} />
         {countryView === 'network'
           ? <CountryCollaborationNetwork data={countryScopedData} />
           : <CountryCollaborationMatrix data={countryScopedData} />}
-        <CountryGeographicFlowMap data={countryScopedData} />
       </section>
 
-      <section aria-labelledby="msc-heading" className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 id="msc-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.mscHeading}</h2>
-          <ViewToggle
-            value={mscView}
-            onChange={setMscView}
-            options={[
-              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
-              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
-            ]}
-          />
-        </div>
-        {mscView === 'network'
-          ? <MscCoOccurrenceNetwork data={filteredData} />
-          : <MscCoOccurrenceMatrix data={filteredData} />}
-      </section>
-
+      {/* 3. Research Topics Co-occurrence */}
       <section aria-labelledby="topics-heading" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="topics-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.topicsHeading}</h2>
@@ -333,6 +323,50 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
         {topicView === 'matrix'
           ? <TopicCoOccurrenceMatrix data={filteredData} />
           : <TopicCoOccurrenceNetwork data={filteredData} />}
+      </section>
+
+      {/* 4. Funder Co-funding */}
+      <section aria-labelledby="funders-heading" className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="funders-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderHeading}</h2>
+          <ViewToggle
+            value={funderView}
+            onChange={setFunderView}
+            options={[
+              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
+              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
+              { value: 'cluster', label: t.common.cluster, icon: <Orbit size={14} /> },
+            ]}
+          />
+        </div>
+        {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
+        {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
+        {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
+      </section>
+
+      {/* 5. Funder Geography */}
+      <section aria-labelledby="funder-geography-heading" className="space-y-6">
+        <h2 id="funder-geography-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderGeoHeading}</h2>
+        <FunderSankey data={filteredData} funders={funders} />
+        <FunderGeographicFlowMap data={filteredData} funders={funders} />
+      </section>
+
+      {/* 6. MSC 2020 Classification */}
+      <section aria-labelledby="msc-heading" className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="msc-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.mscHeading}</h2>
+          <ViewToggle
+            value={mscView}
+            onChange={setMscView}
+            options={[
+              { value: 'network', label: t.common.network, icon: <Share2 size={14} /> },
+              { value: 'matrix', label: t.common.matrix, icon: <Grid3x3 size={14} /> },
+            ]}
+          />
+        </div>
+        {mscView === 'network'
+          ? <MscCoOccurrenceNetwork data={filteredData} />
+          : <MscCoOccurrenceMatrix data={filteredData} />}
       </section>
     </div>
   );

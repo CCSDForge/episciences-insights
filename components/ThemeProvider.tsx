@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useSyncExternalStore, useState, useTransition } from 'react';
+import React, { createContext, use, useEffect, useSyncExternalStore, useState, useTransition } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -75,9 +75,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
       if (effectiveTheme === 'dark') {
         root.classList.add('dark');
+        root.classList.remove('light');
         root.style.colorScheme = 'dark';
       } else {
         root.classList.remove('dark');
+        root.classList.add('light');
         root.style.colorScheme = 'light';
       }
     };
@@ -113,7 +115,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+    <ThemeContext value={{ theme, resolvedTheme, setTheme }}>
       {children}
       {/* Screen reader live announcement region */}
       <div
@@ -124,12 +126,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       >
         {announcement}
       </div>
-    </ThemeContext.Provider>
+    </ThemeContext>
   );
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
+  const context = use(ThemeContext);
   if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }

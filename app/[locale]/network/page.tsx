@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
-import { getPublications, getFunders, getLastUpdated } from '@/lib/data';
+import { getPublications, getFunders } from '@/lib/data';
 import NetworkExplorer from '@/components/NetworkExplorer';
-import PageFooter from '@/components/PageFooter';
 import { Locale, translations } from '@/lib/i18n/translations';
 
 export function generateStaticParams() {
@@ -54,37 +53,28 @@ export default async function LocaleNetworkPage({ params }: { params: Promise<{ 
   const { locale } = await params;
   const validLocale = (locale === 'fr' || locale === 'es' ? locale : 'en') as Locale;
   const [publications, funders] = await Promise.all([getPublications(), getFunders()]);
-  const lastUpdated = getLastUpdated();
   const t = translations[validLocale];
   const numLocale = validLocale === 'fr' ? 'fr-FR' : validLocale === 'es' ? 'es-ES' : 'en-US';
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <a href="#main-content" className="skip-link">{t.common.skipToContent}</a>
+    <div className="space-y-8 animate-in fade-in duration-300">
+      <header>
+        <Link
+          href={`/${validLocale}/`}
+          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-[var(--primary-text)] dark:text-zinc-400 dark:hover:text-[var(--primary-accent)] transition-colors"
+        >
+          <ArrowLeft size={14} />
+          {t.common.backToDashboard}
+        </Link>
+        <h1 className="mt-4 font-heading text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+          {t.header.networkExplorerBtn}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm font-medium text-zinc-600 dark:text-zinc-400">
+          {t.networkExplorer.subtitle.replace('{count}', publications.length.toLocaleString(numLocale))}
+        </p>
+      </header>
 
-      <div className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
-        <header className="mb-12">
-          <Link
-            href={`/${validLocale}/`}
-            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-teal-600 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors"
-          >
-            <ArrowLeft size={14} />
-            {t.common.backToDashboard}
-          </Link>
-          <h1 className="mt-4 font-heading text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            {t.header.networkExplorerBtn}
-          </h1>
-          <p className="mt-3 max-w-2xl text-base font-medium text-zinc-600 dark:text-zinc-400">
-            {t.networkExplorer.subtitle.replace('{count}', publications.length.toLocaleString(numLocale))}
-          </p>
-        </header>
-
-        <main id="main-content">
-          <NetworkExplorer funders={funders} />
-        </main>
-
-        <PageFooter lastUpdated={lastUpdated} />
-      </div>
+      <NetworkExplorer funders={funders} />
     </div>
   );
 }

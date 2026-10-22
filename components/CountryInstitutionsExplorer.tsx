@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Publication } from '@/lib/types';
 import { getCountryName } from '@/lib/countryNames';
 import { COMMUNITY_COLORS } from '@/lib/colorRamps';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Treemap,
+  BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Treemap,
 } from 'recharts';
 import ChartContainer from '@/components/ChartContainer';
+import ChartExportMenu from '@/components/ChartExportMenu';
 import { Building2, LayoutGrid, BarChart2, Globe, ExternalLink, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
@@ -18,6 +19,7 @@ interface CountryInstitutionsExplorerProps {
 }
 
 interface TreemapContentProps {
+  depth?: number;
   x?: number;
   y?: number;
   width?: number;
@@ -63,9 +65,30 @@ function wrapText(text: string, maxCharsPerLine: number, maxLines = 2): string[]
   return lines.slice(0, maxLines);
 }
 
+/**
+ * Calculates relative luminance and returns the text color ('#ffffff' or '#09090b')
+ * guaranteeing compliance with WCAG 2.1 AA (contrast ratio >= 4.5:1).
+ */
+function getContrastTextColor(hexColor?: string): '#ffffff' | '#09090b' {
+  if (!hexColor) return '#ffffff';
+  const cleanHex = hexColor.replace('#', '');
+  if (cleanHex.length !== 6) return '#ffffff';
+  const r = parseInt(cleanHex.substring(0, 2), 16) / 255;
+  const g = parseInt(cleanHex.substring(2, 4), 16) / 255;
+  const b = parseInt(cleanHex.substring(4, 6), 16) / 255;
+  const toLinear = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  const L = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  const contrastWithWhite = 1.05 / (L + 0.05);
+  const contrastWithBlack = (L + 0.05) / 0.05;
+  return contrastWithWhite >= contrastWithBlack ? '#ffffff' : '#09090b';
+}
+
 function TreemapCell(props: TreemapContentProps) {
-  const { x = 0, y = 0, width = 0, height = 0, name = '', color = '#3b82f6', size = 0, count: rawCount } = props;
+  const { depth, x = 0, y = 0, width = 0, height = 0, name = '', color = '#3b82f6', size = 0, count: rawCount } = props;
+  if (depth === 0) return <g />;
   const count = rawCount ?? size;
+  const textColor = getContrastTextColor(color);
+  const secondaryColor = textColor === '#ffffff' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(9, 9, 11, 0.85)';
 
   // Round positions and dimensions to integer pixels to prevent subpixel font blur
   const rx = Math.round(x);
@@ -109,13 +132,16 @@ function TreemapCell(props: TreemapContentProps) {
         <text
           x={startX}
           y={startY}
-          fill="#ffffff"
+          fill={textColor}
+          stroke="none"
           fontSize={fontSize}
           fontWeight="600"
-          textRendering="geometricPrecision"
-          className="pointer-events-none select-none antialiased"
+          textRendering="optimizeLegibility"
+          className="pointer-events-none select-none"
           style={{
-            fontFamily: 'var(--font-noto-sans), var(--font-manrope), system-ui, sans-serif',
+            fontFamily: 'var(--font-sans)',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
           }}
         >
           {lines.map((line, idx) => (
@@ -123,6 +149,8 @@ function TreemapCell(props: TreemapContentProps) {
               key={idx}
               x={startX}
               dy={idx === 0 ? 0 : fontSize + 2}
+              fill={textColor}
+              stroke="none"
             >
               {line}
             </tspan>
@@ -131,7 +159,8 @@ function TreemapCell(props: TreemapContentProps) {
             <tspan
               x={startX}
               dy={fontSize + 3}
-              fill="rgba(255, 255, 255, 0.9)"
+              fill={secondaryColor}
+              stroke="none"
               fontSize={Math.max(9, fontSize - 1)}
               fontWeight="500"
             >
@@ -149,7 +178,7 @@ export default function CountryInstitutionsExplorer({
   selectedCountry: externalSelectedCountry,
   onSelectCountry: externalOnSelectCountry,
 }: CountryInstitutionsExplorerProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [internalCountry, setInternalCountry] = useState<string>('FR');
   const [viewMode, setViewMode] = useState<'treemap' | 'bars'>('treemap');
   const [limit, setLimit] = useState<15 | 30 | 50>(30);
@@ -240,9 +269,10 @@ export default function CountryInstitutionsExplorer({
   }, [institutions, limit]);
 
   const activeCountryName = getCountryName(activeCountry);
+  const chartAreaRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8">
+    <div id="country-affiliations-explorer" className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8 scroll-mt-6">
       {/* Header with Title & Country Selector */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-zinc-100 pb-6 dark:border-zinc-800">
         <div className="flex flex-col">
@@ -254,7 +284,7 @@ export default function CountryInstitutionsExplorer({
               <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
                 {t.countryInstitutions.title}
               </h3>
-              <p className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mt-1">
+              <p className="text-xs font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-[0.2em] mt-1">
                 {t.countryInstitutions.subtitle}
               </p>
             </div>
@@ -264,28 +294,32 @@ export default function CountryInstitutionsExplorer({
         {/* View Mode & Country Selector dropdown */}
         <div className="flex flex-wrap items-center gap-3">
           {/* View Mode Toggle */}
-          <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+          <div role="group" aria-label={locale === 'fr' ? "Mode d'affichage" : locale === 'es' ? "Modo de visualización" : "View mode"} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
             <button
+              type="button"
               onClick={() => setViewMode('treemap')}
               aria-label="Treemap view"
+              aria-pressed={viewMode === 'treemap'}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 viewMode === 'treemap'
                   ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
-              <LayoutGrid size={14} /> {t.countryInstitutions.treemap}
+              <LayoutGrid size={14} aria-hidden="true" /> {t.countryInstitutions.treemap}
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('bars')}
               aria-label="Bar chart view"
+              aria-pressed={viewMode === 'bars'}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 viewMode === 'bars'
                   ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
-              <BarChart2 size={14} /> {t.countryInstitutions.barChart}
+              <BarChart2 size={14} aria-hidden="true" /> {t.countryInstitutions.barChart}
             </button>
           </div>
 
@@ -293,7 +327,7 @@ export default function CountryInstitutionsExplorer({
           <div className="relative">
             <select
               id="country-affiliation-select"
-              aria-label="Select Country"
+              aria-label={t.common.country}
               value={activeCountry}
               onChange={(e) => handleSelectCountry(e.target.value)}
               className="appearance-none rounded-xl border border-zinc-300 bg-white pl-4 pr-10 py-2 text-sm font-bold text-zinc-900 shadow-sm focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 outline-none cursor-pointer"
@@ -309,20 +343,43 @@ export default function CountryInstitutionsExplorer({
               className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
             />
           </div>
+
+          <ChartExportMenu
+            targetRef={chartAreaRef}
+            data={institutions.slice(0, limit).map((inst) => ({
+              countryCode: activeCountry,
+              countryName: activeCountryName,
+              institution: inst.name,
+              rorId: inst.ror || '',
+              publications: inst.count,
+              shareOfCountry: `${inst.percentage}%`,
+            }))}
+            filename={`episciences-institutions-${activeCountry.toLowerCase()}-${viewMode}`}
+            csvColumns={[
+              { key: 'countryCode', header: 'Country_Code' },
+              { key: 'countryName', header: 'Country_Name' },
+              { key: 'institution', header: 'Institution_Name' },
+              { key: 'rorId', header: 'ROR_ID' },
+              { key: 'publications', header: 'Publications_Count' },
+              { key: 'shareOfCountry', header: 'Share_Of_Country' },
+            ]}
+          />
         </div>
       </div>
 
       {/* Quick Select Country Pills */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-black text-zinc-400 uppercase tracking-widest mr-2 flex items-center gap-1.5">
-          <Globe size={13} /> {t.countryInstitutions.quickSelect}
+        <span className="text-xs font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mr-2 flex items-center gap-1.5">
+          <Globe size={13} aria-hidden="true" /> {t.countryInstitutions.quickSelect}
         </span>
         {quickCountries.map((c) => {
           const isSelected = c.code === activeCountry;
           return (
             <button
               key={c.code}
+              type="button"
               onClick={() => handleSelectCountry(c.code)}
+              aria-pressed={isSelected}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
                 isSelected
                   ? 'bg-blue-600 text-white shadow-blue-500/25 ring-2 ring-blue-600'
@@ -351,20 +408,22 @@ export default function CountryInstitutionsExplorer({
         </div>
         <div className="flex items-center gap-6 text-xs font-bold text-zinc-600 dark:text-zinc-300">
           <div>
-            <span className="text-zinc-400 font-normal">{t.countryInstitutions.publications} </span>
+            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{t.countryInstitutions.publications} </span>
             <span className="font-black text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{formatNum(totalCountryPubs)}</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-normal">{t.countryInstitutions.identifiedInstitutions} </span>
+            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{t.countryInstitutions.identifiedInstitutions} </span>
             <span className="font-black text-zinc-900 dark:text-zinc-100 whitespace-nowrap">{formatNum(institutions.length)}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-zinc-400 font-normal">{t.countryInstitutions.limit} </span>
+            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{t.countryInstitutions.limit} </span>
             <div className="flex bg-white dark:bg-zinc-800 rounded-lg p-0.5 shadow-sm border border-zinc-200 dark:border-zinc-700">
               {([15, 30, 50] as const).map((l) => (
                 <button
                   key={l}
+                  type="button"
                   onClick={() => setLimit(l)}
+                  aria-label={`${t.countryInstitutions.limit} ${l}`}
                   className={`px-2 py-0.5 text-[10px] font-black rounded ${
                     limit === l ? 'bg-blue-600 text-white' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
                   }`}
@@ -378,76 +437,37 @@ export default function CountryInstitutionsExplorer({
       </div>
 
       {/* Main Visualization Area */}
-      {institutions.length === 0 ? (
-        <div className="h-[400px] flex items-center justify-center text-zinc-400 italic bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
-          {t.countryInstitutions.noAffiliation.replace('{country}', activeCountryName)}
-        </div>
-      ) : viewMode === 'treemap' ? (
-        /* Treemap View */
-        <div className="h-[560px] min-h-[560px] w-full bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800">
-          <ChartContainer width="100%" height="100%">
-            <Treemap
-              data={treeData}
-              dataKey="size"
-              aspectRatio={16 / 9}
-              stroke="#fff"
-              content={(cellProps: Record<string, unknown>) => {
-                const payload = cellProps.payload as { count?: number; name?: string; color?: string } | undefined;
-                const size = typeof cellProps.size === 'number' ? cellProps.size : 0;
-                const name = typeof cellProps.name === 'string' ? cellProps.name : (payload?.name || '');
-                const color = typeof cellProps.color === 'string' ? cellProps.color : (payload?.color || '#3b82f6');
-                const count = payload?.count ?? size;
-                return (
-                  <TreemapCell
-                    {...(cellProps as TreemapContentProps)}
-                    count={count}
-                    name={name}
-                    color={color}
-                  />
-                );
-              }}
-            >
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload || !payload.length) return null;
-                  const item = payload[0].payload;
+      <div ref={chartAreaRef}>
+        {institutions.length === 0 ? (
+          <div className="h-[400px] flex items-center justify-center text-zinc-400 italic bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
+            {t.countryInstitutions.noAffiliation.replace('{country}', activeCountryName)}
+          </div>
+        ) : viewMode === 'treemap' ? (
+          /* Treemap View */
+          <div className="h-[560px] min-h-[560px] w-full bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800">
+            <ChartContainer width="100%" height="100%">
+              <Treemap
+                data={treeData}
+                dataKey="size"
+                aspectRatio={16 / 9}
+                stroke="none"
+                isAnimationActive={false}
+                content={(cellProps: Record<string, unknown>) => {
+                  const payload = cellProps.payload as { count?: number; name?: string; color?: string } | undefined;
+                  const size = typeof cellProps.size === 'number' ? cellProps.size : 0;
+                  const name = typeof cellProps.name === 'string' ? cellProps.name : (payload?.name || '');
+                  const color = typeof cellProps.color === 'string' ? cellProps.color : (payload?.color || '#3b82f6');
+                  const count = payload?.count ?? size;
                   return (
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl text-white font-sans space-y-1 z-50">
-                      <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{activeCountryName}</p>
-                      <p className="text-sm font-bold text-white max-w-sm">{item.name}</p>
-                      <div className="pt-2 border-t border-zinc-800 flex items-center justify-between gap-4 text-xs">
-                        <span className="font-black text-teal-400">{formatNum(item.count)} publications</span>
-                        <span className="font-bold text-zinc-400">{item.percentage}% of country</span>
-                      </div>
-                      {item.ror && (
-                        <p className="text-[10px] font-mono text-zinc-400 pt-1">ROR: {item.ror}</p>
-                      )}
-                    </div>
+                    <TreemapCell
+                      {...(cellProps as TreemapContentProps)}
+                      count={count}
+                      name={name}
+                      color={color}
+                    />
                   );
                 }}
-              />
-            </Treemap>
-          </ChartContainer>
-        </div>
-      ) : (
-        /* Bar Chart View */
-        <div className="border border-zinc-100 rounded-2xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30">
-          <div style={{ height: `${Math.max(380, Math.min(limit, institutions.length) * 34)}px`, width: '100%' }}>
-            <ChartContainer width="100%" height="100%">
-              <BarChart
-                data={institutions.slice(0, limit)}
-                layout="vertical"
-                margin={{ left: 20, right: 40, top: 10, bottom: 10 }}
               >
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  width={240}
-                  tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload || !payload.length) return null;
@@ -460,63 +480,119 @@ export default function CountryInstitutionsExplorer({
                           <span className="font-black text-teal-400">{formatNum(item.count)} publications</span>
                           <span className="font-bold text-zinc-400">{item.percentage}% of country</span>
                         </div>
+                        {item.ror && (
+                          <p className="text-[10px] font-mono text-zinc-400 pt-1">ROR: {item.ror}</p>
+                        )}
                       </div>
                     );
                   }}
-                  cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
                 />
-                <Bar dataKey="count" fill="#2563eb" radius={[0, 8, 8, 0]} barSize={20} />
-              </BarChart>
+              </Treemap>
             </ChartContainer>
           </div>
-        </div>
-      )}
+        ) : (
+          /* Bar Chart View */
+          <div className="border border-zinc-100 rounded-2xl dark:border-zinc-800 p-4 bg-zinc-50/30 dark:bg-zinc-950/30">
+            <div style={{ height: `${Math.max(380, Math.min(limit, institutions.length) * 34)}px`, width: '100%' }}>
+              <ChartContainer width="100%" height="100%">
+                <BarChart
+                  data={institutions.slice(0, limit)}
+                  layout="vertical"
+                  margin={{ left: 20, right: 40, top: 10, bottom: 10 }}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={240}
+                    tick={{ fontSize: 11, fill: 'currentColor', fontWeight: 600, className: 'text-zinc-700 dark:text-zinc-300' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload || !payload.length) return null;
+                      const item = payload[0].payload;
+                      return (
+                        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl text-white font-sans space-y-1 z-50">
+                          <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{activeCountryName}</p>
+                          <p className="text-sm font-bold text-white max-w-sm">{item.name}</p>
+                          <div className="pt-2 border-t border-zinc-800 flex items-center justify-between gap-4 text-xs">
+                            <span className="font-black text-teal-400">{formatNum(item.count)} publications</span>
+                            <span className="font-bold text-zinc-400">{item.percentage}% of country</span>
+                          </div>
+                        </div>
+                      );
+                    }}
+                    cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
+                  />
+                  <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={20}>
+                    {institutions.slice(0, limit).map((inst, idx) => (
+                      <Cell key={inst.ror || inst.name || idx} fill={COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Top Institutions Grid Cards */}
       <div className="space-y-4">
-        <h4 className="text-sm font-black text-zinc-400 uppercase tracking-widest">
+        <h4 className="text-sm font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">
           Ranked Institutions in {activeCountryName} ({Math.min(limit, institutions.length)} of {institutions.length})
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {institutions.slice(0, limit).map((inst, idx) => (
-            <div
-              key={inst.ror || inst.name}
-              className="flex flex-col justify-between p-4 rounded-xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all group"
-            >
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-700 text-[10px] font-black text-zinc-700 dark:text-zinc-300 font-sans">
-                  {idx + 1}
-                </span>
-                {inst.ror ? (
-                  <a
-                    href={inst.ror.startsWith('http') ? inst.ror : `https://ror.org/${inst.ror}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-bold uppercase truncate hover:underline flex items-center gap-1 shrink-0"
-                    title={`View ${inst.name} on ROR`}
+          {institutions.slice(0, limit).map((inst, idx) => {
+            const badgeColor = COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length];
+            const badgeTextColor = getContrastTextColor(badgeColor);
+            const rankLabel = `${locale === 'fr' ? 'Rang' : locale === 'es' ? 'Rango' : 'Rank'} ${idx + 1}`;
+            return (
+              <div
+                key={inst.ror || inst.name}
+                className="flex flex-col justify-between p-4 rounded-xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all group"
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <span
+                    className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg text-[10px] font-black font-sans shadow-xs ring-1 ring-black/10 dark:ring-white/15"
+                    style={{ backgroundColor: badgeColor, color: badgeTextColor }}
+                    aria-label={rankLabel}
+                    title={rankLabel}
                   >
-                    {inst.ror.split('/').pop()}
-                    <ExternalLink size={10} />
-                  </a>
-                ) : (
-                  <span className="text-[9px] text-zinc-400 font-mono uppercase tracking-tighter shrink-0">
-                    No ROR
+                    <span aria-hidden="true">{idx + 1}</span>
                   </span>
-                )}
+                  {inst.ror ? (
+                    <a
+                      href={inst.ror.startsWith('http') ? inst.ror : `https://ror.org/${inst.ror}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-bold uppercase truncate hover:underline flex items-center gap-1 shrink-0"
+                      title={`View ${inst.name} on ROR`}
+                    >
+                      {inst.ror.split('/').pop()}
+                      <ExternalLink size={10} aria-hidden="true" />
+                    </a>
+                  ) : (
+                    <span className="text-[9px] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-tighter shrink-0">
+                      No ROR
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 min-h-[2.5rem]" title={inst.name}>
+                  {inst.name}
+                </p>
+                <div className="flex items-center justify-between pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+                  <span className="font-black text-zinc-900 dark:text-zinc-100">
+                    {formatNum(inst.count)} <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400">pubs</span>
+                  </span>
+                  <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full text-[10px]">
+                    {inst.percentage}%
+                  </span>
+                </div>
               </div>
-              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 min-h-[2.5rem]" title={inst.name}>
-                {inst.name}
-              </p>
-              <div className="flex items-center justify-between pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs">
-                <span className="font-black text-zinc-900 dark:text-zinc-100">
-                  {formatNum(inst.count)} <span className="text-[10px] font-normal text-zinc-400">pubs</span>
-                </span>
-                <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full text-[10px]">
-                  {inst.percentage}%
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
