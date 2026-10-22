@@ -33,6 +33,8 @@ The dashboard aggregates and synthesizes data from the **OpenAlex API**, the **O
 | **OpenAlex API** | Publication metadata, citation counts, topic modeling (fields, subfields, concepts), author affiliations, and UN Sustainable Development Goals (SDG) confidence scores. |
 | **OpenAIRE Graph v3** | Research grant codes, funder acronyms, open access hosting repositories, licenses, and Scholix links to research data and software. |
 | **ROR API** | Disambiguation of academic institutions and funder geographic coordinates (latitude/longitude). |
+| **zbMATH Open** | Mathematics Subject Classification 2020 (MSC 2020) official taxonomy codes. |
+| **Natural Earth & world-atlas** | Self-hosted TopoJSON world basemap (`countries-110m.json`, ISC license / Public Domain) ensuring zero third-party tracking calls. |
 | **Episciences KPI Logs** | Article downloads, page views, and geographic readership metrics (Matomo-derived). |
 
 ### SDG Impact Score Calculation

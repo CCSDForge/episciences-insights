@@ -927,10 +927,14 @@ export const translations: Record<Locale, Translations> = {
           "sec7Title": "7. Links and Documentation",
           "references": [
               "DORA (2012) - [San Francisco Declaration on Research Assessment](https://sfdora.org)",
+              "CoARA (2022) - [Coalition for Advancing Research Assessment](https://coara.org)",
               "OpenAIRE (2024) - [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
               "OurResearch (2024) - [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
-              "Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)",
-              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)"
+              "ROR (2024) - [Research Organization Registry](https://ror.org)",
+              "zbMATH Open - [Mathematics Subject Classification (MSC 2020)](https://zbmath.org/classification/)",
+              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)",
+              "Natural Earth & world-atlas (Mike Bostock) - [Global TopoJSON Basemap (ISC License / Public Domain)](https://github.com/topojson/world-atlas)",
+              "Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
           ]
       },
       "export": {
@@ -1405,10 +1409,14 @@ export const translations: Record<Locale, Translations> = {
           "sec7Title": "7. Liens et documentation",
           "references": [
               "DORA (2012) - [San Francisco Declaration on Research Assessment](https://sfdora.org)",
+              "CoARA (2022) - [Coalition for Advancing Research Assessment](https://coara.org)",
               "OpenAIRE (2024) - [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
               "OurResearch (2024) - [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
-              "Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)",
-              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)"
+              "ROR (2024) - [Research Organization Registry](https://ror.org)",
+              "zbMATH Open - [Mathematics Subject Classification (MSC 2020)](https://zbmath.org/classification/)",
+              "Scholix - [Cadre d'échange de liens pour la recherche (RDA/WDS)](http://www.scholix.org/)",
+              "Natural Earth & world-atlas (Mike Bostock) - [Fond de carte mondial TopoJSON (Licence ISC / Domaine public)](https://github.com/topojson/world-atlas)",
+              "Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
           ]
       },
       "export": {
@@ -1883,10 +1891,14 @@ export const translations: Record<Locale, Translations> = {
           "sec7Title": "7. Enlaces y documentación",
           "references": [
               "DORA (2012) - [San Francisco Declaration on Research Assessment](https://sfdora.org)",
+              "CoARA (2022) - [Coalition for Advancing Research Assessment](https://coara.org)",
               "OpenAIRE (2024) - [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)",
               "OurResearch (2024) - [OpenAlex Documentation & Data Schema](https://docs.openalex.org)",
-              "Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)",
-              "Scholix - [A Framework for Scholarly Link Exchange (RDA/WDS)](http://www.scholix.org/)"
+              "ROR (2024) - [Research Organization Registry](https://ror.org)",
+              "zbMATH Open - [Mathematics Subject Classification (MSC 2020)](https://zbmath.org/classification/)",
+              "Scholix - [Marco para el intercambio de enlaces académicos (RDA/WDS)](http://www.scholix.org/)",
+              "Natural Earth & world-atlas (Mike Bostock) - [Mapa base mundial TopoJSON (Licencia ISC / Dominio público)](https://github.com/topojson/world-atlas)",
+              "Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)"
           ]
       },
       "export": {
