@@ -115,7 +115,7 @@ export default function PageHeader({ corpusStats, initialUsageStats }: PageHeade
               </span>
             </div>
             <div className="text-3xl font-black text-zinc-900 dark:text-zinc-50">
-              {initialUsageStats ? formatNum(initialUsageStats.downloads) : '—'}
+              {initialUsageStats ? formatNum(initialUsageStats.downloads) : '-'}
             </div>
           </div>
 
@@ -128,7 +128,7 @@ export default function PageHeader({ corpusStats, initialUsageStats }: PageHeade
               </span>
             </div>
             <div className="text-3xl font-black text-zinc-900 dark:text-zinc-50">
-              {initialUsageStats ? formatNum(initialUsageStats.views) : '—'}
+              {initialUsageStats ? formatNum(initialUsageStats.views) : '-'}
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export default function PageHeader({ corpusStats, initialUsageStats }: PageHeade
                   </span>
                 </>
               ) : (
-                '—'
+                '-'
               )}
             </div>
           </div>

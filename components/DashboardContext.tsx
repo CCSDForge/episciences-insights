@@ -93,6 +93,11 @@ interface DashboardData {
     totalLicenseMentions: number;
     topLicenses: { name: string; count: number }[];
     totalRepositories: number;
+    totalWithDatasets: number;
+    totalDatasets: number;
+    totalWithSoftware: number;
+    totalSoftware: number;
+    totalWithArtifacts: number;
   };
 }
 
@@ -381,9 +386,30 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
   const openScienceStats = useMemo(() => {
     const licenseCounts: Record<string, number> = {};
     const repositories = new Set<string>();
+    let totalWithDatasets = 0;
+    let totalDatasets = 0;
+    let totalWithSoftware = 0;
+    let totalSoftware = 0;
+    let totalWithArtifacts = 0;
 
     filteredData.forEach(p => {
       const os = p.open_science;
+      if (os?.linked_outputs) {
+        const dsCount = os.linked_outputs.datasets?.length || 0;
+        const swCount = os.linked_outputs.software?.length || 0;
+        if (dsCount > 0) {
+          totalWithDatasets++;
+          totalDatasets += dsCount;
+        }
+        if (swCount > 0) {
+          totalWithSoftware++;
+          totalSoftware += swCount;
+        }
+        if (dsCount > 0 || swCount > 0) {
+          totalWithArtifacts++;
+        }
+      }
+
       if (!os?.found_in_openaire) return;
       (os.licenses || []).forEach(l => {
         const name = normalizeLicense(l);
@@ -406,7 +432,16 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
       topLicenses.push({ name: `+${sorted.length - TOP_N} more licenses`, count: tailCount });
     }
 
-    return { totalLicenseMentions, topLicenses, totalRepositories: repositories.size };
+    return {
+      totalLicenseMentions,
+      topLicenses,
+      totalRepositories: repositories.size,
+      totalWithDatasets,
+      totalDatasets,
+      totalWithSoftware,
+      totalSoftware,
+      totalWithArtifacts,
+    };
   }, [filteredData]);
 
   const institutionsList = useMemo(() => {
