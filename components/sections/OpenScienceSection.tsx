@@ -72,7 +72,7 @@ export default function OpenScienceSection() {
         {/* 3. Linked Datasets (Scholix) */}
         <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xs ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
           <div className="flex items-center gap-2 mb-3 text-zinc-500 dark:text-zinc-400">
-            <Database size={16} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
+            <Database size={16} className="text-amber-700 dark:text-amber-400" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider">{t.dashboard.kpiDatasetsTitle}</span>
           </div>
           <div className="flex items-baseline gap-2">
@@ -91,7 +91,7 @@ export default function OpenScienceSection() {
         {/* 4. Linked Software (Scholix) */}
         <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xs ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
           <div className="flex items-center gap-2 mb-3 text-zinc-500 dark:text-zinc-400">
-            <Code2 size={16} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <Code2 size={16} className="text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider">{t.dashboard.kpiSoftwareTitle}</span>
           </div>
           <div className="flex items-baseline gap-2">

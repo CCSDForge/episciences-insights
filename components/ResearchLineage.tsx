@@ -32,6 +32,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterArtifactsOnly, setFilterArtifactsOnly] = useState(false);
 
+  const newTabSuffix =
+    locale === 'fr'
+      ? 'ouvre un nouvel onglet'
+      : locale === 'es'
+      ? 'abre en una nueva pestaña'
+      : 'opens in a new tab';
+
   const stats = useMemo(() => {
     let totalRefs = 0;
     let totalRelated = 0;
@@ -208,7 +215,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
               <button
                 type="button"
                 onClick={() => setFilterArtifactsOnly((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 ${
                   filterArtifactsOnly
                     ? 'bg-[#005fb9] text-white shadow-xs'
                     : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
@@ -224,7 +231,8 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                       : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300'
                   }`}
                 >
-                  {totalWithArtifactsCorpus}
+                  <span aria-hidden="true">{totalWithArtifactsCorpus}</span>
+                  <span className="sr-only"> publications</span>
                 </span>
               </button>
             </div>
@@ -279,20 +287,22 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                           </span>
                           {dsCount > 0 && (
                             <span
-                              className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold"
-                              title={`${dsCount} jeu(x) de données`}
+                              className="flex items-center gap-1 text-amber-700 dark:text-amber-400 font-bold"
+                              title={`${dsCount} ${t.lineage.datasetsCountLabel.toLowerCase()}`}
                             >
                               <Database size={11} aria-hidden="true" />
-                              {dsCount}
+                              <span aria-hidden="true">{dsCount}</span>
+                              <span className="sr-only">, {dsCount} {t.lineage.datasetsCountLabel.toLowerCase()}</span>
                             </span>
                           )}
                           {swCount > 0 && (
                             <span
-                              className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold"
-                              title={`${swCount} logiciel(s)`}
+                              className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-bold"
+                              title={`${swCount} ${t.lineage.softwareCountLabel.toLowerCase()}`}
                             >
                               <Code2 size={11} aria-hidden="true" />
-                              {swCount}
+                              <span aria-hidden="true">{swCount}</span>
+                              <span className="sr-only">, {swCount} {t.lineage.softwareCountLabel.toLowerCase()}</span>
                             </span>
                           )}
                         </div>
@@ -579,13 +589,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                       <div className="flex items-center gap-2">
                         {datasets.length > 0 && (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                            <Database size={11} />
+                            <Database size={11} aria-hidden="true" />
                             {datasets.length} {t.lineage.datasetsCountLabel}
                           </span>
                         )}
                         {software.length > 0 && (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            <Code2 size={11} />
+                            <Code2 size={11} aria-hidden="true" />
                             {software.length} {t.lineage.softwareCountLabel}
                           </span>
                         )}
@@ -600,10 +610,10 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Datasets */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400">
-                            <Database size={14} />
+                          <h5 className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
+                            <Database size={14} aria-hidden="true" />
                             <span>{t.lineage.datasetsCountLabel} ({datasets.length})</span>
-                          </div>
+                          </h5>
                           {datasets.length > 0 ? (
                             <div className="space-y-2">
                               {datasets.map((item, idx) => {
@@ -614,14 +624,15 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-amber-500 hover:bg-amber-50/30 dark:hover:bg-amber-950/20 transition-all group"
+                                    aria-label={`${t.lineage.viewArtifact}: ${label} (${newTabSuffix})`}
+                                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-amber-500 hover:bg-amber-50/30 dark:hover:bg-amber-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 transition-all group"
                                   >
                                     <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate pr-2 font-mono">
                                       {label}
                                     </span>
-                                    <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
+                                    <span className="text-[10px] font-semibold text-amber-700 hover:text-amber-800 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
                                       <span>{t.lineage.viewArtifact}</span>
-                                      <ArrowUpRight size={11} />
+                                      <ArrowUpRight size={11} aria-hidden="true" />
                                     </span>
                                   </a>
                                 );
@@ -636,10 +647,10 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
 
                         {/* Software */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                            <Code2 size={14} />
+                          <h5 className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                            <Code2 size={14} aria-hidden="true" />
                             <span>{t.lineage.softwareCountLabel} ({software.length})</span>
-                          </div>
+                          </h5>
                           {software.length > 0 ? (
                             <div className="space-y-2">
                               {software.map((item, idx) => {
@@ -650,14 +661,15 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-all group"
+                                    aria-label={`${t.lineage.viewArtifact}: ${label} (${newTabSuffix})`}
+                                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 transition-all group"
                                   >
                                     <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate pr-2 font-mono">
                                       {label}
                                     </span>
-                                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
+                                    <span className="text-[10px] font-semibold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
                                       <span>{t.lineage.viewArtifact}</span>
-                                      <ArrowUpRight size={11} />
+                                      <ArrowUpRight size={11} aria-hidden="true" />
                                     </span>
                                   </a>
                                 );
