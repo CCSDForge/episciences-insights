@@ -17,6 +17,8 @@ import {
   Info,
   ArrowUpRight,
   Quote,
+  Database,
+  Code2,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
@@ -28,6 +30,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
   const { t, locale } = useTranslation();
   const [selectedPaper, setSelectedPaper] = useState<Publication | null>(data[0] || null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterArtifactsOnly, setFilterArtifactsOnly] = useState(false);
 
   const stats = useMemo(() => {
     let totalRefs = 0;
@@ -39,37 +42,86 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
     return { totalRefs, totalRelated };
   }, [data]);
 
+  const totalWithArtifactsCorpus = useMemo(() => {
+    return data.reduce((count, p) => {
+      const ds = p.open_science?.linked_outputs?.datasets?.length || 0;
+      const sw = p.open_science?.linked_outputs?.software?.length || 0;
+      return count + (ds > 0 || sw > 0 ? 1 : 0);
+    }, 0);
+  }, [data]);
+
   const [displayLimit, setDisplayLimit] = useState(100);
 
   const allFilteredPapers = useMemo(() => {
+    let list = data;
+    if (filterArtifactsOnly) {
+      list = list.filter((p) => {
+        const ds = p.open_science?.linked_outputs?.datasets?.length || 0;
+        const sw = p.open_science?.linked_outputs?.software?.length || 0;
+        return ds > 0 || sw > 0;
+      });
+    }
+
     if (!searchQuery.trim()) {
-      return [...data].sort((a, b) => {
+      return [...list].sort((a, b) => {
+        if (filterArtifactsOnly) {
+          const artifactsB = (b.open_science?.linked_outputs?.datasets?.length || 0) + (b.open_science?.linked_outputs?.software?.length || 0);
+          const artifactsA = (a.open_science?.linked_outputs?.datasets?.length || 0) + (a.open_science?.linked_outputs?.software?.length || 0);
+          if (artifactsB !== artifactsA) return artifactsB - artifactsA;
+        }
         const scoreB = (b.referenced_works_count || 0) + (b.related_works?.length || 0);
         const scoreA = (a.referenced_works_count || 0) + (a.related_works?.length || 0);
         return scoreB - scoreA;
       });
     }
+
     const q = searchQuery.toLowerCase().trim();
-    return data.filter((p) => {
+    return list.filter((p) => {
       const titleMatch = p.title?.toLowerCase().includes(q);
       const authorMatch = p.authors?.some((a) => a.name.toLowerCase().includes(q));
       const journalMatch = p.journal?.name?.toLowerCase().includes(q);
       const doiMatch = p.doi?.toLowerCase().includes(q);
       return titleMatch || authorMatch || journalMatch || doiMatch;
     });
-  }, [data, searchQuery]);
+  }, [data, searchQuery, filterArtifactsOnly]);
 
   React.useEffect(() => {
     setDisplayLimit(100);
-  }, [searchQuery]);
+  }, [searchQuery, filterArtifactsOnly]);
 
   const visiblePapers = useMemo(() => {
     return allFilteredPapers.slice(0, displayLimit);
   }, [allFilteredPapers, displayLimit]);
 
+  React.useEffect(() => {
+    if (allFilteredPapers.length > 0 && (!selectedPaper || !allFilteredPapers.some((p) => p.doi === selectedPaper.doi))) {
+      setSelectedPaper(allFilteredPapers[0]);
+    }
+  }, [allFilteredPapers, selectedPaper]);
+
   const getDoiUrl = (doi: string) => {
     if (doi.startsWith('http')) return doi;
     return `https://doi.org/${doi}`;
+  };
+
+  const getArtifactInfo = (item: { pid: string; url?: string }) => {
+    const pid = item.pid || '';
+    let url = item.url;
+    if (!url) {
+      if (pid.startsWith('10.')) {
+        url = `https://doi.org/${pid}`;
+      } else {
+        const cleanPid = pid.replace(/^50\|/, '');
+        url = `https://explore.openaire.eu/search/result?id=${encodeURIComponent(cleanPid)}`;
+      }
+    }
+
+    let label = pid;
+    if (pid.includes('::')) {
+      const parts = pid.split('::');
+      label = `OpenAIRE: ${parts[1].slice(0, 10)}...`;
+    }
+    return { url, label };
   };
 
   const refCount = selectedPaper?.referenced_works_count || 0;
@@ -150,6 +202,34 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
             )}
           </div>
 
+          {/* Quick Filter: Artifacts toggle */}
+          {totalWithArtifactsCorpus > 0 && (
+            <div className="flex items-center gap-2 pt-1 pb-1">
+              <button
+                type="button"
+                onClick={() => setFilterArtifactsOnly((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  filterArtifactsOnly
+                    ? 'bg-[#005fb9] text-white shadow-xs'
+                    : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
+                }`}
+                aria-pressed={filterArtifactsOnly}
+              >
+                <Database size={13} aria-hidden="true" />
+                <span>{t.lineage.artifactsFilterOnly}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                    filterArtifactsOnly
+                      ? 'bg-white/20 text-white'
+                      : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300'
+                  }`}
+                >
+                  {totalWithArtifactsCorpus}
+                </span>
+              </button>
+            </div>
+          )}
+
           {/* Paper List */}
           <div className="space-y-2.5 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800">
             {visiblePapers.length === 0 ? (
@@ -163,6 +243,8 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                   const authorDisplay = paper.authors?.length
                     ? `${paper.authors[0].name}${paper.authors.length > 1 ? ` et al.` : ''}`
                     : null;
+                  const dsCount = paper.open_science?.linked_outputs?.datasets?.length || 0;
+                  const swCount = paper.open_science?.linked_outputs?.software?.length || 0;
 
                   return (
                     <button
@@ -195,6 +277,24 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                             <Network size={11} aria-hidden="true" />
                             {paper.related_works?.length || 0}
                           </span>
+                          {dsCount > 0 && (
+                            <span
+                              className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold"
+                              title={`${dsCount} jeu(x) de données`}
+                            >
+                              <Database size={11} aria-hidden="true" />
+                              {dsCount}
+                            </span>
+                          )}
+                          {swCount > 0 && (
+                            <span
+                              className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold"
+                              title={`${swCount} logiciel(s)`}
+                            >
+                              <Code2 size={11} aria-hidden="true" />
+                              {swCount}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -454,6 +554,126 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                   )}
                 </div>
               </div>
+
+              {/* 3. Open Research Artifacts (Scholix: Datasets & Software) */}
+              {(() => {
+                const datasets = selectedPaper.open_science?.linked_outputs?.datasets || [];
+                const software = selectedPaper.open_science?.linked_outputs?.software || [];
+                const hasArtifacts = datasets.length > 0 || software.length > 0;
+
+                return (
+                  <div className="p-6 sm:p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2.5 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]">
+                          <Database size={18} aria-hidden="true" />
+                          <h4 className="text-xs font-black uppercase tracking-wider">
+                            {t.lineage.artifactsTitle}
+                          </h4>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {t.lineage.artifactsSubtitle}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {datasets.length > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            <Database size={11} />
+                            {datasets.length} {t.lineage.datasetsCountLabel}
+                          </span>
+                        )}
+                        {software.length > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <Code2 size={11} />
+                            {software.length} {t.lineage.softwareCountLabel}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {!hasArtifacts ? (
+                      <p className="text-xs text-zinc-400 italic py-4 text-center bg-zinc-100/50 dark:bg-zinc-800/30 rounded-2xl">
+                        {t.lineage.noArtifactsFound}
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Datasets */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400">
+                            <Database size={14} />
+                            <span>{t.lineage.datasetsCountLabel} ({datasets.length})</span>
+                          </div>
+                          {datasets.length > 0 ? (
+                            <div className="space-y-2">
+                              {datasets.map((item, idx) => {
+                                const { url, label } = getArtifactInfo(item);
+                                return (
+                                  <a
+                                    key={idx}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-amber-500 hover:bg-amber-50/30 dark:hover:bg-amber-950/20 transition-all group"
+                                  >
+                                    <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate pr-2 font-mono">
+                                      {label}
+                                    </span>
+                                    <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
+                                      <span>{t.lineage.viewArtifact}</span>
+                                      <ArrowUpRight size={11} />
+                                    </span>
+                                  </a>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-zinc-400 italic p-3 bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl">
+                              0 {t.lineage.datasetsCountLabel.toLowerCase()}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Software */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                            <Code2 size={14} />
+                            <span>{t.lineage.softwareCountLabel} ({software.length})</span>
+                          </div>
+                          {software.length > 0 ? (
+                            <div className="space-y-2">
+                              {software.map((item, idx) => {
+                                const { url, label } = getArtifactInfo(item);
+                                return (
+                                  <a
+                                    key={idx}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-all group"
+                                  >
+                                    <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate pr-2 font-mono">
+                                      {label}
+                                    </span>
+                                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
+                                      <span>{t.lineage.viewArtifact}</span>
+                                      <ArrowUpRight size={11} />
+                                    </span>
+                                  </a>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-zinc-400 italic p-3 bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl">
+                              0 {t.lineage.softwareCountLabel.toLowerCase()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-zinc-400 p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">

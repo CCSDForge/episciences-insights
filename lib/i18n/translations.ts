@@ -142,6 +142,15 @@ export interface Translations {
     loadMore: string;
     showingCount: string;
     openAlexLimitExplanation: string;
+    artifactsFilterOnly: string;
+    artifactsFilterAll: string;
+    artifactsTitle: string;
+    artifactsSubtitle: string;
+    datasetsCountLabel: string;
+    softwareCountLabel: string;
+    noArtifactsFound: string;
+    viewArtifact: string;
+    openAireRecord: string;
   };
   network: {
     title: string;
@@ -189,6 +198,12 @@ export interface Translations {
     licensingDesc: string;
     licenseDeclarations: string;
     noLicenseData: string;
+    kpiDatasetsTitle: string;
+    kpiDatasetsDesc: string;
+    kpiSoftwareTitle: string;
+    kpiSoftwareDesc: string;
+    kpiRepositoriesTitle: string;
+    kpiRepositoriesDesc: string;
     funderVolumeTitle: string;
     funderVolumeDesc: string;
     affiliatedCountries: string;
@@ -598,7 +613,16 @@ export const translations: Record<Locale, Translations> = {
           "semanticAffinityDesc": "Publications sharing co-citations and high semantic affinity in the global scientific graph.",
           "loadMore": "Load 50 more publications",
           "showingCount": "Showing {visible} of {total} publications",
-          "openAlexLimitExplanation": "OpenAlex computes up to 10 nearest scientific neighbors per work based on co-citation and text embeddings similarity."
+          "openAlexLimitExplanation": "OpenAlex computes up to 10 nearest scientific neighbors per work based on co-citation and text embeddings similarity.",
+          "artifactsFilterOnly": "With data or code",
+          "artifactsFilterAll": "All publications",
+          "artifactsTitle": "Associated Research Artifacts",
+          "artifactsSubtitle": "Research datasets and software indexed via OpenAIRE Scholix",
+          "datasetsCountLabel": "Dataset(s)",
+          "softwareCountLabel": "Software & Code",
+          "noArtifactsFound": "No associated research datasets or software detected for this publication in OpenAIRE Scholix.",
+          "viewArtifact": "View artifact",
+          "openAireRecord": "OpenAIRE record"
       },
       "network": {
           "title": "Network Explorer - Episciences Insights",
@@ -646,6 +670,12 @@ export const translations: Record<Locale, Translations> = {
           "licensingDesc": "Examines Creative Commons open licenses declared on published articles. Standard licenses (like CC-BY) allow authors to retain copyright while authorizing unrestricted worldwide reading, text/data mining, redistribution, and permanent archival.",
           "licenseDeclarations": "license declarations across the selected publications.",
           "noLicenseData": "No license data in this selection",
+          "kpiDatasetsTitle": "Linked Datasets",
+          "kpiDatasetsDesc": "Publications linked to research datasets (Dryad, Zenodo, etc.)",
+          "kpiSoftwareTitle": "Linked Software & Code",
+          "kpiSoftwareDesc": "Publications linked to source code and software repositories",
+          "kpiRepositoriesTitle": "Open Repositories",
+          "kpiRepositoriesDesc": "Distinct open platforms and archives hosting copies (HAL, arXiv...)",
           "funderVolumeTitle": "Volume by Research Funder",
           "funderVolumeDesc": "Ranked volume of acknowledgments for national, European, and international research grant sponsors.",
           "affiliatedCountries": "Affiliated Countries & Territories",
@@ -1058,7 +1088,16 @@ export const translations: Record<Locale, Translations> = {
           "semanticAffinityDesc": "Publications partageant des co-citations et une forte proximité thématique dans le graphe scientifique mondial.",
           "loadMore": "Afficher 50 publications de plus",
           "showingCount": "Affichage de {visible} sur {total} publications",
-          "openAlexLimitExplanation": "OpenAlex identifie algorithmiquement jusqu'à 10 voisins scientifiques les plus proches (co-citations et similarité vectorielle)."
+          "openAlexLimitExplanation": "OpenAlex identifie algorithmiquement jusqu'à 10 voisins scientifiques les plus proches (co-citations et similarité vectorielle).",
+          "artifactsFilterOnly": "Avec données ou code",
+          "artifactsFilterAll": "Toutes les publications",
+          "artifactsTitle": "Artefacts de recherche associés",
+          "artifactsSubtitle": "Jeux de données et logiciels répertoriés via OpenAIRE Scholix",
+          "datasetsCountLabel": "Jeu(x) de données",
+          "softwareCountLabel": "Logiciel(s) & Code",
+          "noArtifactsFound": "Aucun jeu de données ou logiciel associé n'a été détecté pour cette publication dans OpenAIRE Scholix.",
+          "viewArtifact": "Consulter l'artefact",
+          "openAireRecord": "Fiche OpenAIRE"
       },
       "network": {
           "title": "Exploration Réseau - Episciences Insights",
@@ -1106,6 +1145,12 @@ export const translations: Record<Locale, Translations> = {
           "licensingDesc": "Examine les licences ouvertes Creative Commons déclarées sur les articles publiés. Les licences standard (telles que CC-BY) permettent aux auteurs de conserver leurs droits d'auteur tout en autorisant la lecture libre, la fouille de données (TDM), la redistribution et l'archivage pérenne.",
           "licenseDeclarations": "mentions de licences sur les publications sélectionnées.",
           "noLicenseData": "Aucune donnée de licence dans cette sélection",
+          "kpiDatasetsTitle": "Données associées",
+          "kpiDatasetsDesc": "Publications liées à des jeux de données de recherche (Dryad, Zenodo...)",
+          "kpiSoftwareTitle": "Logiciels & Code source",
+          "kpiSoftwareDesc": "Publications associées à des dépôts de code et logiciels",
+          "kpiRepositoriesTitle": "Entrepôts ouverts",
+          "kpiRepositoriesDesc": "Plateformes et archives ouvertes distinctes hébergeant des copies (HAL, arXiv...)",
           "funderVolumeTitle": "Volume par organisme de financement",
           "funderVolumeDesc": "Classement par volume de remerciements pour les organismes de subventions nationaux, européens et internationaux.",
           "affiliatedCountries": "Pays & territoires affiliés",
@@ -1518,7 +1563,16 @@ export const translations: Record<Locale, Translations> = {
           "semanticAffinityDesc": "Publicaciones que comparten cocitaciones y afinidad temática en el grafo científico global.",
           "loadMore": "Cargar 50 publicaciones más",
           "showingCount": "Mostrando {visible} de {total} publicaciones",
-          "openAlexLimitExplanation": "OpenAlex identifica algorítmicamente hasta 10 vecinos científicos más cercanos (cocitaciones y similitud vectorial)."
+          "openAlexLimitExplanation": "OpenAlex identifica algorítmicamente hasta 10 vecinos científicos más cercanos (cocitaciones y similitud vectorial).",
+          "artifactsFilterOnly": "Con datos o código",
+          "artifactsFilterAll": "Todas las publicaciones",
+          "artifactsTitle": "Artefactos de investigación vinculados",
+          "artifactsSubtitle": "Conjuntos de datos y software indexados mediante OpenAIRE Scholix",
+          "datasetsCountLabel": "Conjunto(s) de datos",
+          "softwareCountLabel": "Software y Código",
+          "noArtifactsFound": "No se han detectado conjuntos de datos ni software asociados para esta publicación en OpenAIRE Scholix.",
+          "viewArtifact": "Ver artefacto",
+          "openAireRecord": "Ficha OpenAIRE"
       },
       "network": {
           "title": "Explorador de Red - Episciences Insights",
@@ -1566,6 +1620,12 @@ export const translations: Record<Locale, Translations> = {
           "licensingDesc": "Examina las licencias abiertas Creative Commons declaradas en los artículos publicados. Las licencias estándar (como CC-BY) permiten conservar derechos de autor autorizando la lectura libre, minería de textos y datos (TDM), redistribución y archivo permanente.",
           "licenseDeclarations": "declaraciones de licencias en las publicaciones seleccionadas.",
           "noLicenseData": "No hay datos de licencias en esta selección",
+          "kpiDatasetsTitle": "Datos vinculados",
+          "kpiDatasetsDesc": "Publicaciones vinculadas a conjuntos de datos de investigación (Dryad, Zenodo...)",
+          "kpiSoftwareTitle": "Software y código fuente",
+          "kpiSoftwareDesc": "Publicaciones vinculadas a repositorios de código y software",
+          "kpiRepositoriesTitle": "Repositorios abiertos",
+          "kpiRepositoriesDesc": "Plataformas y archivos abiertos distintos que alojan copias (HAL, arXiv...)",
           "funderVolumeTitle": "Volumen por financiador de investigación",
           "funderVolumeDesc": "Clasificación por volumen de agradecimientos para patrocinadores nacionales, europeos e internacionales.",
           "affiliatedCountries": "Países y territorios afiliados",
