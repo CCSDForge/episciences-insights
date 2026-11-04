@@ -95,6 +95,95 @@ export default function InstitutionSection() {
       .slice(0, 8);
   }, [filteredData]);
 
+  // Data for exporting the list of institutions (CSV and JSON)
+  const institutionsExportData = useMemo(() => {
+    const isYearFiltered = state.yearFilter !== 'all';
+    let list: Array<{ id: string; name: string; ror: string | null; country: string | null; count: number; affiliationsCount: number }>;
+
+    if (!isYearFiltered) {
+      list = institutionsList;
+    } else {
+      const map = new Map<string, { id: string; name: string; ror: string | null; country: string | null; count: number; affiliationsCount: number }>();
+      const relevantPubs = data.initialData.filter((p) => String(p.year) === state.yearFilter);
+      relevantPubs.forEach((p) => {
+        const seenInPub = new Set<string>();
+        p.authors.forEach((a) => {
+          a.institutions.forEach((inst) => {
+            const id = inst.ror || inst.name;
+            if (!id) return;
+            let entry = map.get(id);
+            if (!entry) {
+              entry = {
+                id,
+                name: inst.name,
+                ror: inst.ror,
+                country: inst.country,
+                count: 0,
+                affiliationsCount: 0,
+              };
+              map.set(id, entry);
+            }
+            entry.affiliationsCount += 1;
+            if (!seenInPub.has(id)) {
+              seenInPub.add(id);
+              entry.count += 1;
+            }
+          });
+        });
+      });
+      list = Array.from(map.values()).sort(
+        (a, b) => b.count - a.count || b.affiliationsCount - a.affiliationsCount || a.name.localeCompare(b.name)
+      );
+    }
+
+    if (currentInstitution) {
+      list = list.filter(
+        (i) =>
+          i.id === currentInstitution.id ||
+          (i.ror && i.ror === currentInstitution.ror) ||
+          i.name === currentInstitution.name
+      );
+    }
+
+    return list.map((inst) => ({
+      institution: inst.name,
+      countryCode: inst.country || '',
+      countryName: inst.country ? getCountryName(inst.country) : '',
+      rorId: inst.ror || '',
+      publicationsCount: inst.count,
+      affiliationsCount: inst.affiliationsCount,
+    }));
+  }, [institutionsList, state.yearFilter, data.initialData, currentInstitution]);
+
+  const exportFilename = useMemo(() => {
+    const parts = ['episciences'];
+    if (currentInstitution) {
+      const safeName = currentInstitution.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      parts.push(`institution-${safeName || 'selected'}`);
+    } else {
+      parts.push('institutions');
+    }
+    if (state.yearFilter !== 'all') {
+      parts.push(state.yearFilter);
+    }
+    return parts.join('-');
+  }, [currentInstitution, state.yearFilter]);
+
+  const institutionCsvColumns = useMemo(
+    () => [
+      { key: 'institution', header: 'Institution_Name' },
+      { key: 'countryCode', header: 'Country_Code' },
+      { key: 'countryName', header: 'Country_Name' },
+      { key: 'rorId', header: 'ROR_ID' },
+      { key: 'publicationsCount', header: 'Publications_Count' },
+      { key: 'affiliationsCount', header: 'Affiliations_Count' },
+    ],
+    []
+  );
+
   return (
     <section aria-labelledby="institution-section-heading" className="space-y-8 animate-in fade-in duration-300">
       {/* 1. Purpose Banner: Décrire l'utilisation + sources */}
@@ -121,15 +210,36 @@ export default function InstitutionSection() {
             </p>
           </div>
 
-          <div className="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-2xl ring-1 ring-zinc-200 dark:ring-zinc-700">
-            <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] shrink-0" />
-            <span>
-              {locale === 'fr'
-                ? 'Sources : API Episciences, ROR (Research Organization Registry), OpenAlex et OpenAIRE Graph.'
-                : locale === 'es'
-                ? 'Fuentes: API Episciences, ROR (Research Organization Registry), OpenAlex y OpenAIRE Graph.'
-                : 'Sources: Episciences API, ROR (Research Organization Registry), OpenAlex and OpenAIRE Graph.'}
-            </span>
+          <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3">
+            <ChartExportMenu
+              data={institutionsExportData}
+              filename={exportFilename}
+              csvColumns={institutionCsvColumns}
+              buttonLabel={
+                currentInstitution
+                  ? locale === 'fr'
+                    ? 'Exporter l’institution'
+                    : locale === 'es'
+                    ? 'Exportar la institución'
+                    : 'Export institution'
+                  : locale === 'fr'
+                  ? 'Exporter les institutions'
+                  : locale === 'es'
+                  ? 'Exportar las instituciones'
+                  : 'Export institutions'
+              }
+              align="right"
+            />
+            <div className="flex items-center gap-2.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-2xl ring-1 ring-zinc-200 dark:ring-zinc-700">
+              <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] shrink-0" />
+              <span>
+                {locale === 'fr'
+                  ? 'Sources : API Episciences, ROR (Research Organization Registry), OpenAlex et OpenAIRE Graph.'
+                  : locale === 'es'
+                  ? 'Fuentes: API Episciences, ROR (Research Organization Registry), OpenAlex y OpenAIRE Graph.'
+                  : 'Sources: Episciences API, ROR (Research Organization Registry), OpenAlex and OpenAIRE Graph.'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
