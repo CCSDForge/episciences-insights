@@ -110,7 +110,7 @@ OPENALEX_API_KEY=your_openalex_key_here
 # OpenAIRE Graph v3 (Optional — anonymous mode supported with lower rate limits)
 OPENAIRE_CLIENT_ID=
 OPENAIRE_CLIENT_SECRET=
-OPENAIRE_AUTH_URL=https://aai.openaire.eu/oidc/token
+OPENAIRE_AUTH_URL=https://aai.openaire.eu/auth/realms/openaire/protocol/openid-connect/token
 OPENAIRE_API_URL=https://api.openaire.eu/graph/v3/research-products
 OPENAIRE_LINKS_URL=https://api.openaire.eu/graph/v3/research-products/links
 

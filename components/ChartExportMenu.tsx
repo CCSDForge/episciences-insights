@@ -44,6 +44,10 @@ export interface ChartExportMenuProps {
    * Whether the export button is disabled.
    */
   disabled?: boolean;
+  /**
+   * Optional custom button label text (defaults to localized "Export").
+   */
+  buttonLabel?: string;
 }
 
 export default function ChartExportMenu({
@@ -55,6 +59,7 @@ export default function ChartExportMenu({
   align = 'right',
   className = '',
   disabled = false,
+  buttonLabel,
 }: ChartExportMenuProps) {
   const { t } = useTranslation();
   const menuId = useId();
@@ -254,8 +259,8 @@ export default function ChartExportMenu({
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-controls={isOpen ? menuId : undefined}
-        aria-label={t.export.exportMenu}
-        title={t.export.exportMenu}
+        aria-label={buttonLabel || t.export.exportMenu}
+        title={buttonLabel || t.export.exportMenu}
         className={`inline-flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-focus)] ${
           isOpen
             ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 ring-1 ring-zinc-300 dark:ring-zinc-600 shadow-xs'
@@ -267,7 +272,7 @@ export default function ChartExportMenu({
         ) : (
           <Download size={14} className="shrink-0" aria-hidden="true" />
         )}
-        <span className="hidden sm:inline font-semibold">{t.export.exportButton}</span>
+        <span className="hidden sm:inline font-semibold">{buttonLabel || t.export.exportButton}</span>
       </button>
 
       {/* Screen Reader Announcement Live Region */}

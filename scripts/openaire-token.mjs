@@ -4,14 +4,15 @@ import path from 'node:path';
 /**
  * OAuth2 client-credentials token manager for the OpenAIRE AAI.
  *
- * NOTE: the real token endpoint is /oidc/token, not /token. The latter
- * 404s — verified directly against the API before writing this file.
+ * NOTE: since the AAI migration to Keycloak (Nov. 2026) the token endpoint is
+ * /auth/realms/openaire/protocol/openid-connect/token. The former /oidc/token
+ * answers HTTP 410 Gone. Client ID/secret are unchanged by the migration.
  */
 export class OpenAireTokenManager {
   constructor(options = {}) {
     this.clientId = options.clientId || process.env.OPENAIRE_CLIENT_ID || '';
     this.clientSecret = options.clientSecret || process.env.OPENAIRE_CLIENT_SECRET || '';
-    this.authUrl = options.authUrl || process.env.OPENAIRE_AUTH_URL || 'https://aai.openaire.eu/oidc/token';
+    this.authUrl = options.authUrl || process.env.OPENAIRE_AUTH_URL || 'https://aai.openaire.eu/auth/realms/openaire/protocol/openid-connect/token';
     this.tokenFilePath = path.resolve(options.cacheDir || './.cache', 'openaire_token.json');
   }
 
