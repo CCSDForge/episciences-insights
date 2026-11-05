@@ -28,7 +28,7 @@ interface ResearchLineageProps {
 
 export default function ResearchLineage({ data }: ResearchLineageProps) {
   const { t, locale } = useTranslation();
-  const [selectedPaper, setSelectedPaper] = useState<Publication | null>(data[0] || null);
+  const [selectedDoi, setSelectedDoi] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterArtifactsOnly, setFilterArtifactsOnly] = useState(false);
 
@@ -92,19 +92,17 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
     });
   }, [data, searchQuery, filterArtifactsOnly]);
 
-  React.useEffect(() => {
-    setDisplayLimit(100);
-  }, [searchQuery, filterArtifactsOnly]);
+  const selectedPaper = useMemo(() => {
+    if (selectedDoi) {
+      const found = allFilteredPapers.find((p) => p.doi === selectedDoi);
+      if (found) return found;
+    }
+    return allFilteredPapers[0] || null;
+  }, [allFilteredPapers, selectedDoi]);
 
   const visiblePapers = useMemo(() => {
     return allFilteredPapers.slice(0, displayLimit);
   }, [allFilteredPapers, displayLimit]);
-
-  React.useEffect(() => {
-    if (allFilteredPapers.length > 0 && (!selectedPaper || !allFilteredPapers.some((p) => p.doi === selectedPaper.doi))) {
-      setSelectedPaper(allFilteredPapers[0]);
-    }
-  }, [allFilteredPapers, selectedPaper]);
 
   const getDoiUrl = (doi: string) => {
     if (doi.startsWith('http')) return doi;
@@ -192,7 +190,10 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
               id="lineage-search-input"
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setDisplayLimit(100);
+              }}
               placeholder={t.lineage.searchPlaceholder}
               aria-label={t.lineage.searchPlaceholder}
               className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#0aa0be] focus:border-transparent transition-all"
@@ -200,7 +201,10 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchQuery('');
+                  setDisplayLimit(100);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                 aria-label={t.lineage.clearSearch}
               >
@@ -214,7 +218,10 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
             <div className="flex items-center gap-2 pt-1 pb-1">
               <button
                 type="button"
-                onClick={() => setFilterArtifactsOnly((prev) => !prev)}
+                onClick={() => {
+                  setFilterArtifactsOnly((prev) => !prev);
+                  setDisplayLimit(100);
+                }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 ${
                   filterArtifactsOnly
                     ? 'bg-[#005fb9] text-white shadow-xs'
@@ -258,7 +265,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                     <button
                       key={paper.doi}
                       type="button"
-                      onClick={() => setSelectedPaper(paper)}
+                      onClick={() => setSelectedDoi(paper.doi)}
                       aria-pressed={isSelected}
                       className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
                         isSelected
