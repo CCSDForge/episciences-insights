@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, use, useState, useMemo, useCallback } from 'react';
+import React, { createContext, use, useState, useEffect, useMemo, useCallback } from 'react';
 import { Publication, UsageSummary, FundersFile } from '@/lib/types';
 import { normalizeLicense } from '@/lib/licenses';
 import { getCountryName } from '@/lib/countryNames';
@@ -69,6 +69,7 @@ interface DashboardActions {
 }
 
 interface DashboardData {
+  isLoading: boolean;
   filteredData: Publication[];
   usageSummary: UsageSummary | null;
   funders: FundersFile;
@@ -116,7 +117,7 @@ export function useDashboard() {
 }
 
 interface DashboardProviderProps {
-  initialData: Publication[];
+  initialData?: Publication[];
   usageSummary: UsageSummary | null;
   funders?: FundersFile;
   children: React.ReactNode;
@@ -195,7 +196,47 @@ function computePeerReviewStats(dataset: Publication[]): PeerReviewDelayStats {
   };
 }
 
+let cachedPublications: Publication[] | null = null;
+let fetchPromise: Promise<Publication[]> | null = null;
+
 export function DashboardProvider({ initialData, usageSummary, funders = {}, children }: DashboardProviderProps) {
+  const [publications, setPublications] = useState<Publication[]>(() => {
+    if (initialData && initialData.length > 0) return initialData;
+    if (cachedPublications) return cachedPublications;
+    return [];
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    return (!initialData || initialData.length === 0) && !cachedPublications;
+  });
+
+  useEffect(() => {
+    if (publications.length > 0) return;
+    if (!fetchPromise) {
+      fetchPromise = fetch('/data/publications.json')
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((data: Publication[]) => {
+          cachedPublications = data;
+          return data;
+        })
+        .catch(err => {
+          fetchPromise = null;
+          throw err;
+        });
+    }
+    fetchPromise
+      .then(data => {
+        setPublications(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load publications:', err);
+        setIsLoading(false);
+      });
+  }, [publications.length]);
+
   const [yearFilter, setYearFilter] = useState('all');
   const [funderFilter, setFunderFilter] = useState('all');
   const [journalFilter, setJournalFilter] = useState('all');
@@ -216,18 +257,18 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
   // Map of journal code/issn to canonical name
   const journalIdToName = useMemo(() => {
     const map = new Map<string, string>();
-    initialData.forEach(p => {
+    publications.forEach(p => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
       if (!name) return;
       if (p.journal.code) map.set(p.journal.code, name);
       if (p.journal.issn) map.set(p.journal.issn, name);
     });
     return map;
-  }, [initialData]);
+  }, [publications]);
 
   const filteredData = useMemo(() => {
     const selectedJournalName = journalFilter !== 'all' ? journalIdToName.get(journalFilter) : null;
-    return initialData.filter(p => {
+    return publications.filter(p => {
       const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
       const journalMatch =
         journalFilter === 'all' ||
@@ -240,7 +281,7 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
       );
       return yearMatch && journalMatch && institutionMatch;
     });
-  }, [initialData, yearFilter, journalFilter, institutionFilter, journalIdToName]);
+  }, [publications, yearFilter, journalFilter, institutionFilter, journalIdToName]);
 
   const stats = useMemo(() => ({
     totalPubs: filteredData.length,
@@ -344,25 +385,25 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
 
   const topicDomains = useMemo(() => {
     const domains = new Set<string>();
-    initialData.forEach(p => { if (p.primary_topic?.domain) domains.add(p.primary_topic.domain); });
+    publications.forEach(p => { if (p.primary_topic?.domain) domains.add(p.primary_topic.domain); });
     return Array.from(domains).sort();
-  }, [initialData]);
+  }, [publications]);
 
   const years = useMemo(
-    () => Array.from(new Set(initialData.map(p => p.year.toString()))).sort().reverse(),
-    [initialData]
+    () => Array.from(new Set(publications.map(p => p.year.toString()))).sort().reverse(),
+    [publications]
   );
 
   const allFunders = useMemo(() => {
-    return Array.from(new Set(initialData.flatMap(p => p.awards.map(a => a.funder))))
+    return Array.from(new Set(publications.flatMap(p => p.awards.map(a => a.funder))))
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b));
-  }, [initialData]);
+  }, [publications]);
 
   const journals = useMemo(() => {
     const idToNames = new Map<string, Map<string, number>>();
 
-    initialData.forEach((p) => {
+    publications.forEach((p) => {
       const name = p.journal.name?.replace(/\s+/g, ' ').trim();
       if (!name) return;
       const id = p.journal.code || p.journal.issn || name;
@@ -381,7 +422,7 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
         return [id, bestName] as [string, string];
       })
       .sort((a, b) => a[1].localeCompare(b[1]));
-  }, [initialData]);
+  }, [publications]);
 
   const openScienceStats = useMemo(() => {
     const licenseCounts: Record<string, number> = {};
@@ -446,7 +487,7 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
 
   const institutionsList = useMemo(() => {
     const map = new Map<string, InstitutionItem>();
-    initialData.forEach(p => {
+    publications.forEach(p => {
       const seenInPub = new Set<string>();
       p.authors.forEach(a => {
         a.institutions.forEach(inst => {
@@ -475,11 +516,11 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
     return Array.from(map.values()).sort(
       (a, b) => b.count - a.count || b.affiliationsCount - a.affiliationsCount || a.name.localeCompare(b.name)
     );
-  }, [initialData]);
+  }, [publications]);
 
-  const platformFilteredData = useMemo(() => initialData.filter(p => {
+  const platformFilteredData = useMemo(() => publications.filter(p => {
     return yearFilter === 'all' || p.year.toString() === yearFilter;
-  }), [initialData, yearFilter]);
+  }), [publications, yearFilter]);
 
   const platformPeerReviewStats = useMemo(() => computePeerReviewStats(platformFilteredData), [platformFilteredData]);
   const peerReviewStats = useMemo(() => computePeerReviewStats(filteredData), [filteredData]);
@@ -488,7 +529,7 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
     <DashboardContext value={{
       state: { yearFilter, funderFilter, journalFilter, institutionFilter, funderLimit, institutionLimit, countryLimit, topicLimit, topicDomainFilter },
       actions: { setYearFilter, setFunderFilter, setJournalFilter, setInstitutionFilter, resetFilters, setFunderLimit, setInstitutionLimit, setCountryLimit, setTopicLimit, setTopicDomainFilter },
-      data: { initialData, filteredData, platformFilteredData, platformPeerReviewStats, usageSummary, funders, stats, sdgData, funderData, institutionData, institutionsList, peerReviewStats, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, allFunders, journals, openScienceStats },
+      data: { isLoading, initialData: publications, filteredData, platformFilteredData, platformPeerReviewStats, usageSummary, funders, stats, sdgData, funderData, institutionData, institutionsList, peerReviewStats, countryData, topCountriesData, globalReachStats, topicData, topicDomains, years, allFunders, journals, openScienceStats },
     }}>
       {children}
     </DashboardContext>

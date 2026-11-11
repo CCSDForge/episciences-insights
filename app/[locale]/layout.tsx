@@ -28,7 +28,7 @@ export default async function LocaleLayout({
 
   return (
     <LanguageProvider initialLocale={validLocale}>
-      <DashboardProvider initialData={publications} usageSummary={kpiSummary} funders={funders}>
+      <DashboardProvider usageSummary={kpiSummary} funders={funders}>
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col transition-colors">
           <a href="#main-content" className="skip-link">
             {translations[validLocale].common.skipToContent}
