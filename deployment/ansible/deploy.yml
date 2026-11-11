@@ -1,0 +1,52 @@
+---
+# Episciences Insights — Ansistrano static deployment playbook
+#
+# Builds the static site locally (Next.js output: 'export' in out/)
+# and synchronizes it via rsync to target servers with atomic release switching.
+#
+# Usage:
+#   ansible-playbook deploy.yml -i inventory/preprod.ini
+#   ansible-playbook deploy.yml -i inventory/production.ini
+#   ansible-playbook deploy.yml -i inventory/production.ini -e "build_locally=false"
+#
+# Prerequisites:
+#   ansible-galaxy install -r requirements.yml
+#   ansible-galaxy collection install community.general ansible.posix
+
+- name: Deploy Episciences Insights
+  hosts: all
+  gather_facts: false
+
+  pre_tasks:
+    - name: Build Next.js static site locally
+      ansible.builtin.command:
+        cmd: npm run build
+        chdir: '{{ playbook_dir }}/../..'
+      delegate_to: localhost
+      run_once: true
+      when: build_locally | default(true) | bool
+
+    - name: Verify local static export exists
+      ansible.builtin.stat:
+        path: '{{ playbook_dir }}/../../out/index.html'
+      register: local_out_stat
+      delegate_to: localhost
+      run_once: true
+
+    - name: Fail if local static export is missing
+      ansible.builtin.fail:
+        msg: >-
+          Directory 'out/' does not exist or has no index.html.
+          Run 'npm run build' before deploying or leave build_locally=true.
+      when: not local_out_stat.stat.exists
+      delegate_to: localhost
+      run_once: true
+
+  roles:
+    - ansistrano.deploy
+
+  post_tasks:
+    - name: Reload Apache gracefully to serve new release
+      ansible.builtin.command:
+        cmd: sudo /bin/systemctl reload apache2
+      changed_when: true

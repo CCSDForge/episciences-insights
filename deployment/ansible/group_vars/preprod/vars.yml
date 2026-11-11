@@ -1,0 +1,15 @@
+---
+# Preproduction — Ansistrano static rsync deployment variables
+
+ansistrano_deploy_via: rsync_direct
+ansistrano_deploy_from: "{{ playbook_dir }}/../../out/"
+ansistrano_deploy_to: '/srv/episciences-insights'
+ansistrano_keep_releases: 3
+
+ansistrano_deploy_user: "{{ ansible_user }}"
+ansistrano_deploy_group: 'www-data'
+
+# No remote shared files or build hooks needed: the static export (out/)
+# is built locally and rsynced directly into the release directory.
+ansistrano_shared_files: []
+ansistrano_shared_paths: []

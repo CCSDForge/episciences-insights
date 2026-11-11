@@ -1,0 +1,9 @@
+# Production inventory — copy to production.ini and fill in real values
+# production.ini is strictly gitignored
+
+[production]
+prod-insights-01 ansible_host=<VM1_IP_OR_HOSTNAME>
+# prod-insights-02 ansible_host=<VM2_IP_OR_HOSTNAME>
+
+[production:vars]
+ansible_port=22

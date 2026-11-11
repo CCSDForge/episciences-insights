@@ -1,0 +1,110 @@
+# vim: set filetype=apache:
+# vim: syntax=apache
+
+<VirtualHost *:80>
+    ServerName insights.example.org
+    Define app_path /var/www/episciences-insights/
+    ServerAdmin webmaster@example.org
+    DocumentRoot ${app_path}/current/
+
+    <Directory "${app_path}/current/">
+        AllowOverride FileInfo
+        Options -Indexes +FollowSymLinks
+        Require all granted
+
+        DirectoryIndex index.html
+
+        # 404 handler
+        ErrorDocument 404 /404.html
+
+        # -------------------------------------------------------------
+        # 1. SERVE PRE-COMPRESSED ASSETS (.br and .gz)
+        # -------------------------------------------------------------
+        <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteBase /
+
+            # Serve Brotli first if supported by the client browser
+            RewriteCond %{HTTP:Accept-Encoding} br
+            RewriteCond %{REQUEST_FILENAME}.br -f
+            RewriteRule ^(.*)$ $1.br [L]
+
+            # Otherwise serve Gzip if supported
+            RewriteCond %{HTTP:Accept-Encoding} gzip
+            RewriteCond %{REQUEST_FILENAME}.gz -f
+            RewriteRule ^(.*)$ $1.gz [L]
+        </IfModule>
+
+        <IfModule mod_headers.c>
+            # Headers for pre-compressed Brotli files
+            <Files *.json.br>
+                ForceType application/json
+                Header set Content-Encoding br
+                Header append Vary Accept-Encoding
+            </Files>
+
+            # Headers for pre-compressed Gzip files
+            <Files *.json.gz>
+                ForceType application/json
+                Header set Content-Encoding gzip
+                Header append Vary Accept-Encoding
+            </Files>
+        </IfModule>
+
+        # Prevent double compression on already compressed static assets
+        <FilesMatch "\.(gz|br)$">
+            SetEnv no-gzip 1
+        </FilesMatch>
+
+        # -------------------------------------------------------------
+        # 2. DYNAMIC ON-THE-FLY COMPRESSION (HTML, JS, CSS, SVG)
+        # -------------------------------------------------------------
+        <IfModule mod_deflate.c>
+            AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+            AddOutputFilterByType DEFLATE text/javascript application/javascript application/json image/svg+xml
+        </IfModule>
+
+        # -------------------------------------------------------------
+        # 3. BROWSER CACHING AND ROLLING RELEASES
+        # -------------------------------------------------------------
+        # Prevent ETag invalidation across release directories with different inodes
+        FileETag MTime Size
+
+        <IfModule mod_expires.c>
+            ExpiresActive On
+
+            # Next.js immutable assets (_next/static/) : 1 year
+            ExpiresByType text/css "access plus 1 year"
+            ExpiresByType application/javascript "access plus 1 year"
+            ExpiresByType image/svg+xml "access plus 1 month"
+
+            # Data files (publications.json) : mandatory revalidation
+            ExpiresByType application/json "access plus 0 seconds"
+
+            # HTML files : immediate revalidation
+            ExpiresByType text/html "access plus 0 seconds"
+        </IfModule>
+
+        <IfModule mod_headers.c>
+            # Immutable cache for content-hashed assets (_next/static/)
+            <FilesMatch "\.(js|css)$">
+                Header set Cache-Control "public, max-age=31536000, immutable"
+            </FilesMatch>
+
+            # JSON datasets: always revalidate to pick up dataset updates immediately
+            <FilesMatch "\.json(\.gz|\.br)?$">
+                Header set Cache-Control "public, max-age=0, must-revalidate"
+            </FilesMatch>
+
+            # HTML: always revalidate to guarantee immediate deployment updates
+            <FilesMatch "\.html$">
+                Header set Cache-Control "public, max-age=0, must-revalidate"
+            </FilesMatch>
+        </IfModule>
+    </Directory>
+
+    # Reverse proxy / load-balancer client IP restoration (e.g. HAProxy)
+    RemoteIPHeader X-Forwarded-For
+    RemoteIPInternalProxy 10.0.0.1 10.0.0.2
+
+</VirtualHost>

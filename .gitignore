@@ -19,6 +19,8 @@
 
 # production
 /build
+*.tar.bz2
+*.tar.gz
 
 # misc
 .DS_Store
@@ -32,6 +34,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.preprod.local.example
+!.env.production.local.example
+
+# Ansible & Ansistrano secrets
+/deployment/ansible/inventory/*.ini
+!/deployment/ansible/inventory/*.ini.example
+/deployment/ansible/group_vars/**/secrets.yml
+!/deployment/ansible/group_vars/**/secrets.yml.example
+/deployment/ansible/roles/
 
 # vercel
 .vercel

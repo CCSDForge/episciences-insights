@@ -1,0 +1,19 @@
+---
+# Episciences Insights — Ansistrano rollback playbook
+#
+# Usage:
+#   ansible-playbook rollback.yml -i inventory/preprod.ini
+#   ansible-playbook rollback.yml -i inventory/production.ini
+
+- name: Rollback Episciences Insights
+  hosts: all
+  gather_facts: false
+
+  roles:
+    - ansistrano.rollback
+
+  post_tasks:
+    - name: Reload Apache gracefully to serve previous release
+      ansible.builtin.command:
+        cmd: sudo /bin/systemctl reload apache2
+      changed_when: true
