@@ -155,6 +155,115 @@ export interface Translations {
     showMoreInstitutions: string;
     noInstitutionFound: string;
   };
+  journalSection: {
+    allJournals: string;
+    title: string;
+    description: string;
+    readership: string;
+    readershipSubtitle: string;
+    consultationTrends: string;
+    yearEndEstimate: string;
+    yearEndEstimateParenthesis: string;
+    downloads: string;
+    abstractViews: string;
+    geographicReachReadership: string;
+    activeCountries: string;
+    readershipByCountry: string;
+    consultationsUnit: string;
+    top10Countries: string;
+    mostConsultedArticles: string;
+    authorship: string;
+    authorshipSubtitle: string;
+    geographicReachAuthors: string;
+    topAuthorInstitutions: string;
+    sourceRepositories: string;
+    sourceRepositoriesDesc: string;
+    indexedArticles: string;
+    researchTopics: string;
+    topicsSubtitle: string;
+    topicViewModeAria: string;
+    treemap: string;
+    network: string;
+    researchFunders: string;
+    fundersSubtitle: string;
+    fundingTimeline: string;
+    topFundingAgencies: string;
+  };
+  institutionSection: {
+    allInstitutions: string;
+    title: string;
+    description: string;
+    exportInstitution: string;
+    exportInstitutions: string;
+    selectedInstitution: string;
+    volume: string;
+    publicationsCount: string;
+    rorRecord: string;
+    authorshipNetworks: string;
+    authorshipSubtitle: string;
+    collabViewModeAria: string;
+    network: string;
+    matrix: string;
+    flows: string;
+    intlCollabScope: string;
+    intlCollabRate: string;
+    journals: string;
+    journalsSubtitle: string;
+    publishingJournals: string;
+    journalsToShowAria: string;
+    allCount: string;
+    publications: string;
+    journalSummary: string;
+    journalsRepresented: string;
+    researchTopics: string;
+    topicsSubtitle: string;
+    topicViewModeAria: string;
+    treemap: string;
+    researchFunders: string;
+    fundersSubtitle: string;
+    grantsTimeline: string;
+    fundingBodies: string;
+  };
+  platformSection: {
+    unclassified: string;
+    badge: string;
+    title: string;
+    description: string;
+    publicationVolumes: string;
+    publicationVolumesSubtitle: string;
+    totalArticles: string;
+    articles: string;
+    diamondAffirmation: string;
+    peerReviewDelay: string;
+    peerReviewDelaySubtitle: string;
+    monthsMedian: string;
+    reviewDistribution: string;
+    basedOnArticles: string;
+    articlesCount: string;
+    peerReviewNote: string;
+    hostedJournals: string;
+    hostedJournalsSubtitle: string;
+    cumulativeHostedJournals: string;
+    addedJournals: string;
+    journalsInCatalog: string;
+    cumulativeTotal: string;
+    disciplinaryBreakdown: string;
+    publications: string;
+    networksSynergies: string;
+    networksSubtitle: string;
+    networkViewModeAria: string;
+    synergies: string;
+    countryFlows: string;
+    openGraphAria: string;
+    graph: string;
+    scholarlyImpact: string;
+    scholarlyImpactSubtitle: string;
+    impactModeAria: string;
+    sdgs: string;
+    topics: string;
+    lineage: string;
+    multiModalRelationalNetwork: string;
+  };
   lineage: {
     title: string;
     subtitle: string;
@@ -605,6 +714,115 @@ export const translations: Record<Locale, Translations> = {
           "showMoreInstitutions": "Show 100 more institutions ({count} remaining)",
           "noInstitutionFound": "No institution found"
       },
+      "journalSection": {
+          "allJournals": "All journals",
+          "title": "Journal Statistics",
+          "description": "This section is designed for editorial boards and journal teams hosted on Episciences. It provides readership insights (downloads and views), geographical authorship reach, topic landscapes, and associated research funders.",
+          "readership": "Readership",
+          "readershipSubtitle": "Usage trends & Readership geography",
+          "consultationTrends": "Consultation Trends",
+          "yearEndEstimate": "* {year} year-end estimate",
+          "yearEndEstimateParenthesis": "year-end estimate",
+          "downloads": "Downloads",
+          "abstractViews": "Abstract Views",
+          "geographicReachReadership": "Geographic Reach of Readership",
+          "activeCountries": "{count} active countries and territories",
+          "readershipByCountry": "Readership by Country or Territory",
+          "consultationsUnit": "consultations",
+          "top10Countries": "Top 10 Readership Countries and Territories",
+          "mostConsultedArticles": "Most Consulted Articles",
+          "authorship": "Authorship",
+          "authorshipSubtitle": "Author affiliations & Contributing countries",
+          "geographicReachAuthors": "Geographic Reach of Authors",
+          "topAuthorInstitutions": "Top Author Institutions",
+          "sourceRepositories": "Source Preprint Repositories (Overlay)",
+          "sourceRepositoriesDesc": "Open repositories hosting the manuscripts peer-reviewed and published on Episciences.",
+          "indexedArticles": "{count} indexed articles",
+          "researchTopics": "Research Topics",
+          "topicsSubtitle": "Topic Overview & Co-occurrences",
+          "topicViewModeAria": "Topic view mode",
+          "treemap": "Treemap",
+          "network": "Network",
+          "researchFunders": "Research Funders",
+          "fundersSubtitle": "Grants Timeline & Funder Breakdown",
+          "fundingTimeline": "Funding Timeline",
+          "topFundingAgencies": "Top Funding Agencies"
+      },
+      "institutionSection": {
+          "allInstitutions": "All Institutions",
+          "title": "Institution Statistics",
+          "description": "This section is designed for universities, research bodies, and bibliometrics offices. It enables measuring your institution’s contribution to Episciences overlay journals, analyzing co-authorship networks, and mapping research grants.",
+          "exportInstitution": "Export institution",
+          "exportInstitutions": "Export institutions",
+          "selectedInstitution": "Selected Institution:",
+          "volume": "Volume:",
+          "publicationsCount": "{count} publications",
+          "rorRecord": "ROR Record",
+          "authorshipNetworks": "Authorship & Networks",
+          "authorshipSubtitle": "Co-authorships & Partnership networks",
+          "collabViewModeAria": "Collaboration view mode",
+          "network": "Network",
+          "matrix": "Matrix",
+          "flows": "Flows",
+          "intlCollabScope": "International Collaboration Scope",
+          "intlCollabRate": "{rate}% intl. co-authorship rate",
+          "journals": "Overlay Journals",
+          "journalsSubtitle": "Distribution across Episciences journals",
+          "publishingJournals": "Publishing Journals ({count})",
+          "journalsToShowAria": "Number of journals to show",
+          "allCount": "All ({count})",
+          "publications": "Publications",
+          "journalSummary": "Journal Summary",
+          "journalsRepresented": "{count} journals represented",
+          "researchTopics": "Research Topics",
+          "topicsSubtitle": "Topic Overview & Fields",
+          "topicViewModeAria": "Topic view mode",
+          "treemap": "Treemap",
+          "researchFunders": "Research Funders",
+          "fundersSubtitle": "Funding Timeline & Funder Volume",
+          "grantsTimeline": "Grants Timeline",
+          "fundingBodies": "Funding Bodies"
+      },
+      "platformSection": {
+          "unclassified": "Unclassified",
+          "badge": "Trajectory & Global Impact",
+          "title": "Platform Data",
+          "description": "This section showcases the global trajectory of the Episciences platform, developed by CCSD. Aimed at institutional stakeholders, platform funders, and open science observatories, it measures publication growth, peer-review turnaround, journal dynamics, and societal impact.",
+          "publicationVolumes": "Publication Volumes",
+          "publicationVolumesSubtitle": "Annual Growth & Publication Trends",
+          "totalArticles": "{count} total articles",
+          "articles": "Articles",
+          "diamondAffirmation": "100% Diamond Open Access: no author-facing fees (APC-free) and fully open to readers.",
+          "peerReviewDelay": "Peer-Review Turnaround Delay",
+          "peerReviewDelaySubtitle": "Duration between first submission to repository and journal publication",
+          "monthsMedian": "months (median)",
+          "reviewDistribution": "Review Turnaround Distribution",
+          "basedOnArticles": "Based on {count} regular articles",
+          "articlesCount": "{count} pubs",
+          "peerReviewNote": "Methodological note: this indicator measures editorial turnaround on Episciences. Backfilled legacy articles with earlier preprint dates are excluded to prevent skewing the median.",
+          "hostedJournals": "Hosted Journals",
+          "hostedJournalsSubtitle": "Catalog Growth & Field Distribution",
+          "cumulativeHostedJournals": "Cumulative Hosted Journals Evolution",
+          "addedJournals": "(+{count} added)",
+          "journalsInCatalog": "{count} journals in catalog",
+          "cumulativeTotal": "Cumulative total",
+          "disciplinaryBreakdown": "Disciplinary Breakdown",
+          "publications": "Publications",
+          "networksSynergies": "Networks & Synergies",
+          "networksSubtitle": "Funders, Institutions & Worldwide Flows",
+          "networkViewModeAria": "Network view mode",
+          "synergies": "Synergies",
+          "countryFlows": "Flows",
+          "openGraphAria": "Open immersive graph explorer",
+          "graph": "Graph",
+          "scholarlyImpact": "Scholarly & Societal Impact",
+          "scholarlyImpactSubtitle": "Research Topics & UN SDGs",
+          "impactModeAria": "Impact mode",
+          "sdgs": "SDGs",
+          "topics": "Topics",
+          "lineage": "Lineage",
+          "multiModalRelationalNetwork": "Multi-Modal Relational Network"
+      },
       "lineage": {
           "title": "Research Lineage",
           "subtitle": "Research Lineage & Open Science Provenance",
@@ -1053,6 +1271,115 @@ export const translations: Record<Locale, Translations> = {
           "showMoreInstitutions": "Afficher 100 institutions de plus ({count} restantes)",
           "noInstitutionFound": "Aucune institution trouvée"
       },
+      "journalSection": {
+          "allJournals": "Toutes les revues",
+          "title": "Statistiques à l’usage des revues",
+          "description": "Cet espace est conçu pour les comités éditoriaux et les équipes de revues hébergées sur Episciences. Il permet de suivre l’audience de vos articles (lectorat), la diversité géographique de vos auteurs (autorat), le paysage thématique et les financeurs des projets soutenant vos publications.",
+          "readership": "Lectorat",
+          "readershipSubtitle": "Dynamique d’usage & Géographie du lectorat",
+          "consultationTrends": "Dynamique des consultations",
+          "yearEndEstimate": "* {year} estimation de fin d'année",
+          "yearEndEstimateParenthesis": "estimation de fin d'année",
+          "downloads": "Téléchargements",
+          "abstractViews": "Vues des résumés",
+          "geographicReachReadership": "Origine géographique du lectorat",
+          "activeCountries": "{count} pays et territoires actifs",
+          "readershipByCountry": "Consultations par pays ou territoire",
+          "consultationsUnit": "consultations",
+          "top10Countries": "Top 10 pays et territoires du lectorat",
+          "mostConsultedArticles": "Articles les plus consultés",
+          "authorship": "Autorat",
+          "authorshipSubtitle": "Affiliations auteurs & Pays contributeurs",
+          "geographicReachAuthors": "Origine géographique des auteurs",
+          "topAuthorInstitutions": "Top établissements d’affiliation",
+          "sourceRepositories": "Entrepôts d’origine (Revues en épi / Overlay)",
+          "sourceRepositoriesDesc": "Archives ouvertes hébergeant les manuscrits évalués par les pairs et publiés sur Episciences.",
+          "indexedArticles": "{count} articles répertoriés",
+          "researchTopics": "Thématiques",
+          "topicsSubtitle": "Vue d’ensemble & Co-thématiques",
+          "topicViewModeAria": "Mode d'affichage des thématiques",
+          "treemap": "Treemap",
+          "network": "Réseau",
+          "researchFunders": "Financeurs",
+          "fundersSubtitle": "Évolution temporelle & Volume par bailleur",
+          "fundingTimeline": "Évolution chronologique des financements",
+          "topFundingAgencies": "Principaux organismes financeurs"
+      },
+      "institutionSection": {
+          "allInstitutions": "Toutes les institutions",
+          "title": "Statistiques à l’usage des institutions",
+          "description": "Cet espace est conçu pour les universités, organismes de recherche et bibliométriciens. Il permet d’évaluer la visibilité de votre établissement dans les revues Episciences, d’identifier les coopérations scientifiques internationales et les bailleurs finançant vos équipes.",
+          "exportInstitution": "Exporter l’institution",
+          "exportInstitutions": "Exporter les institutions",
+          "selectedInstitution": "Établissement sélectionné :",
+          "volume": "Volume :",
+          "publicationsCount": "{count} publications",
+          "rorRecord": "Fiche ROR",
+          "authorshipNetworks": "Autorat & Réseaux",
+          "authorshipSubtitle": "Co-publications & Réseaux de co-autorat",
+          "collabViewModeAria": "Mode de visualisation des coopérations",
+          "network": "Réseau",
+          "matrix": "Matrice",
+          "flows": "Flux",
+          "intlCollabScope": "Coopérations internationales",
+          "intlCollabRate": "{rate}% de co-publications internationales",
+          "journals": "Revues",
+          "journalsSubtitle": "Représentation dans les publications par revue",
+          "publishingJournals": "Revues hébergeant les articles de l’institution ({count})",
+          "journalsToShowAria": "Nombre de revues à afficher",
+          "allCount": "Toutes ({count})",
+          "publications": "Publications",
+          "journalSummary": "Détail des revues",
+          "journalsRepresented": "{count} revues représentées",
+          "researchTopics": "Thématiques",
+          "topicsSubtitle": "Vue d’ensemble & Domaines scientifiques",
+          "topicViewModeAria": "Mode de visualisation des thématiques",
+          "treemap": "Treemap",
+          "researchFunders": "Financeurs",
+          "fundersSubtitle": "Évolution & Volume par financeurs",
+          "grantsTimeline": "Évolution temporelle des financements",
+          "fundingBodies": "Bailleurs finançant les travaux de l’institution"
+      },
+      "platformSection": {
+          "unclassified": "Non classifié",
+          "badge": "Trajectoire et impact global",
+          "title": "Données de la plateforme",
+          "description": "Cet espace présente l’impact global de la plateforme Episciences, développé par le CCSD. Destiné aux tutelles, financeurs de la plateforme et observatoires de la science ouverte, il mesure la croissance des publications, les délais d’évaluation par les pairs, la dynamique des revues et leur rayonnement sociétal.",
+          "publicationVolumes": "Volumes de publication",
+          "publicationVolumesSubtitle": "Croissance annuelle des parutions sur la plateforme",
+          "totalArticles": "{count} articles au total",
+          "articles": "Articles",
+          "diamondAffirmation": "100% Modèle Diamant : gratuité totale pour les auteurs (aucun frais APC) et pour les lecteurs.",
+          "peerReviewDelay": "Délais d’évaluation par les pairs",
+          "peerReviewDelaySubtitle": "Temps d’expertise éditoriale entre première soumission sur archive et parution finale",
+          "monthsMedian": "mois (médiane)",
+          "reviewDistribution": "Distribution des délais d’expertise",
+          "basedOnArticles": "Calculé sur {count} articles réguliers",
+          "articlesCount": "{count} articles",
+          "peerReviewNote": "Note méthodologique : cet indicateur mesure la rapidité du processus éditorial géré par les comités de revues sur Episciences. Les articles importés rétroactivement avec une date de soumission antérieure ne sont pas inclus afin de ne pas biaiser la médiane.",
+          "hostedJournals": "Revues hébergées",
+          "hostedJournalsSubtitle": "Évolution du catalogue & Répartition disciplinaire",
+          "cumulativeHostedJournals": "Évolution cumulée des revues hébergées",
+          "addedJournals": "(+{count} créée(s))",
+          "journalsInCatalog": "{count} revues au catalogue",
+          "cumulativeTotal": "Total cumulé",
+          "disciplinaryBreakdown": "Répartition disciplinaire des publications",
+          "publications": "Publications",
+          "networksSynergies": "Réseaux & Synergies",
+          "networksSubtitle": "Financeurs, institutions représentées & coopérations",
+          "networkViewModeAria": "Mode de visualisation des réseaux",
+          "synergies": "Synergies",
+          "countryFlows": "Flux pays",
+          "openGraphAria": "Ouvrir l'explorateur immersif de graphe",
+          "graph": "Graphe",
+          "scholarlyImpact": "Impact des publications",
+          "scholarlyImpactSubtitle": "Thématiques de recherche & Contribution aux ODD",
+          "impactModeAria": "Mode d'impact",
+          "sdgs": "ODD",
+          "topics": "Thématiques",
+          "lineage": "Filiation",
+          "multiModalRelationalNetwork": "Explorateur immersif de réseau multi-entités"
+      },
       "lineage": {
           "title": "Filiation de la recherche",
           "subtitle": "Filiation de la recherche & Provenance en science ouverte",
@@ -1500,6 +1827,115 @@ export const translations: Record<Locale, Translations> = {
           "affShort": "afil.",
           "showMoreInstitutions": "Mostrar 100 instituciones más ({count} restantes)",
           "noInstitutionFound": "Ninguna institución encontrada"
+      },
+      "journalSection": {
+          "allJournals": "Todas las revistas",
+          "title": "Estadísticas de revistas",
+          "description": "Este espacio está diseñado para comités editoriales y equipos de revistas alojadas en Episciences. Permite seguir la audiencia de sus artículos (lectores), la diversidad geográfica de sus autores (autoría), el panorama temático y los financiadores de proyectos que apoyan sus publicaciones.",
+          "readership": "Lectores",
+          "readershipSubtitle": "Dinámica de uso y geografía del lectorado",
+          "consultationTrends": "Dinámica de consultas",
+          "yearEndEstimate": "* {year} estimación de fin de año",
+          "yearEndEstimateParenthesis": "estimación de fin de año",
+          "downloads": "Descargas",
+          "abstractViews": "Vistas de resúmenes",
+          "geographicReachReadership": "Origen geográfico del lectorado",
+          "activeCountries": "{count} países y territorios activos",
+          "readershipByCountry": "Consultas por país o territorio",
+          "consultationsUnit": "consultas",
+          "top10Countries": "Top 10 países y territorios del lectorado",
+          "mostConsultedArticles": "Artículos más consultados",
+          "authorship": "Autoría",
+          "authorshipSubtitle": "Afiliaciones de autores y países contribuyentes",
+          "geographicReachAuthors": "Origen geográfico de autores",
+          "topAuthorInstitutions": "Principales instituciones de afiliación",
+          "sourceRepositories": "Repositorios de origen (Revistas superpuestas / Overlay)",
+          "sourceRepositoriesDesc": "Repositorios abiertos que alojan los manuscritos revisados por pares y publicados en Episciences.",
+          "indexedArticles": "{count} artículos registrados",
+          "researchTopics": "Temáticas",
+          "topicsSubtitle": "Resumen y cotemáticas",
+          "topicViewModeAria": "Modo de visualización de temas",
+          "treemap": "Treemap",
+          "network": "Red",
+          "researchFunders": "Financiadores",
+          "fundersSubtitle": "Evolución temporal y volumen por financiador",
+          "fundingTimeline": "Evolución cronológica de la financiación",
+          "topFundingAgencies": "Principales organismos financiadores"
+      },
+      "institutionSection": {
+          "allInstitutions": "Todas las instituciones",
+          "title": "Estadísticas por institución",
+          "description": "Este espacio está diseñado para universidades, centros de investigación y bibliómetras. Permite evaluar la presencia de su institución en las revistas Episciences, identificar colaboraciones científicas internacionales y organismos que financian a sus equipos.",
+          "exportInstitution": "Exportar la institución",
+          "exportInstitutions": "Exportar las instituciones",
+          "selectedInstitution": "Institución seleccionada:",
+          "volume": "Volumen:",
+          "publicationsCount": "{count} publicaciones",
+          "rorRecord": "Ficha ROR",
+          "authorshipNetworks": "Autoría y Redes",
+          "authorshipSubtitle": "Copublicaciones y redes de coautoría",
+          "collabViewModeAria": "Modo de visualización de cooperaciones",
+          "network": "Red",
+          "matrix": "Matriz",
+          "flows": "Flujos",
+          "intlCollabScope": "Cooperaciones internacionales",
+          "intlCollabRate": "{rate}% de copublicaciones internacionales",
+          "journals": "Revistas",
+          "journalsSubtitle": "Distribución en publicaciones por revista",
+          "publishingJournals": "Revistas que publican artículos de la institución ({count})",
+          "journalsToShowAria": "Número de revistas para mostrar",
+          "allCount": "Todas ({count})",
+          "publications": "Publicaciones",
+          "journalSummary": "Detalle de revistas",
+          "journalsRepresented": "{count} revistas",
+          "researchTopics": "Temáticas",
+          "topicsSubtitle": "Resumen y dominios científicos",
+          "topicViewModeAria": "Modo de visualización de temas",
+          "treemap": "Treemap",
+          "researchFunders": "Financiadores",
+          "fundersSubtitle": "Evolución y volumen por financiador",
+          "grantsTimeline": "Evolución temporal de la financiación",
+          "fundingBodies": "Organismos que financian el trabajo de la institución"
+      },
+      "platformSection": {
+          "unclassified": "No clasificado",
+          "badge": "Trayectoria e impacto global",
+          "title": "Datos de la plataforma",
+          "description": "Este espacio presenta el impacto global de la plataforma Episciences, desarrollada por el CCSD. Destinado a instituciones supervisoras, financiadores de la plataforma y observatorios de ciencia abierta, mide el crecimiento de las publicaciones, los plazos de revisión por pares, la dinámica de las revistas y su impacto social.",
+          "publicationVolumes": "Volúmenes de publicación",
+          "publicationVolumesSubtitle": "Crecimiento anual de publicaciones en la plataforma",
+          "totalArticles": "{count} artículos en total",
+          "articles": "Artículos",
+          "diamondAffirmation": "100% Modelo Diamante: gratuidad total para autores (sin cargos APC) y para lectores.",
+          "peerReviewDelay": "Plazos de revisión por pares",
+          "peerReviewDelaySubtitle": "Tiempo de evaluación editorial entre el primer envío al repositorio y la publicación final",
+          "monthsMedian": "meses (mediana)",
+          "reviewDistribution": "Distribución de plazos de evaluación",
+          "basedOnArticles": "Calculado sobre {count} artículos regulares",
+          "articlesCount": "{count} artículos",
+          "peerReviewNote": "Nota metodológica: este indicador mide la rapidez del proceso editorial gestionado por los comités de revistas en Episciences. Los artículos importados retroactivamente con fecha de envío anterior no se incluyen para no sesgar la mediana.",
+          "hostedJournals": "Revistas alojadas",
+          "hostedJournalsSubtitle": "Evolución del catálogo y distribución disciplinaria",
+          "cumulativeHostedJournals": "Evolución acumulada de revistas alojadas",
+          "addedJournals": "(+{count} creada(s))",
+          "journalsInCatalog": "{count} revistas en el catálogo",
+          "cumulativeTotal": "Total acumulado",
+          "disciplinaryBreakdown": "Distribución disciplinaria de publicaciones",
+          "publications": "Publicaciones",
+          "networksSynergies": "Redes y Sinergias",
+          "networksSubtitle": "Financiadores, instituciones representadas y cooperaciones",
+          "networkViewModeAria": "Modo de visualización de redes",
+          "synergies": "Sinergias",
+          "countryFlows": "Flujos por país",
+          "openGraphAria": "Abrir explorador inmersivo de grafos",
+          "graph": "Grafo",
+          "scholarlyImpact": "Impacto de las publicaciones",
+          "scholarlyImpactSubtitle": "Temáticas de investigación y contribución a los ODS",
+          "impactModeAria": "Modo de impacto",
+          "sdgs": "ODS",
+          "topics": "Temáticas",
+          "lineage": "Filiación",
+          "multiModalRelationalNetwork": "Explorador inmersivo de redes multientidad"
       },
       "lineage": {
           "title": "Linaje de la investigación",

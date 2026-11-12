@@ -8,7 +8,6 @@ import {
   Share2,
   Sparkles,
   Network,
-  Info,
   CheckCircle2,
   TrendingUp,
 } from 'lucide-react';
@@ -37,7 +36,7 @@ import {
 } from 'recharts';
 
 export default function PlatformSection() {
-  const { locale } = useTranslation();
+  const { t } = useTranslation();
   const { data } = useDashboard();
   const { platformFilteredData, platformPeerReviewStats, funders } = data;
   const filteredData = platformFilteredData;
@@ -79,14 +78,14 @@ export default function PlatformSection() {
   const disciplinaryData = useMemo(() => {
     const counts: Record<string, number> = {};
     filteredData.forEach((p) => {
-      const field = p.primary_topic?.field || (locale === 'fr' ? 'Non classifié' : locale === 'es' ? 'No clasificado' : 'Unclassified');
+      const field = p.primary_topic?.field || t.platformSection.unclassified;
       counts[field] = (counts[field] || 0) + 1;
     });
     return Object.entries(counts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
-  }, [filteredData, locale]);
+  }, [filteredData, t]);
 
   // Cumulative journals count over time
   const cumulativeJournalsPerYear = useMemo(() => {
@@ -123,7 +122,7 @@ export default function PlatformSection() {
   return (
     <section aria-labelledby="platform-section-heading" className="space-y-8 animate-in fade-in duration-300">
       {/* 1. Purpose Banner: Décrire l'utilisation + sources */}
-      <div className="rounded-3xl bg-gradient-to-r from-[var(--episciences-cyan-00)]/15 via-white dark:via-zinc-900 to-transparent p-6 sm:p-8 ring-1 ring-[var(--episciences-cyan-01)]/30 shadow-xs">
+      <div className="rounded-3xl bg-gradient-to-r from-[var(--episciences-cyan-00)]/15 via-white dark:via-zinc-900 to-transparent p-6 sm:p-8 ring-1 ring-[var(--episciences-cyan-01)]/30">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
@@ -131,30 +130,15 @@ export default function PlatformSection() {
                 <Globe size={20} />
               </span>
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {locale === 'fr' ? 'Trajectoire et impact global' : locale === 'es' ? 'Trayectoria e impacto global' : 'Trajectory & Global Impact'}
+                {t.platformSection.badge}
               </span>
             </div>
             <h1 id="platform-section-heading" className="font-heading text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
-              {locale === 'fr' ? 'Données de la plateforme' : locale === 'es' ? 'Datos de la plataforma' : 'Platform Data'}
+              {t.platformSection.title}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-4xl leading-relaxed font-medium">
-              {locale === 'fr'
-                ? 'Cet espace présente l’impact global de la plateforme Episciences, développé par le CCSD. Destiné aux tutelles, financeurs de la plateforme et observatoires de la science ouverte, il mesure la croissance des publications, les délais d’évaluation par les pairs, la dynamique des revues et leur rayonnement sociétal.'
-                : locale === 'es'
-                ? 'Este espacio presenta el impacto global de la plataforma Episciences, desarrollada por el CCSD. Destinado a instituciones supervisoras, financiadores de la plataforma y observatorios de ciencia abierta, mide el crecimiento de las publicaciones, los plazos de revisión por pares, la dinámica de las revistas y su impacto social.'
-                : 'This section showcases the global trajectory of the Episciences platform, developed by CCSD. Aimed at institutional stakeholders, platform funders, and open science observatories, it measures publication growth, peer-review turnaround, journal dynamics, and societal impact.'}
+              {t.platformSection.description}
             </p>
-          </div>
-
-          <div className="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-2xl ring-1 ring-zinc-200 dark:ring-zinc-700">
-            <Info size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] shrink-0" />
-            <span>
-              {locale === 'fr'
-                ? 'Sources : API Episciences, OpenAlex, OpenAIRE Graph v3, ROR, zbMATH Open.'
-                : locale === 'es'
-                ? 'Fuentes: API Episciences, OpenAlex, OpenAIRE Graph v3, ROR, zbMATH Open.'
-                : 'Sources: Episciences API, OpenAlex, OpenAIRE Graph v3, ROR, zbMATH Open.'}
-            </span>
           </div>
         </div>
       </div>
@@ -167,7 +151,7 @@ export default function PlatformSection() {
         {/* =========================================================================
             BLOC 1: VOLUMES DE PUBLICATION
             ========================================================================= */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--episciences-cyan-00)]/15 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
@@ -175,17 +159,17 @@ export default function PlatformSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Volumes de publication' : locale === 'es' ? 'Volúmenes de publicación' : 'Publication Volumes'}
+                  {t.platformSection.publicationVolumes}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Croissance annuelle des parutions sur la plateforme' : locale === 'es' ? 'Crecimiento anual de publicaciones en la plataforma' : 'Annual Growth & Publication Trends'}
+                  {t.platformSection.publicationVolumesSubtitle}
                 </p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {formatNum(filteredData.length)} {locale === 'fr' ? 'articles au total' : locale === 'es' ? 'artículos en total' : 'total articles'}
+                {t.platformSection.totalArticles.replace('{count}', formatNum(filteredData.length))}
               </span>
               <ChartExportMenu
                 targetRef={yearlyPubsRef}
@@ -209,7 +193,7 @@ export default function PlatformSection() {
                   <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
                   <Tooltip
                     contentStyle={{ borderRadius: '1rem', border: '1px solid #e4e4e7', fontSize: '12px' }}
-                    formatter={(val: unknown) => [formatNum(Number(val) || 0), locale === 'fr' ? 'Articles' : locale === 'es' ? 'Artículos' : 'Articles']}
+                    formatter={(val: unknown) => [formatNum(Number(val) || 0), t.platformSection.articles]}
                   />
                   <Bar dataKey="count" fill="#0aa0be" radius={[8, 8, 0, 0]} />
                 </BarChart>
@@ -221,11 +205,7 @@ export default function PlatformSection() {
           <div className="flex items-center gap-2.5 rounded-xl bg-[var(--episciences-cyan-00)]/10 p-3 text-xs text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] font-semibold">
             <CheckCircle2 size={16} className="shrink-0" />
             <span>
-              {locale === 'fr'
-                ? '100% Modèle Diamant : gratuité totale pour les auteurs (aucun frais APC) et pour les lecteurs.'
-                : locale === 'es'
-                ? '100% Modelo Diamante: gratuidad total para autores (sin cargos APC) y para lectores.'
-                : '100% Diamond Open Access: no author-facing fees (APC-free) and fully open to readers.'}
+              {t.platformSection.diamondAffirmation}
             </span>
           </div>
         </div>
@@ -233,7 +213,7 @@ export default function PlatformSection() {
         {/* =========================================================================
             BLOC 2: DÉLAIS D'ÉVALUATION PAR LES PAIRS (PEER-REVIEW)
             ========================================================================= */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--episciences-cyan-00)]/15 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
@@ -241,14 +221,10 @@ export default function PlatformSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Délais d’évaluation par les pairs' : locale === 'es' ? 'Plazos de revisión por pares' : 'Peer-Review Turnaround Delay'}
+                  {t.platformSection.peerReviewDelay}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr'
-                    ? 'Temps d’expertise éditoriale entre première soumission sur archive et parution finale'
-                    : locale === 'es'
-                    ? 'Tiempo de evaluación editorial entre el primer envío al repositorio y la publicación final'
-                    : 'Duration between first submission to repository and journal publication'}
+                  {t.platformSection.peerReviewDelaySubtitle}
                 </p>
               </div>
             </div>
@@ -259,7 +235,7 @@ export default function PlatformSection() {
                   {peerReviewStats.medianMonths}
                 </span>
                 <span className="text-xs font-bold text-zinc-500">
-                  {locale === 'fr' ? 'mois (médiane)' : locale === 'es' ? 'meses (mediana)' : 'months (median)'}
+                  {t.platformSection.monthsMedian}
                 </span>
               </div>
               <ChartExportMenu
@@ -278,14 +254,10 @@ export default function PlatformSection() {
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs text-zinc-500">
               <span className="font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                {locale === 'fr' ? 'Distribution des délais d’expertise' : locale === 'es' ? 'Distribución de plazos de evaluación' : 'Review Turnaround Distribution'}
+                {t.platformSection.reviewDistribution}
               </span>
               <span>
-                {locale === 'fr'
-                  ? `Calculé sur ${formatNum(peerReviewStats.validCount)} articles réguliers`
-                  : locale === 'es'
-                  ? `Calculado sobre ${formatNum(peerReviewStats.validCount)} artículos regulares`
-                  : `Based on ${formatNum(peerReviewStats.validCount)} regular articles`}
+                {t.platformSection.basedOnArticles.replace('{count}', formatNum(peerReviewStats.validCount))}
               </span>
             </div>
 
@@ -294,25 +266,21 @@ export default function PlatformSection() {
                 <div key={bin.range} className="rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 p-3.5 text-center ring-1 ring-zinc-200/50 dark:ring-zinc-700/50">
                   <div className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">{bin.range}</div>
                   <div className="text-base font-black text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] mt-1">{bin.percentage}%</div>
-                  <div className="text-[10px] text-zinc-400 mt-0.5">{formatNum(bin.count)} {locale === 'fr' ? 'articles' : locale === 'es' ? 'artículos' : 'pubs'}</div>
+                  <div className="text-[10px] text-zinc-400 mt-0.5">{t.platformSection.articlesCount.replace('{count}', formatNum(bin.count))}</div>
                 </div>
               ))}
             </div>
           </div>
 
           <p className="text-xs text-zinc-500 dark:text-zinc-400 italic">
-            {locale === 'fr'
-              ? 'Note méthodologique : cet indicateur mesure la rapidité du processus éditorial géré par les comités de revues sur Episciences. Les articles importés rétroactivement avec une date de soumission antérieure ne sont pas inclus afin de ne pas biaiser la médiane.'
-              : locale === 'es'
-              ? 'Nota metodológica: este indicador mide la rapidez del proceso editorial gestionado por los comités de revistas en Episciences. Los artículos importados retroactivamente con fecha de envío anterior no se incluyen para no sesgar la mediana.'
-              : 'Methodological note: this indicator measures editorial turnaround on Episciences. Backfilled legacy articles with earlier preprint dates are excluded to prevent skewing the median.'}
+            {t.platformSection.peerReviewNote}
           </p>
         </div>
 
         {/* =========================================================================
             QUADRANT 2: REVUES
             ========================================================================= */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
           <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--episciences-cyan-00)]/15 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
@@ -320,10 +288,10 @@ export default function PlatformSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Revues hébergées' : locale === 'es' ? 'Revistas alojadas' : 'Hosted Journals'}
+                  {t.platformSection.hostedJournals}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Évolution du catalogue & Répartition disciplinaire' : locale === 'es' ? 'Evolución del catálogo y distribución disciplinaria' : 'Catalog Growth & Field Distribution'}
+                  {t.platformSection.hostedJournalsSubtitle}
                 </p>
               </div>
             </div>
@@ -333,7 +301,7 @@ export default function PlatformSection() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                {locale === 'fr' ? 'Évolution cumulée des revues hébergées' : locale === 'es' ? 'Evolución acumulada de revistas alojadas' : 'Cumulative Hosted Journals Evolution'}
+                {t.platformSection.cumulativeHostedJournals}
               </h3>
               <ChartExportMenu
                 targetRef={cumulativeJournalsRef}
@@ -361,10 +329,10 @@ export default function PlatformSection() {
                     contentStyle={{ borderRadius: '1rem', border: '1px solid #e4e4e7', fontSize: '12px' }}
                     formatter={(val: unknown, _name: unknown, item: { payload?: { newJournals?: number } }) => {
                       const count = Number(val) || 0;
-                      const added = item.payload?.newJournals ? ` (+${item.payload.newJournals} ${locale === 'fr' ? 'créée(s)' : locale === 'es' ? 'creada(s)' : 'added'})` : '';
+                      const added = item.payload?.newJournals ? ` ${t.platformSection.addedJournals.replace('{count}', String(item.payload.newJournals))}` : '';
                       return [
-                        `${count} ${locale === 'fr' ? 'revues au catalogue' : locale === 'es' ? 'revistas en el catálogo' : 'journals in catalog'}${added}`,
-                        locale === 'fr' ? 'Total cumulé' : locale === 'es' ? 'Total acumulado' : 'Cumulative total',
+                        `${t.platformSection.journalsInCatalog.replace('{count}', String(count))}${added}`,
+                        t.platformSection.cumulativeTotal,
                       ];
                     }}
                   />
@@ -386,7 +354,7 @@ export default function PlatformSection() {
           <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                {locale === 'fr' ? 'Répartition disciplinaire des publications' : locale === 'es' ? 'Distribución disciplinaria de publicaciones' : 'Disciplinary Breakdown'}
+                {t.platformSection.disciplinaryBreakdown}
               </h3>
               <ChartExportMenu
                 targetRef={disciplinaryRef}
@@ -417,7 +385,7 @@ export default function PlatformSection() {
                   />
                   <Tooltip
                     contentStyle={{ borderRadius: '1rem', border: '1px solid #e4e4e7', fontSize: '12px' }}
-                    formatter={(val: unknown) => [formatNum(Number(val) || 0), locale === 'fr' ? 'Publications' : locale === 'es' ? 'Publicaciones' : 'Publications']}
+                    formatter={(val: unknown) => [formatNum(Number(val) || 0), t.platformSection.publications]}
                   />
                   <Bar dataKey="count" fill="#57bec3" radius={[0, 8, 8, 0]} />
                 </BarChart>
@@ -429,7 +397,7 @@ export default function PlatformSection() {
         {/* =========================================================================
             QUADRANT 3: RÉSEAUX
             ========================================================================= */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--episciences-cyan-00)]/15 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
@@ -437,17 +405,17 @@ export default function PlatformSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Réseaux & Synergies' : locale === 'es' ? 'Redes y Sinergias' : 'Networks & Synergies'}
+                  {t.platformSection.networksSynergies}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Financeurs, institutions représentées & coopérations' : locale === 'es' ? 'Financiadores, instituciones representadas y cooperaciones' : 'Funders, Institutions & Worldwide Flows'}
+                  {t.platformSection.networksSubtitle}
                 </p>
               </div>
             </div>
 
             {/* Toggle controls */}
             <div className="flex flex-wrap items-center gap-2">
-              <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation des réseaux' : locale === 'es' ? 'Modo de visualización de redes' : 'Network view mode'} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+              <div role="group" aria-label={t.platformSection.networkViewModeAria} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
                 <button
                   type="button"
                   onClick={() => setNetworkTab('funders')}
@@ -458,7 +426,7 @@ export default function PlatformSection() {
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                   }`}
                 >
-                  {locale === 'fr' ? 'Synergies' : locale === 'es' ? 'Sinergias' : 'Synergies'}
+                  {t.platformSection.synergies}
                 </button>
                 <button
                   type="button"
@@ -482,7 +450,7 @@ export default function PlatformSection() {
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                   }`}
                 >
-                  {locale === 'fr' ? 'Flux pays' : locale === 'es' ? 'Flujos por país' : 'Flows'}
+                  {t.platformSection.countryFlows}
                 </button>
               </div>
 
@@ -495,12 +463,12 @@ export default function PlatformSection() {
               <button
                 type="button"
                 onClick={() => setIsNetworkModalOpen(true)}
-                aria-label={locale === 'fr' ? "Ouvrir l'explorateur immersif de graphe" : locale === 'es' ? "Abrir explorador inmersivo de grafos" : "Open immersive graph explorer"}
-                title={locale === 'fr' ? "Ouvrir l'explorateur immersif de graphe" : locale === 'es' ? "Abrir explorador inmersivo de grafos" : "Open immersive graph explorer"}
+                aria-label={t.platformSection.openGraphAria}
+                title={t.platformSection.openGraphAria}
                 className="flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
               >
                 <Network size={14} aria-hidden="true" />
-                <span className="hidden sm:inline">{locale === 'fr' ? 'Graphe' : locale === 'es' ? 'Grafo' : 'Graph'}</span>
+                <span className="hidden sm:inline">{t.platformSection.graph}</span>
               </button>
             </div>
           </div>
@@ -516,7 +484,7 @@ export default function PlatformSection() {
         {/* =========================================================================
             QUADRANT 4: IMPACT DES PUBLICATIONS
             ========================================================================= */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--episciences-cyan-00)]/15 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
@@ -524,17 +492,17 @@ export default function PlatformSection() {
               </div>
               <div>
                 <h2 className="font-heading text-lg font-black text-zinc-900 dark:text-zinc-50">
-                  {locale === 'fr' ? 'Impact des publications' : locale === 'es' ? 'Impacto de las publicaciones' : 'Scholarly & Societal Impact'}
+                  {t.platformSection.scholarlyImpact}
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {locale === 'fr' ? 'Thématiques de recherche & Contribution aux ODD' : locale === 'es' ? 'Temáticas de investigación y contribución a los ODS' : 'Research Topics & UN SDGs'}
+                  {t.platformSection.scholarlyImpactSubtitle}
                 </p>
               </div>
             </div>
 
             {/* Toggle controls */}
             <div className="flex flex-wrap items-center gap-2">
-              <div role="group" aria-label={locale === 'fr' ? "Mode d'impact" : locale === 'es' ? "Modo de impacto" : "Impact mode"} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
+              <div role="group" aria-label={t.platformSection.impactModeAria} className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1">
                 <button
                   type="button"
                   onClick={() => setImpactTab('sdg')}
@@ -545,7 +513,7 @@ export default function PlatformSection() {
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                   }`}
                 >
-                  {locale === 'fr' ? 'ODD' : locale === 'es' ? 'ODS' : 'SDGs'}
+                  {t.platformSection.sdgs}
                 </button>
                 <button
                   type="button"
@@ -557,7 +525,7 @@ export default function PlatformSection() {
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                   }`}
                 >
-                  {locale === 'fr' ? 'Thématiques' : locale === 'es' ? 'Temáticas' : 'Topics'}
+                  {t.platformSection.topics}
                 </button>
                 <button
                   type="button"
@@ -569,7 +537,7 @@ export default function PlatformSection() {
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
                   }`}
                 >
-                  {locale === 'fr' ? 'Filiation' : locale === 'es' ? 'Filiación' : 'Lineage'}
+                  {t.platformSection.lineage}
                 </button>
               </div>
 
@@ -593,7 +561,7 @@ export default function PlatformSection() {
       <FullscreenModal
         isOpen={isNetworkModalOpen}
         onClose={() => setIsNetworkModalOpen(false)}
-        title={locale === 'fr' ? 'Explorateur immersif de réseau multi-entités' : locale === 'es' ? 'Explorador inmersivo de redes multientidad' : 'Multi-Modal Relational Network'}
+        title={t.platformSection.multiModalRelationalNetwork}
       >
         <div className="h-full w-full p-4">
           <NetworkExplorer data={filteredData} funders={funders} />
