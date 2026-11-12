@@ -13,7 +13,7 @@ import { useTranslation } from '@/lib/i18n/LanguageContext';
 import PageHeader from '@/components/PageHeader';
 
 export default function HomePageClient() {
-  const { locale } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data } = useDashboard();
   const { stats, usageSummary } = data;
 
@@ -35,37 +35,25 @@ export default function HomePageClient() {
   const PERSONA_SECTIONS = [
     {
       href: `/${locale}/journals`,
-      title: locale === 'fr' ? 'Statistiques à l’usage des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Statistics',
-      badge: locale === 'fr' ? 'Comités éditoriaux & Revues' : locale === 'es' ? 'Comités editoriales' : 'Editorial Boards & Journals',
-      desc: locale === 'fr'
-        ? 'Indicateurs de lectorat (dynamique d’usage, pays), autorat, thématiques et financeurs pour le pilotage de chaque revue.'
-        : locale === 'es'
-        ? 'Indicadores de lectores (dinámica de uso, países), autoría, temas y financiadores para la gestión de cada revista.'
-        : 'Readership metrics (usage trends, countries), authorship, topics, and funders for editorial evaluation.',
+      title: t.homePage.journalsTitle,
+      badge: t.homePage.journalsBadge,
+      desc: t.homePage.journalsDesc,
       icon: <BookOpen className="h-6 w-6 text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
       borderHover: 'hover:border-[var(--episciences-cyan-03)] dark:hover:border-[var(--episciences-cyan-00)]',
     },
     {
       href: `/${locale}/institutions`,
-      title: locale === 'fr' ? 'Statistiques à l’usage des institutions' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Statistics',
-      badge: locale === 'fr' ? 'Établissements & Recherche' : locale === 'es' ? 'Instituciones y Centros' : 'Universities & Research Bodies',
-      desc: locale === 'fr'
-        ? 'Mesurez la production de votre établissement sur Episciences : réseaux de co-autorat, revues hébergeant vos articles et financeurs.'
-        : locale === 'es'
-        ? 'Mida la producción de su institución en Episciences: redes de coautoría, revistas receptoras y entidades financiadoras.'
-        : 'Measure your institution’s footprint on Episciences: co-authorship networks, hosting journals, topics, and funding bodies.',
+      title: t.homePage.institutionsTitle,
+      badge: t.homePage.institutionsBadge,
+      desc: t.homePage.institutionsDesc,
       icon: <Building2 className="h-6 w-6 text-[var(--episciences-cyan-02)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />,
       borderHover: 'hover:border-[var(--episciences-cyan-02)] dark:hover:border-[var(--episciences-cyan-00)]',
     },
     {
       href: `/${locale}/platform`,
-      title: locale === 'fr' ? 'Données de la plateforme' : locale === 'es' ? 'Datos de la plataforma' : 'Platform Data',
-      badge: locale === 'fr' ? 'Impact Global & Tutelles' : locale === 'es' ? 'Impacto Global y Tutelas' : 'Global Impact & Stakeholders',
-      desc: locale === 'fr'
-        ? 'Bilan global de la plateforme : évolution des publications, délais d’évaluation par les pairs, réseaux de coopération et ODD.'
-        : locale === 'es'
-        ? 'Balance global de la plataforma: evolución de publicaciones, tiempos de revisión por pares, redes de cooperación y ODS.'
-        : 'Global platform metrics: publication volume, peer-review timelines, international collaboration networks, and UN SDGs.',
+      title: t.homePage.platformTitle,
+      badge: t.homePage.platformBadge,
+      desc: t.homePage.platformDesc,
       icon: <Globe className="h-6 w-6 text-[var(--ccsd-bleu-01)] dark:text-[var(--episciences-cyan-01)]" aria-hidden="true" />,
       borderHover: 'hover:border-[var(--ccsd-bleu-01)] dark:hover:border-[var(--episciences-cyan-01)]',
     },
@@ -84,18 +72,10 @@ export default function HomePageClient() {
       <section aria-labelledby="section-personas-title" className="space-y-6">
         <div className="text-center sm:text-left">
           <h2 id="section-personas-title" className="font-heading text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
-            {locale === 'fr'
-              ? 'Accéder aux statistiques par profil'
-              : locale === 'es'
-              ? 'Acceder a las estadísticas por perfil'
-              : 'Access Statistics by Profile'}
+            {t.homePage.sectionTitle}
           </h2>
           <p className="mt-2 text-sm sm:text-base text-zinc-600 dark:text-zinc-400 font-medium max-w-3xl">
-            {locale === 'fr'
-              ? 'Sélectionnez votre espace pour explorer les données adaptées à vos besoins de pilotage, d’évaluation ou de suivi de la science ouverte.'
-              : locale === 'es'
-              ? 'Seleccione su espacio para explorar los datos adaptados a sus necesidades de gestión, evaluación o seguimiento de la ciencia abierta.'
-              : 'Select your workspace to explore data tailored to your editorial, institutional, or open science monitoring needs.'}
+            {t.homePage.sectionSubtitle}
           </p>
         </div>
 
@@ -104,7 +84,7 @@ export default function HomePageClient() {
             <Link
               key={sec.href}
               href={sec.href}
-              className={`group relative flex flex-col justify-between rounded-3xl bg-white p-7 shadow-xs ring-1 ring-zinc-200 transition-all hover:shadow-xl hover:-translate-y-1 dark:bg-zinc-900/90 dark:ring-zinc-800 ${sec.borderHover}`}
+              className={`group relative flex flex-col justify-between rounded-3xl bg-white p-7 ring-1 ring-zinc-200 transition-all hover:-translate-y-1 dark:bg-zinc-900/90 dark:ring-zinc-800 ${sec.borderHover}`}
             >
               <div>
                 <div className="flex items-center justify-between gap-3 mb-4">
@@ -124,7 +104,7 @@ export default function HomePageClient() {
               </div>
 
               <div className="mt-6 flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] group-hover:translate-x-1 transition-transform">
-                <span>{locale === 'fr' ? 'Accéder à la vue' : locale === 'es' ? 'Ver espacio' : 'Enter view'}</span>
+                <span>{t.homePage.enterView}</span>
                 <ArrowRight size={14} aria-hidden="true" />
               </div>
             </Link>

@@ -66,6 +66,13 @@ export interface Translations {
     abstractViews: string;
     globalCoverage: string;
     countriesMetric: string;
+    navSectionsAria: string;
+    navSectionsMobileAria: string;
+    navHome: string;
+    navHomeTitle: string;
+    navJournalsTitle: string;
+    navInstitutionsTitle: string;
+    navPlatformTitle: string;
   };
   tabs: {
     overview: string;
@@ -99,6 +106,54 @@ export interface Translations {
     lastUpdated: string;
     methodologyLink: string;
     sourceCode: string;
+  };
+  theme: {
+    changeTheme: string;
+    themeMenuAria: string;
+    light: string;
+    lightAria: string;
+    dark: string;
+    darkAria: string;
+    system: string;
+    systemAria: string;
+  };
+  pageHeader: {
+    subtitle: string;
+    descriptionP1: string;
+    descriptionP2: string;
+    publications: string;
+    totalDownloads: string;
+    abstractViews: string;
+    fundersRepresented: string;
+    globalReach: string;
+    countriesAndTerritories: string;
+  };
+  homePage: {
+    sectionTitle: string;
+    sectionSubtitle: string;
+    enterView: string;
+    journalsTitle: string;
+    journalsBadge: string;
+    journalsDesc: string;
+    institutionsTitle: string;
+    institutionsBadge: string;
+    institutionsDesc: string;
+    platformTitle: string;
+    platformBadge: string;
+    platformDesc: string;
+  };
+  filters: {
+    filtersAria: string;
+    filtersLabel: string;
+    allInstitutions: string;
+    institution: string;
+    searchInstitutionPlaceholder: string;
+    clearSearch: string;
+    uniquePubsAffiliations: string;
+    pubsShort: string;
+    affShort: string;
+    showMoreInstitutions: string;
+    noInstitutionFound: string;
   };
   lineage: {
     title: string;
@@ -460,7 +515,14 @@ export const translations: Record<Locale, Translations> = {
           "of17": "of 17",
           "abstractViews": "Abstract Views",
           "globalCoverage": "Global Coverage",
-          "countriesMetric": "Countries & territories"
+          "countriesMetric": "Countries & territories",
+          "navSectionsAria": "Dashboard sections",
+          "navSectionsMobileAria": "Dashboard sections (mobile)",
+          "navHome": "Home",
+          "navHomeTitle": "Home & overview",
+          "navJournalsTitle": "Journal statistics",
+          "navInstitutionsTitle": "Institution statistics",
+          "navPlatformTitle": "Platform data & global impact"
       },
       "tabs": {
           "overview": "Overview",
@@ -494,6 +556,54 @@ export const translations: Record<Locale, Translations> = {
           "lastUpdated": "Data last updated: {date}",
           "methodologyLink": "Disclaimer & Methodological Framework",
           "sourceCode": "Source code & repository"
+      },
+      "theme": {
+          "changeTheme": "Change display theme",
+          "themeMenuAria": "Display theme",
+          "light": "Light",
+          "lightAria": "Light theme",
+          "dark": "Dark",
+          "darkAria": "Dark theme",
+          "system": "System",
+          "systemAria": "System theme"
+      },
+      "pageHeader": {
+          "subtitle": "Data visualization platform for Episciences",
+          "descriptionP1": "Episciences Insights is developed by the CCSD (Centre pour la Communication Scientifique Directe, UAR 3668). It presents indicators on articles published by journals hosted on the Episciences platform: authors, affiliations and countries, research topics, funding, open science practices, and readership.",
+          "descriptionP2": "Indicators originate exclusively from open infrastructures and their calculation methodology is documented below. In compliance with the principles of DORA and CoARA, the dashboard avoids proprietary metrics such as journal impact factors.",
+          "publications": "Publications",
+          "totalDownloads": "Total Downloads",
+          "abstractViews": "Abstract Views",
+          "fundersRepresented": "Funders Represented",
+          "globalReach": "Global Reach",
+          "countriesAndTerritories": "countries and territories"
+      },
+      "homePage": {
+          "sectionTitle": "Access Statistics by Profile",
+          "sectionSubtitle": "Select your workspace to explore data tailored to your editorial, institutional, or open science monitoring needs.",
+          "enterView": "Enter view",
+          "journalsTitle": "Journal Statistics",
+          "journalsBadge": "Editorial Boards & Journals",
+          "journalsDesc": "Readership metrics (usage trends, countries), authorship, topics, and funders for editorial evaluation.",
+          "institutionsTitle": "Institution Statistics",
+          "institutionsBadge": "Universities & Research Bodies",
+          "institutionsDesc": "Measure your institution’s footprint on Episciences: co-authorship networks, hosting journals, topics, and funding bodies.",
+          "platformTitle": "Platform Data",
+          "platformBadge": "Global Impact & Stakeholders",
+          "platformDesc": "Global platform metrics: publication volume, peer-review timelines, international collaboration networks, and UN SDGs."
+      },
+      "filters": {
+          "filtersAria": "Global corpus filters",
+          "filtersLabel": "Filters",
+          "allInstitutions": "All institutions",
+          "institution": "Institution",
+          "searchInstitutionPlaceholder": "Search institution...",
+          "clearSearch": "Clear search",
+          "uniquePubsAffiliations": "{count} unique publications · {affCount} author affiliations",
+          "pubsShort": "pubs",
+          "affShort": "aff.",
+          "showMoreInstitutions": "Show 100 more institutions ({count} remaining)",
+          "noInstitutionFound": "No institution found"
       },
       "lineage": {
           "title": "Research Lineage",
@@ -853,7 +963,14 @@ export const translations: Record<Locale, Translations> = {
           "of17": "sur 17",
           "abstractViews": "Vues de résumés",
           "globalCoverage": "Couverture mondiale",
-          "countriesMetric": "Pays & territoires"
+          "countriesMetric": "Pays & territoires",
+          "navSectionsAria": "Sections du tableau de bord",
+          "navSectionsMobileAria": "Sections du tableau de bord (mobile)",
+          "navHome": "Accueil",
+          "navHomeTitle": "Page d'accueil et présentation",
+          "navJournalsTitle": "Statistiques à l'usage des revues",
+          "navInstitutionsTitle": "Statistiques à l'usage des institutions",
+          "navPlatformTitle": "Données de la plateforme Episciences"
       },
       "tabs": {
           "overview": "Vue d'ensemble",
@@ -887,6 +1004,54 @@ export const translations: Record<Locale, Translations> = {
           "lastUpdated": "Dernière mise à jour des données : {date}",
           "methodologyLink": "Disclaimer & Cadre méthodologique",
           "sourceCode": "Code source & dépôt"
+      },
+      "theme": {
+          "changeTheme": "Changer le thème d'affichage",
+          "themeMenuAria": "Thème d'affichage",
+          "light": "Clair",
+          "lightAria": "Thème clair",
+          "dark": "Sombre",
+          "darkAria": "Thème sombre",
+          "system": "Système",
+          "systemAria": "Thème système"
+      },
+      "pageHeader": {
+          "subtitle": "Outil de visualisation des données d’Episciences",
+          "descriptionP1": "Episciences Insights est développé par le CCSD (Centre pour la Communication Scientifique Directe, UAR 3668). Il présente des indicateurs sur les articles publiés par les revues hébergées sur la plateforme Episciences : auteurs/autrices, affiliations et pays, thématiques de recherche, financements, pratiques de science ouverte et consultations.",
+          "descriptionP2": "Les indicateurs proviennent uniquement d’infrastructures ouvertes et leur mode de calcul est documenté ci-dessous. Conformément aux principes de DORA et de CoARA, le tableau de bord n’utilise pas d’indicateurs propriétaires comme le facteur d’impact.",
+          "publications": "Publications",
+          "totalDownloads": "Téléchargements totaux",
+          "abstractViews": "Vue des résumés",
+          "fundersRepresented": "Financeurs représentés",
+          "globalReach": "Couverture mondiale",
+          "countriesAndTerritories": "pays et territoires"
+      },
+      "homePage": {
+          "sectionTitle": "Accéder aux statistiques par profil",
+          "sectionSubtitle": "Sélectionnez votre espace pour explorer les données adaptées à vos besoins de pilotage, d’évaluation ou de suivi de la science ouverte.",
+          "enterView": "Accéder à la vue",
+          "journalsTitle": "Statistiques à l’usage des revues",
+          "journalsBadge": "Comités éditoriaux & Revues",
+          "journalsDesc": "Indicateurs de lectorat (dynamique d’usage, pays), autorat, thématiques et financeurs pour le pilotage de chaque revue.",
+          "institutionsTitle": "Statistiques à l’usage des institutions",
+          "institutionsBadge": "Établissements & Recherche",
+          "institutionsDesc": "Mesurez la production de votre établissement sur Episciences : réseaux de co-autorat, revues hébergeant vos articles et financeurs.",
+          "platformTitle": "Données de la plateforme",
+          "platformBadge": "Impact Global & Tutelles",
+          "platformDesc": "Bilan global de la plateforme : évolution des publications, délais d’évaluation par les pairs, réseaux de coopération et ODD."
+      },
+      "filters": {
+          "filtersAria": "Filtres globaux du corpus",
+          "filtersLabel": "Filtres",
+          "allInstitutions": "Toutes les institutions",
+          "institution": "Institution",
+          "searchInstitutionPlaceholder": "Rechercher (ex: CNRS, Inria, Oxford)...",
+          "clearSearch": "Effacer la recherche",
+          "uniquePubsAffiliations": "{count} publications uniques · {affCount} affiliations d'auteurs",
+          "pubsShort": "pubs",
+          "affShort": "aff.",
+          "showMoreInstitutions": "Afficher 100 institutions de plus ({count} restantes)",
+          "noInstitutionFound": "Aucune institution trouvée"
       },
       "lineage": {
           "title": "Filiation de la recherche",
@@ -1246,7 +1411,14 @@ export const translations: Record<Locale, Translations> = {
           "of17": "de 17",
           "abstractViews": "Vistas de resúmenes",
           "globalCoverage": "Cobertura global",
-          "countriesMetric": "Países y territorios"
+          "countriesMetric": "Países y territorios",
+          "navSectionsAria": "Secciones del panel",
+          "navSectionsMobileAria": "Secciones del panel (móvil)",
+          "navHome": "Inicio",
+          "navHomeTitle": "Inicio y resumen",
+          "navJournalsTitle": "Estadísticas de revistas",
+          "navInstitutionsTitle": "Estadísticas por institución",
+          "navPlatformTitle": "Datos de la plataforma"
       },
       "tabs": {
           "overview": "Resumen",
@@ -1280,6 +1452,54 @@ export const translations: Record<Locale, Translations> = {
           "lastUpdated": "Última actualización de los datos: {date}",
           "methodologyLink": "Aviso legal y marco metodológico",
           "sourceCode": "Código fuente y repositorio"
+      },
+      "theme": {
+          "changeTheme": "Cambiar tema de visualización",
+          "themeMenuAria": "Tema de visualización",
+          "light": "Claro",
+          "lightAria": "Tema claro",
+          "dark": "Oscuro",
+          "darkAria": "Tema oscuro",
+          "system": "Sistema",
+          "systemAria": "Tema del sistema"
+      },
+      "pageHeader": {
+          "subtitle": "Herramienta de visualización de datos de Episciences",
+          "descriptionP1": "Episciences Insights es desarrollado por el CCSD (Centre pour la Communication Scientifique Directe, UAR 3668). Presenta indicadores sobre los artículos publicados por las revistas alojadas en la plataforma Episciences: autores/autoras, afiliaciones y países, temas de investigación, financiación, prácticas de ciencia abierta y consultas.",
+          "descriptionP2": "Los indicadores provienen exclusivamente de infraestructuras abiertas y su método de cálculo está documentado a continuación. De acuerdo con los principios de DORA y CoARA, el panel no utiliza indicadores propietarios como el factor de impacto.",
+          "publications": "Publicaciones",
+          "totalDownloads": "Descargas totales",
+          "abstractViews": "Vistas de resúmenes",
+          "fundersRepresented": "Financiadores",
+          "globalReach": "Cobertura global",
+          "countriesAndTerritories": "países y territorios"
+      },
+      "homePage": {
+          "sectionTitle": "Acceder a las estadísticas por perfil",
+          "sectionSubtitle": "Seleccione su espacio para explorar los datos adaptados a sus necesidades de gestión, evaluación o seguimiento de la ciencia abierta.",
+          "enterView": "Ver espacio",
+          "journalsTitle": "Estadísticas de revistas",
+          "journalsBadge": "Comités editoriales",
+          "journalsDesc": "Indicadores de lectores (dinámica de uso, países), autoría, temas y financiadores para la gestión de cada revista.",
+          "institutionsTitle": "Estadísticas por institución",
+          "institutionsBadge": "Instituciones y Centros",
+          "institutionsDesc": "Mida la producción de su institución en Episciences: redes de coautoría, revistas receptoras y entidades financiadoras.",
+          "platformTitle": "Datos de la plataforma",
+          "platformBadge": "Impacto Global y Tutelas",
+          "platformDesc": "Balance global de la plataforma: evolución de publicaciones, tiempos de revisión por pares, redes de cooperación y ODS."
+      },
+      "filters": {
+          "filtersAria": "Filtros globales del corpus",
+          "filtersLabel": "Filtros",
+          "allInstitutions": "Todas las instituciones",
+          "institution": "Institución",
+          "searchInstitutionPlaceholder": "Buscar institución...",
+          "clearSearch": "Borrar búsqueda",
+          "uniquePubsAffiliations": "{count} publicaciones únicas · {affCount} afiliaciones de autores",
+          "pubsShort": "pubs",
+          "affShort": "afil.",
+          "showMoreInstitutions": "Mostrar 100 instituciones más ({count} restantes)",
+          "noInstitutionFound": "Ninguna institución encontrada"
       },
       "lineage": {
           "title": "Linaje de la investigación",

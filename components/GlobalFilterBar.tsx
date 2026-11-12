@@ -52,7 +52,7 @@ function InstitutionCombobox() {
   const { institutionFilter } = state;
   const { setInstitutionFilter } = actions;
   const { institutionsList } = data;
-  const { locale } = useTranslation();
+  const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -105,9 +105,9 @@ function InstitutionCombobox() {
     setDisplayLimit(INITIAL_LIMIT);
   };
 
-  const allLabel = locale === 'fr' ? 'Toutes les institutions' : locale === 'es' ? 'Todas las instituciones' : 'All institutions';
-  const labelText = locale === 'fr' ? 'Institution' : locale === 'es' ? 'Institución' : 'Institution';
-  const searchPlaceholder = locale === 'fr' ? 'Rechercher (ex: CNRS, Inria, Oxford)...' : locale === 'es' ? 'Buscar institución...' : 'Search institution...';
+  const allLabel = t.filters.allInstitutions;
+  const labelText = t.filters.institution;
+  const searchPlaceholder = t.filters.searchInstitutionPlaceholder;
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-2 min-w-[260px] max-w-[420px] flex-1">
@@ -155,7 +155,7 @@ function InstitutionCombobox() {
                     setSearchTerm('');
                     setDisplayLimit(INITIAL_LIMIT);
                   }}
-                  aria-label={locale === 'fr' ? 'Effacer la recherche' : locale === 'es' ? 'Borrar búsqueda' : 'Clear search'}
+                  aria-label={t.filters.clearSearch}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                 >
                   <X size={12} aria-hidden="true" />
@@ -203,19 +203,15 @@ function InstitutionCombobox() {
                     <div className="shrink-0 flex items-center gap-2">
                       <div
                         className="flex flex-col items-end text-right"
-                        title={
-                          locale === 'fr'
-                            ? `${formatNum(inst.count)} publications uniques · ${formatNum(inst.affiliationsCount)} affiliations d'auteurs`
-                            : locale === 'es'
-                            ? `${formatNum(inst.count)} publicaciones únicas · ${formatNum(inst.affiliationsCount)} afiliaciones de autores`
-                            : `${formatNum(inst.count)} unique publications · ${formatNum(inst.affiliationsCount)} author affiliations`
-                        }
+                        title={t.filters.uniquePubsAffiliations
+                          .replace('{count}', formatNum(inst.count))
+                          .replace('{affCount}', formatNum(inst.affiliationsCount))}
                       >
                         <span className="rounded-md bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-700 dark:text-zinc-300">
-                          {formatNum(inst.count)} {locale === 'fr' ? 'pubs' : 'pubs'}
+                          {formatNum(inst.count)} {t.filters.pubsShort}
                         </span>
                         <span className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">
-                          {formatNum(inst.affiliationsCount)} {locale === 'fr' ? 'aff.' : locale === 'es' ? 'afil.' : 'aff.'}
+                          {formatNum(inst.affiliationsCount)} {t.filters.affShort}
                         </span>
                       </div>
                       {isSelected && <Check size={14} className="text-[var(--primary-text)]" aria-hidden="true" />}
@@ -231,18 +227,14 @@ function InstitutionCombobox() {
                     onClick={() => setDisplayLimit((prev) => prev + STEP)}
                     className="w-full py-2 px-3 text-xs font-bold text-[var(--primary-text)] hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer border border-dashed border-zinc-200 dark:border-zinc-700"
                   >
-                    {locale === 'fr'
-                      ? `Afficher 100 institutions de plus (${formatNum(remainingCount)} restantes)`
-                      : locale === 'es'
-                      ? `Mostrar 100 instituciones más (${formatNum(remainingCount)} restantes)`
-                      : `Show 100 more institutions (${formatNum(remainingCount)} remaining)`}
+                    {t.filters.showMoreInstitutions.replace('{count}', formatNum(remainingCount))}
                   </button>
                 </div>
               )}
 
               {visibleInstitutions.length === 0 && (
                 <div className="py-4 text-center text-xs text-zinc-500">
-                  {locale === 'fr' ? 'Aucune institution trouvée' : locale === 'es' ? 'Ninguna institución encontrada' : 'No institution found'}
+                  {t.filters.noInstitutionFound}
                 </div>
               )}
             </div>
@@ -278,14 +270,14 @@ export default function GlobalFilterBar() {
 
   return (
     <section
-      aria-label={locale === 'fr' ? 'Filtres globaux du corpus' : locale === 'es' ? 'Filtros globales del corpus' : 'Global corpus filters'}
-      className="rounded-2xl bg-white p-4 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 transition-colors"
+      aria-label={t.filters.filtersAria}
+      className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 transition-colors"
     >
       <div className="flex flex-wrap items-center gap-4">
         {/* Filter icon label */}
         <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           <Filter size={14} className="text-[var(--primary-text)]" aria-hidden="true" />
-          <span>{locale === 'fr' ? 'Filtres' : locale === 'es' ? 'Filtros' : 'Filters'}</span>
+          <span>{t.filters.filtersLabel}</span>
         </div>
 
         {/* Publication Year (always shown on filtered views) */}

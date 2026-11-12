@@ -16,7 +16,7 @@ const emptySubscribe = () => () => {};
 
 export default function ThemeSwitcher({ className = '' }: { className?: string }) {
   const { theme, setTheme } = useTheme();
-  const { locale } = useTranslation();
+  const { t } = useTranslation();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -25,23 +25,23 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
   const themeOptions = useMemo<ThemeOption[]>(() => [
     {
       value: 'light',
-      label: locale === 'fr' ? 'Clair' : locale === 'es' ? 'Claro' : 'Light',
-      ariaLabel: locale === 'fr' ? 'Thème clair' : locale === 'es' ? 'Tema claro' : 'Light theme',
+      label: t.theme.light,
+      ariaLabel: t.theme.lightAria,
       icon: Sun,
     },
     {
       value: 'dark',
-      label: locale === 'fr' ? 'Sombre' : locale === 'es' ? 'Oscuro' : 'Dark',
-      ariaLabel: locale === 'fr' ? 'Thème sombre' : locale === 'es' ? 'Tema oscuro' : 'Dark theme',
+      label: t.theme.dark,
+      ariaLabel: t.theme.darkAria,
       icon: Moon,
     },
     {
       value: 'system',
-      label: locale === 'fr' ? 'Système' : locale === 'es' ? 'Sistema' : 'System',
-      ariaLabel: locale === 'fr' ? 'Thème système' : locale === 'es' ? 'Tema del sistema' : 'System theme',
+      label: t.theme.system,
+      ariaLabel: t.theme.systemAria,
       icon: Monitor,
     },
-  ], [locale]);
+  ], [t]);
 
   const currentOption = themeOptions.find((opt) => opt.value === theme) || themeOptions[2];
   const CurrentIcon = currentOption.icon;
@@ -83,7 +83,7 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
         onClick={() => setIsOpen(!isOpen)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-label={locale === 'fr' ? "Changer le thème d'affichage" : locale === 'es' ? "Cambiar tema de visualización" : "Change display theme"}
+        aria-label={t.theme.changeTheme}
         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-bold transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-focus)] ${
           isOpen
             ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50 ring-1 ring-zinc-300 dark:ring-zinc-700'
@@ -101,7 +101,7 @@ export default function ThemeSwitcher({ className = '' }: { className?: string }
       {isOpen && (
         <div
           role="listbox"
-          aria-label={locale === 'fr' ? "Thème d'affichage" : locale === 'es' ? "Tema de visualización" : "Display theme"}
+          aria-label={t.theme.themeMenuAria}
           className="absolute right-0 z-50 mt-1.5 w-36 origin-top-right rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 animate-in fade-in zoom-in-95 duration-150"
         >
           {themeOptions.map((option) => {

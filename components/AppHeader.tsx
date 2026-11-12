@@ -17,26 +17,26 @@ export default function AppHeader() {
     {
       href: `/${locale}`,
       slug: 'home',
-      label: locale === 'fr' ? 'Accueil' : locale === 'es' ? 'Inicio' : 'Home',
-      title: locale === 'fr' ? "Page d'accueil et présentation" : locale === 'es' ? 'Inicio y resumen' : 'Home & overview',
+      label: t.header.navHome,
+      title: t.header.navHomeTitle,
     },
     {
       href: `/${locale}/journals`,
       slug: 'journals',
       label: t.tabs.journals,
-      title: locale === 'fr' ? "Statistiques à l'usage des revues" : locale === 'es' ? 'Estadísticas de revistas' : 'Journal statistics',
+      title: t.header.navJournalsTitle,
     },
     {
       href: `/${locale}/institutions`,
       slug: 'institutions',
       label: t.tabs.institutions,
-      title: locale === 'fr' ? "Statistiques à l'usage des institutions" : locale === 'es' ? 'Estadísticas por institución' : 'Institution statistics',
+      title: t.header.navInstitutionsTitle,
     },
     {
       href: `/${locale}/platform`,
       slug: 'platform',
       label: t.tabs.platform,
-      title: locale === 'fr' ? "Données de la plateforme Episciences" : locale === 'es' ? 'Datos de la plataforma' : 'Platform data & global impact',
+      title: t.header.navPlatformTitle,
     },
   ];
 
@@ -70,7 +70,7 @@ export default function AppHeader() {
 
           {/* Navigation Links (Desktop) */}
           <nav
-            aria-label={locale === 'fr' ? 'Sections du tableau de bord' : locale === 'es' ? 'Secciones del panel' : 'Dashboard sections'}
+            aria-label={t.header.navSectionsAria}
             className="hidden md:flex items-center gap-1 lg:gap-1.5 overflow-x-auto scrollbar-hide py-1"
           >
             {NAV_ITEMS.map((item) => {
@@ -116,7 +116,7 @@ export default function AppHeader() {
 
         {/* Mobile Navigation Row */}
         <nav
-          aria-label={locale === 'fr' ? 'Sections du tableau de bord (mobile)' : locale === 'es' ? 'Secciones del panel (móvil)' : 'Dashboard sections (mobile)'}
+          aria-label={t.header.navSectionsMobileAria}
           className="flex md:hidden items-center gap-1.5 overflow-x-auto scrollbar-hide py-2 border-t border-white/15"
         >
           {NAV_ITEMS.map((item) => {
