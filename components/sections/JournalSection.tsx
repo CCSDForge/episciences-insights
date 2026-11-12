@@ -20,6 +20,7 @@ import TopicCoOccurrenceNetwork from '@/components/TopicCoOccurrenceNetwork';
 import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import FunderStoryline from '@/components/FunderStoryline';
 import OverlayRepositorySpectrum from '@/components/OverlayRepositorySpectrum';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getCountryName } from '@/lib/countryNames';
 
@@ -188,11 +189,11 @@ export default function JournalSection() {
                 <BookOpen size={20} />
               </span>
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {locale === 'fr' ? 'Statistiques à l’usage des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Dashboard'}
+                {currentJournalName}
               </span>
             </div>
             <h1 id="journal-section-heading" className="font-heading text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
-              {currentJournalName}
+              {locale === 'fr' ? 'Statistiques à l’usage des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Statistics'}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-4xl leading-relaxed font-medium">
               {locale === 'fr'
@@ -215,6 +216,9 @@ export default function JournalSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* 2. Four Quadrants (Single column layout) */}
       <div className="flex flex-col gap-8">

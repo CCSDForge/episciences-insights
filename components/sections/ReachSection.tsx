@@ -22,6 +22,7 @@ import CountryCollaborationNetwork from '@/components/CountryCollaborationNetwor
 import CountryCollaborationMatrix from '@/components/CountryCollaborationMatrix';
 import CollaborationWeb from '@/components/CollaborationWeb';
 import FullscreenModal from '@/components/FullscreenModal';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import ViewSegmentedControl, { ViewOption } from '@/components/ViewSegmentedControl';
 
 const CountryGeographicFlowMap = dynamic(
@@ -90,6 +91,9 @@ export default function ReachSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* Unified View Segmented Control */}
       <ViewSegmentedControl<ReachView>

@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Building2, Globe, Network } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
@@ -20,28 +19,24 @@ export default function AppHeader() {
       slug: 'home',
       label: locale === 'fr' ? 'Accueil' : locale === 'es' ? 'Inicio' : 'Home',
       title: locale === 'fr' ? "Page d'accueil et présentation" : locale === 'es' ? 'Inicio y resumen' : 'Home & overview',
-      icon: <Home size={15} aria-hidden="true" />,
     },
     {
       href: `/${locale}/journals`,
       slug: 'journals',
       label: t.tabs.journals,
       title: locale === 'fr' ? "Statistiques à l'usage des revues" : locale === 'es' ? 'Estadísticas de revistas' : 'Journal statistics',
-      icon: <BookOpen size={15} aria-hidden="true" />,
     },
     {
       href: `/${locale}/institutions`,
       slug: 'institutions',
       label: t.tabs.institutions,
       title: locale === 'fr' ? "Statistiques à l'usage des institutions" : locale === 'es' ? 'Estadísticas por institución' : 'Institution statistics',
-      icon: <Building2 size={15} aria-hidden="true" />,
     },
     {
       href: `/${locale}/platform`,
       slug: 'platform',
       label: t.tabs.platform,
-      title: locale === 'fr' ? "Données globales de la plateforme Episciences" : locale === 'es' ? 'Datos globales de la plataforma' : 'Platform data & global impact',
-      icon: <Globe size={15} aria-hidden="true" />,
+      title: locale === 'fr' ? "Données de la plateforme Episciences" : locale === 'es' ? 'Datos de la plataforma' : 'Platform data & global impact',
     },
   ];
 
@@ -53,36 +48,24 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md shadow-xs transition-colors">
+    <header className="sticky top-0 z-40 w-full border-b border-white/10 shadow-md backdrop-blur-md bg-[linear-gradient(to_right,#4da6b2_0%,#307599_35%,#1d4680_70%,#02015f_100%)] supports-[background:linear-gradient(to_right_in_oklab,red,blue)]:bg-[linear-gradient(to_right_in_oklab,#4da6b2_0%,#307599_35%,#1d4680_70%,#02015f_100%)] transition-colors">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-3 lg:gap-6">
           {/* Logo & Brand */}
           <Link
             href={`/${locale}/`}
-            className="flex items-center gap-2.5 shrink-0 focus-visible:outline-2 focus-visible:outline-[var(--primary-focus)] rounded-xl"
+            className="flex items-center shrink-0 focus-visible:outline-2 focus-visible:outline-[var(--primary-focus)] rounded-xl py-1 transition-opacity hover:opacity-90"
             aria-label="Episciences Insights Home"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 p-1.5 transition-transform hover:scale-105">
-              <Image
-                src="/episciences.svg"
-                alt="Episciences Logo"
-                width={28}
-                height={28}
-                className="h-full w-full object-contain"
-                priority
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-heading text-base sm:text-lg font-black tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">
-                Episciences{' '}
-                <span className="bg-gradient-to-r from-[#005fb9] to-[#0aa0be] dark:from-[#57bec3] dark:to-[#008cc3] bg-clip-text text-transparent">
-                  Insights
-                </span>
-              </span>
-              <span className="hidden xl:inline text-[9px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                {t.header.diamondDashboard}
-              </span>
-            </div>
+            <Image
+              src="/episciences-insights-white.svg"
+              alt="Episciences Insights"
+              width={120}
+              height={42}
+              className="h-9 sm:h-10 w-auto object-contain"
+              priority
+            />
+            <span className="sr-only">Episciences Insights - {t.header.diamondDashboard}</span>
           </Link>
 
           {/* Navigation Links (Desktop) */}
@@ -99,13 +82,12 @@ export default function AppHeader() {
                   href={item.href}
                   title={item.title}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`flex items-center gap-1.5 lg:gap-2 rounded-full px-3 lg:px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[var(--primary-focus)] ${
+                  className={`flex items-center rounded-full px-3 lg:px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[var(--primary-focus)] ${
                     isActive
-                      ? 'bg-[#005fb9] text-white shadow-sm dark:bg-[#57bec3] dark:text-[#00005f] dark:font-black'
-                      : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                      ? 'bg-white text-[#003b73] shadow-sm font-black'
+                      : 'text-white/85 hover:text-white hover:bg-white/15'
                   }`}
                 >
-                  <span className="shrink-0">{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               );
@@ -118,14 +100,13 @@ export default function AppHeader() {
               href={`/${locale}/network`}
               title={t.header.networkExplorerBtn}
               aria-label={t.header.networkExplorerBtn}
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
+              className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                 isNetworkPage
-                  ? 'bg-[#005fb9] text-white dark:bg-[#57bec3] dark:text-[#00005f]'
-                  : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 ring-1 ring-zinc-200 dark:ring-zinc-800'
+                  ? 'bg-white text-[#00005f] shadow-sm'
+                  : 'bg-white/15 text-white hover:bg-white/25 ring-1 ring-white/20'
               }`}
             >
-              <Network size={14} aria-hidden="true" />
-              <span className="hidden xl:inline">{t.header.networkExplorerBtn}</span>
+              <span>{t.header.networkExplorerBtn}</span>
             </Link>
 
             <LanguageSwitcher />
@@ -136,7 +117,7 @@ export default function AppHeader() {
         {/* Mobile Navigation Row */}
         <nav
           aria-label={locale === 'fr' ? 'Sections du tableau de bord (mobile)' : locale === 'es' ? 'Secciones del panel (móvil)' : 'Dashboard sections (mobile)'}
-          className="flex md:hidden items-center gap-1.5 overflow-x-auto scrollbar-hide py-2 border-t border-zinc-100 dark:border-zinc-800"
+          className="flex md:hidden items-center gap-1.5 overflow-x-auto scrollbar-hide py-2 border-t border-white/15"
         >
           {NAV_ITEMS.map((item) => {
             const isActive = checkIsActive(item);
@@ -148,8 +129,8 @@ export default function AppHeader() {
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-[#005fb9] text-white dark:bg-[#57bec3] dark:text-[#00005f] dark:font-black'
-                    : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:hover:text-white'
+                    ? 'bg-white text-[#003b73] shadow-sm font-black'
+                    : 'text-white/85 hover:text-white hover:bg-white/15'
                 }`}
               >
                 <span>{item.label}</span>

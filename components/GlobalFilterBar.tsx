@@ -279,7 +279,7 @@ export default function GlobalFilterBar() {
   return (
     <section
       aria-label={locale === 'fr' ? 'Filtres globaux du corpus' : locale === 'es' ? 'Filtros globales del corpus' : 'Global corpus filters'}
-      className="mb-8 rounded-2xl bg-white p-4 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 transition-colors"
+      className="rounded-2xl bg-white p-4 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 transition-colors"
     >
       <div className="flex flex-wrap items-center gap-4">
         {/* Filter icon label */}

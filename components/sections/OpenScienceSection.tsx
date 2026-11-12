@@ -7,6 +7,7 @@ import { useDashboard } from '@/components/DashboardContext';
 import ResearchLineage from '@/components/ResearchLineage';
 import LicenseSpectrum from '@/components/LicenseSpectrum';
 import ChartExportMenu from '@/components/ChartExportMenu';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 
 export default function OpenScienceSection() {
   const { t } = useTranslation();
@@ -38,6 +39,9 @@ export default function OpenScienceSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* Open Science KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

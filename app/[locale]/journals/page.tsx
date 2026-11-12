@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://insights.episciences.org';
 
   const titles: Record<Locale, string> = {
-    fr: 'Statistiques des revues - Episciences Insights',
+    fr: 'Statistiques à l’usage des revues - Episciences Insights',
     en: 'Journal Statistics - Episciences Insights',
     es: 'Estadísticas de revistas - Episciences Insights',
   };

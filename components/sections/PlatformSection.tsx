@@ -24,6 +24,7 @@ import CountryGeographicFlowMap from '@/components/CountryGeographicFlowMap';
 import ResearchLineage from '@/components/ResearchLineage';
 import NetworkExplorer from '@/components/NetworkExplorer';
 import FullscreenModal from '@/components/FullscreenModal';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import {
   BarChart,
   Bar,
@@ -130,11 +131,11 @@ export default function PlatformSection() {
                 <Globe size={20} />
               </span>
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {locale === 'fr' ? 'Données de la plateforme' : locale === 'es' ? 'Datos de la plataforma' : 'Platform Global Impact'}
+                {locale === 'fr' ? 'Trajectoire et impact global' : locale === 'es' ? 'Trayectoria e impacto global' : 'Trajectory & Global Impact'}
               </span>
             </div>
             <h1 id="platform-section-heading" className="font-heading text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
-              {locale === 'fr' ? 'Trajectoire et impact global d’Episciences' : locale === 'es' ? 'Trayectoria e impacto global de Episciences' : 'Episciences Trajectory & Global Impact'}
+              {locale === 'fr' ? 'Données de la plateforme' : locale === 'es' ? 'Datos de la plataforma' : 'Platform Data'}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-4xl leading-relaxed font-medium">
               {locale === 'fr'
@@ -157,6 +158,9 @@ export default function PlatformSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* 2. Four Quadrants (Single column layout) */}
       <div className="flex flex-col gap-8">

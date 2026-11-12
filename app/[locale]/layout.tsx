@@ -3,7 +3,6 @@ import { Locale, translations } from '@/lib/i18n/translations';
 import { LanguageProvider } from '@/lib/i18n/LanguageContext';
 import { DashboardProvider } from '@/components/DashboardContext';
 import AppHeader from '@/components/AppHeader';
-import GlobalFilterBar from '@/components/GlobalFilterBar';
 import PageFooter from '@/components/PageFooter';
 import { getPublications, getFunders, getLastUpdated } from '@/lib/data';
 import { getKpiSummary } from '@/lib/dashboardData';
@@ -37,7 +36,6 @@ export default async function LocaleLayout({
           <AppHeader />
 
           <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1">
-            <GlobalFilterBar />
             <main id="main-content">
               {children}
             </main>

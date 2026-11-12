@@ -20,6 +20,7 @@ import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import MscCoOccurrenceMatrix from '@/components/MscCoOccurrenceMatrix';
 import FullscreenModal from '@/components/FullscreenModal';
 import ChartExportMenu from '@/components/ChartExportMenu';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import ViewSegmentedControl, { ViewOption } from '@/components/ViewSegmentedControl';
 
 type TopicsView = 'overview' | 'topics-network' | 'topics-matrix' | 'msc-network' | 'msc-matrix';
@@ -91,6 +92,9 @@ export default function TopicsSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* Unified View Segmented Control */}
       <ViewSegmentedControl<TopicsView>

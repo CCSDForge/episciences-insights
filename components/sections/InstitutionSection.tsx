@@ -21,6 +21,7 @@ import TopicTreeMap from '@/components/TopicTreeMap';
 import TopicCoOccurrenceNetwork from '@/components/TopicCoOccurrenceNetwork';
 import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import FunderStoryline from '@/components/FunderStoryline';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getCountryName } from '@/lib/countryNames';
 
@@ -195,11 +196,11 @@ export default function InstitutionSection() {
                 <Building2 size={20} />
               </span>
               <span className="rounded-full bg-[var(--episciences-cyan-00)]/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)]">
-                {locale === 'fr' ? 'Statistiques par institution' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Dashboard'}
+                {currentInstitution ? currentInstitution.name : locale === 'fr' ? 'Toutes les institutions' : locale === 'es' ? 'Todas las instituciones' : 'All Institutions'}
               </span>
             </div>
             <h1 id="institution-section-heading" className="font-heading text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
-              {currentInstitution ? currentInstitution.name : locale === 'fr' ? 'Toutes les institutions' : locale === 'es' ? 'Todas las instituciones' : 'All Institutions'}
+              {locale === 'fr' ? 'Statistiques à l’usage des institutions' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Statistics'}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-4xl leading-relaxed font-medium">
               {locale === 'fr'
@@ -243,6 +244,9 @@ export default function InstitutionSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* Institution Details Quick Bar (if filtered) */}
       {currentInstitution && (

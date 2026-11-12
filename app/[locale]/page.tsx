@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { getLastUpdated } from '@/lib/data';
 import HomePageClient from '@/components/HomePageClient';
 
 export function generateStaticParams() {
@@ -38,6 +37,5 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function LocaleHomePage() {
-  const lastUpdated = getLastUpdated();
-  return <HomePageClient lastUpdated={lastUpdated} />;
+  return <HomePageClient />;
 }

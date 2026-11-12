@@ -98,6 +98,7 @@ export interface Translations {
     source: string;
     lastUpdated: string;
     methodologyLink: string;
+    sourceCode: string;
   };
   lineage: {
     title: string;
@@ -491,7 +492,8 @@ export const translations: Record<Locale, Translations> = {
           "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Data automatically aggregated from the OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open, and ROR APIs",
           "lastUpdated": "Data last updated: {date}",
-          "methodologyLink": "Methodology & Scholarly Framework"
+          "methodologyLink": "Disclaimer & Methodological Framework",
+          "sourceCode": "Source code & repository"
       },
       "lineage": {
           "title": "Research Lineage",
@@ -860,8 +862,8 @@ export const translations: Record<Locale, Translations> = {
           "funders": "Impact financeurs",
           "lineage": "Filiation & Science Ouverte",
           "usage": "Analytique d'usage",
-          "journals": "Statistiques des revues",
-          "institutions": "Statistiques par institution",
+          "journals": "Statistiques à l'usage des revues",
+          "institutions": "Statistiques à l'usage des institutions",
           "platform": "Données de la plateforme"
       },
       "kpi": {
@@ -883,7 +885,8 @@ export const translations: Record<Locale, Translations> = {
           "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
           "lastUpdated": "Dernière mise à jour des données : {date}",
-          "methodologyLink": "Méthodologie et sources de données"
+          "methodologyLink": "Disclaimer & Cadre méthodologique",
+          "sourceCode": "Code source & dépôt"
       },
       "lineage": {
           "title": "Filiation de la recherche",
@@ -1275,7 +1278,8 @@ export const translations: Record<Locale, Translations> = {
           "license": "CC-BY 2026 CCSD - Episciences - Código Abierto (GPL v3)",
           "source": "Datos agregados automáticamente desde las API de OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open y ROR",
           "lastUpdated": "Última actualización de los datos: {date}",
-          "methodologyLink": "Metodología y Marco científico"
+          "methodologyLink": "Aviso legal y marco metodológico",
+          "sourceCode": "Código fuente y repositorio"
       },
       "lineage": {
           "title": "Linaje de la investigación",

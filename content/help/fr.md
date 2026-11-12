@@ -19,9 +19,7 @@ tocItems:
   - id: "sec5"
     label: "5. Limites"
   - id: "sec6"
-    label: "6. Architecture, licences et reproductibilité"
-  - id: "sec7"
-    label: "7. Liens et documentation"
+    label: "6. Liens et documentation"
 ---
 
 ## 1. Contexte
@@ -47,6 +45,12 @@ Les données proviennent de plusieurs sources, reliées entre elles par des iden
 | [zbMATH Open](https://zbmath.org) | Via l'export Episciences | Codes de la Mathematics Subject Classification (MSC 2020) | Code MSC 2020 |
 | **Episciences KPI Logs** | `kpi_downloads.json` | Téléchargements et consultations de pages, par revue, par article et par pays | DOI, rvcode |
 
+### Jeux de données ouverts (Open Data)
+
+Les jeux de données consolidés utilisés pour alimenter la plateforme sont mis à disposition sous licence [Creative Commons CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) :
+* [Télécharger le fichier consolidé des publications (JSON)](/data/publications.json)
+* [Télécharger le référentiel normalisé des financeurs (JSON)](/data/funders.json)
+
 ## 3. Collecte et traitement
 
 Les données sont collectées et traitées en amont par une suite de scripts. Le site est ensuite généré à partir de ces données.
@@ -71,7 +75,9 @@ Sur le graphe des financeurs, deux organismes sont reliés s'ils financent les m
 
 ### Précautions relatives aux statistiques de consultation
 
-Les chiffres de téléchargements et de vues proviennent des journaux de consultation de la plateforme Episciences. Ils sont agrégés par revue, par article et par pays lorsque l'adresse IP permet de le déterminer.
+Les statistiques de téléchargement et de consultation de pages proviennent exclusivement de la plateforme Episciences et reflètent les consultations directes sur les sites des revues. Elles sont agrégées par revue, par article et par pays lorsque l'adresse IP permet de le déterminer.
+
+Ces indicateurs ne comptabilisent pas les consultations et téléchargements effectués sur les archives ouvertes ou entrepôts partenaires (HAL, arXiv, Zenodo...) où les mêmes articles sont librement accessibles : le lectorat effectif global est donc très probablement supérieur aux chiffres présentés ici.
 
 > **Attention méthodologique :** Les chiffres de consultation ne sont pas directement comparables d'une revue à l'autre : une revue ancienne ou publiant un grand nombre d'articles cumulera naturellement plus de vues qu'une revue récente. De même, les pratiques de consultation varient sensiblement selon les disciplines.
 
@@ -93,56 +99,25 @@ Un pays est comptabilisé dès lors qu'au moins un coauteur ou une coautrice dé
 
 Plusieurs limites sont à garder à l'esprit pour interpréter les résultats :
 
+* **Couverture et exhaustivité :** Bien que le corpus rassemble la quasi-totalité des publications de la plateforme, aucun agrégateur externe ne constitue un catalogue exhaustif absolu. La couverture d'un article par des sources tierces (OpenAlex, OpenAIRE) n'est pas garantie, et certains indicateurs (science ouverte, ODD, classifications) ne sont disponibles que lorsqu'un enregistrement correspondant existe.
 * **Délai d'indexation :** Un article récent peut ne pas encore être indexé par OpenAlex ou OpenAIRE, ou ne l'être que partiellement.
+* **Modèles algorithmiques :** Certaines métadonnées issues d'OpenAlex (notamment les concepts thématiques, l'alignement avec les ODD et les travaux connexes) sont produites par des modèles automatisés et peuvent comporter des approximations.
 * **Classifications disciplinaires :** Les codes MSC 2020 (mathématiques) et JEL (économie) ne concernent que certaines revues. Leur absence ailleurs est normale.
 * **Affiliations :** Les établissements des auteurs proviennent d'OpenAlex, complétés par les affiliations déclarées sur Episciences avec un identifiant ROR. Le rattachement automatique d'OpenAlex peut contenir des erreurs, et une partie des auteurs reste sans établissement connu.
 * **Artefacts de recherche (données et code) :** La détection des jeux de données et logiciels liés (Scholix) dépend des déclarations effectuées par les auteurs dans des entrepôts partenaires (Dryad, Zenodo, etc.) et moissonnées par OpenAIRE Graph. Seule une fraction des articles dispose de ces liens formalisés.
+* **Démarche d'amélioration continue :** L'équipe d'Episciences s'investit continuellement pour affiner, vérifier et enrichir ces jeux de données afin d'offrir une représentation toujours plus fidèle de l'impact scientifique des revues.
 
-## 6. Architecture, licences et reproductibilité
+## 6. Liens et documentation
 
-Le site est un ensemble de fichiers statiques, générés à partir de données préparées à l'avance.
-
-### Site statique
-Le site est généré avec Next.js sous forme de fichiers HTML et JSON. Toutes les ressources, y compris le fond de carte, sont servies par le site lui-même : la consultation ne déclenche aucun appel vers un service tiers.
-
-### Compression
-Les données sont compressées à l'avance (Brotli et Gzip), ce qui réduit le volume à télécharger.
-
-### Licences et données ouvertes
-Le code source est publié sous licence GNU GPL v3. Les jeux de données consolidés sont diffusés sous licence CC-BY 4.0.
-
-* [Télécharger le fichier des publications (JSON)](/data/publications.json)
-* [Télécharger le fichier des financeurs (JSON)](/data/funders.json)
-
-### Reproduire la collecte
-L'ensemble du traitement peut être relancé localement avec Node.js :
-
-```bash
-# 1. Cloner le dépôt (GPL v3)
-git clone https://github.com/CCSDForge/episciences-insights.git
-cd episciences-insights && npm install
-
-# 2. Récupérer la liste des DOI depuis l'API Episciences
-npm run sync:dois
-
-# 3. Collecter et fusionner les métadonnées
-npm run collect
-
-# Optionnel : collecter les liens Scholix (données et logiciels)
-npm run collect:links
-
-# 4. Générer le site statique
-npm run build
-```
-
-## 7. Liens et documentation
-
-* DORA (2012) - [San Francisco Declaration on Research Assessment](https://sfdora.org)
-* CoARA (2022) - [Coalition for Advancing Research Assessment](https://coara.org)
-* OpenAIRE (2024) - [OpenAIRE Graph v3 API Documentation](https://graph.openaire.eu/docs)
-* OurResearch (2024) - [OpenAlex Documentation & Data Schema](https://docs.openalex.org)
-* ROR (2024) - [Research Organization Registry](https://ror.org)
-* zbMATH Open - [Mathematics Subject Classification (MSC 2020)](https://zbmath.org/classification/)
-* Scholix - [Cadre d'échange de liens pour la recherche (RDA/WDS)](http://www.scholix.org/)
-* Natural Earth & world-atlas (Mike Bostock) - [Fond de carte mondial TopoJSON (Licence ISC / Domaine public)](https://github.com/topojson/world-atlas)
-* Plique, G. - [graphology-communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (Licence MIT)
+* **DORA** (2012). *Déclaration de San Francisco sur l’évaluation de la recherche*. Disponible sur : [https://sfdora.org](https://sfdora.org) (consulté en novembre 2026).
+* **CoARA** (2022). *Agreement on Reforming Research Assessment*. Coalition for Advancing Research Assessment. Disponible sur : [https://coara.org](https://coara.org) (consulté en novembre 2026).
+* **OpenAIRE**. *OpenAIRE Graph v3 API Documentation* [en ligne]. OpenAIRE A.M.K.E. Disponible sur : [https://graph.openaire.eu/docs](https://graph.openaire.eu/docs) (consulté en novembre 2026).
+* **OurResearch**. *OpenAlex Documentation & Data Schema* [en ligne]. Disponible sur : [https://docs.openalex.org](https://docs.openalex.org) (consulté en novembre 2026).
+* **Research Organization Registry (ROR)**. *Registry Documentation and API* [en ligne]. Disponible sur : [https://ror.org](https://ror.org) (consulté en novembre 2026).
+* **American Economic Association (AEA)**. *JEL Classification System / EconLit Subject Descriptors* [en ligne]. Disponible sur : [https://www.aeaweb.org/econlit/jelCodes.php](https://www.aeaweb.org/econlit/jelCodes.php) (consulté en novembre 2026).
+* **zbMATH Open**. *Mathematics Subject Classification (MSC 2020)* [en ligne]. FIZ Karlsruhe. Disponible sur : [https://zbmath.org/classification/](https://zbmath.org/classification/) (consulté en novembre 2026).
+* **American Mathematical Society (AMS)**. *MSC2020 – Mathematics Subject Classification System* [en ligne]. Disponible sur : [https://msc2020.org](https://msc2020.org) et [https://mathscinet.ams.org/msc/msc2020.html](https://mathscinet.ams.org/msc/msc2020.html) (consulté en novembre 2026).
+* **Organisation des Nations Unies (ONU)**. *Objectifs de développement durable (ODD) – Agenda 2030* [en ligne]. Nations Unies. Disponible sur : [https://sdgs.un.org/goals](https://sdgs.un.org/goals) (consulté en novembre 2026).
+* **Research Data Alliance (RDA) & World Data System (WDS)**. *Scholix: A Framework for Scholarly Link Exchange* [en ligne]. Disponible sur : [http://www.scholix.org/](http://www.scholix.org/) (consulté en novembre 2026).
+* **Bostock, M.** *world-atlas: Pre-built TopoJSON from Natural Earth* [données en ligne]. GitHub. Licence ISC / Domaine public. Disponible sur : [https://github.com/topojson/world-atlas](https://github.com/topojson/world-atlas) (consulté en novembre 2026).
+* **Plique, G.** *graphology-communities-louvain: Louvain community detection algorithm for graphology* [logiciel en ligne]. Graphology. Licence MIT. Disponible sur : [https://graphology.github.io/standard-library/communities-louvain](https://graphology.github.io/standard-library/communities-louvain) (consulté en novembre 2026).

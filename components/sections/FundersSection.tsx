@@ -26,6 +26,7 @@ import FunderCofundingClusterNetwork from '@/components/FunderCofundingClusterNe
 import FunderSankey from '@/components/FunderSankey';
 import FullscreenModal from '@/components/FullscreenModal';
 import ChartExportMenu from '@/components/ChartExportMenu';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import ViewSegmentedControl, { ViewOption } from '@/components/ViewSegmentedControl';
 
 const FunderGeographicFlowMap = dynamic(
@@ -118,6 +119,9 @@ export default function FundersSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {/* Control Row: Views + Search Specific Funder */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-4">

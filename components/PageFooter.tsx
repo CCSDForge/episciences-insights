@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface PageFooterProps {
@@ -12,8 +11,6 @@ interface PageFooterProps {
 
 export default function PageFooter({ lastUpdated }: PageFooterProps) {
   const { t, locale } = useTranslation();
-  const pathname = usePathname();
-  const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
 
   const formattedDate = React.useMemo(() => {
     if (!lastUpdated) return null;
@@ -28,10 +25,6 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
   }, [lastUpdated, locale]);
 
   const newTabNotice = locale === 'fr' ? '(ouvre un nouvel onglet)' : locale === 'es' ? '(abre una nueva pestaña)' : '(opens in a new tab)';
-
-  if (isHome) {
-    return null;
-  }
 
   return (
     <footer className="mt-20 border-t border-zinc-200 py-12 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
@@ -160,21 +153,31 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
           />
         </a>
       </div>
-      <div className="mb-4 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
+      <p className="font-semibold">{t.footer.license}</p>
+      <p className="mt-2">{t.footer.source}</p>
+      <p className="mt-3 text-xs text-zinc-600 dark:text-zinc-400 flex items-center justify-center gap-2 flex-wrap">
+        {formattedDate && (
+          <>
+            <span>{t.footer.lastUpdated.replace('{date}', formattedDate)}</span>
+            <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-600">•</span>
+          </>
+        )}
         <Link
           href={`/${locale}/help`}
-          className="text-zinc-600 hover:text-[var(--episciences-cyan-03)] dark:text-zinc-400 dark:hover:text-[var(--episciences-cyan-00)] underline underline-offset-4 transition-colors"
+          className="text-zinc-600 hover:text-[var(--episciences-cyan-03)] dark:text-zinc-400 dark:hover:text-[var(--episciences-cyan-00)] underline underline-offset-4 transition-colors font-medium"
         >
           {t.footer.methodologyLink}
         </Link>
-      </div>
-      <p className="font-semibold">{t.footer.license}</p>
-      <p className="mt-2">{t.footer.source}</p>
-      {formattedDate && (
-        <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
-          {t.footer.lastUpdated.replace('{date}', formattedDate)}
-        </p>
-      )}
+        <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-600">•</span>
+        <a
+          href="https://github.com/CCSDForge/episciences-insights"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-zinc-600 hover:text-[var(--episciences-cyan-03)] dark:text-zinc-400 dark:hover:text-[var(--episciences-cyan-00)] underline underline-offset-4 transition-colors font-medium"
+        >
+          {t.footer.sourceCode}
+        </a>
+      </p>
     </footer>
   );
 }

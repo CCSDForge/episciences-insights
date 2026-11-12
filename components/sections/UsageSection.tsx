@@ -4,6 +4,7 @@ import React from 'react';
 import { BarChart3 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
+import GlobalFilterBar from '@/components/GlobalFilterBar';
 import UsageAnalytics from '@/components/UsageAnalytics';
 
 export default function UsageSection() {
@@ -34,6 +35,9 @@ export default function UsageSection() {
           </div>
         </div>
       </div>
+
+      {/* Global Filters */}
+      <GlobalFilterBar />
 
       {usageSummary ? (
         <UsageAnalytics />

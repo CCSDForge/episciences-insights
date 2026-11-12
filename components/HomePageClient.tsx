@@ -2,26 +2,18 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   BookOpen,
   Building2,
   Globe,
   ArrowRight,
-  ExternalLink,
-  ShieldCheck,
 } from 'lucide-react';
 import { useDashboard } from '@/components/DashboardContext';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import PageHeader from '@/components/PageHeader';
-import { renderLinkedText } from '@/lib/renderLinkedText';
 
-interface HomePageClientProps {
-  lastUpdated?: string | null;
-}
-
-export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
-  const { t, locale } = useTranslation();
+export default function HomePageClient() {
+  const { locale } = useTranslation();
   const { data } = useDashboard();
   const { stats, usageSummary } = data;
 
@@ -40,22 +32,10 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
     funders: stats.totalFunders,
   }), [stats]);
 
-  const formattedDate = useMemo(() => {
-    if (!lastUpdated) return null;
-    const date = new Date(lastUpdated);
-    if (isNaN(date.getTime())) return null;
-    const dateLocale = locale === 'fr' ? 'fr-FR' : locale === 'es' ? 'es-ES' : 'en-US';
-    return new Intl.DateTimeFormat(dateLocale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(date);
-  }, [lastUpdated, locale]);
-
   const PERSONA_SECTIONS = [
     {
       href: `/${locale}/journals`,
-      title: locale === 'fr' ? 'Statistiques des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Statistics',
+      title: locale === 'fr' ? 'Statistiques à l’usage des revues' : locale === 'es' ? 'Estadísticas de revistas' : 'Journal Statistics',
       badge: locale === 'fr' ? 'Comités éditoriaux & Revues' : locale === 'es' ? 'Comités editoriales' : 'Editorial Boards & Journals',
       desc: locale === 'fr'
         ? 'Indicateurs de lectorat (dynamique d’usage, pays), autorat, thématiques et financeurs pour le pilotage de chaque revue.'
@@ -67,7 +47,7 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
     },
     {
       href: `/${locale}/institutions`,
-      title: locale === 'fr' ? 'Statistiques par institution' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Statistics',
+      title: locale === 'fr' ? 'Statistiques à l’usage des institutions' : locale === 'es' ? 'Estadísticas por institución' : 'Institution Statistics',
       badge: locale === 'fr' ? 'Établissements & Recherche' : locale === 'es' ? 'Instituciones y Centros' : 'Universities & Research Bodies',
       desc: locale === 'fr'
         ? 'Mesurez la production de votre établissement sur Episciences : réseaux de co-autorat, revues hébergeant vos articles et financeurs.'
@@ -150,190 +130,6 @@ export default function HomePageClient({ lastUpdated }: HomePageClientProps) {
             </Link>
           ))}
         </div>
-      </section>
-
-      {/* 3. Disclaimer and Link to Methodology (Matching bottom of Mockup 1) */}
-      <section
-        aria-labelledby="home-methodology-title"
-        className="rounded-[2.5rem] bg-white p-8 sm:p-12 shadow-xl ring-1 ring-zinc-200 dark:bg-zinc-900/90 dark:ring-zinc-800 space-y-8"
-      >
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--episciences-cyan-03)]/10 text-[var(--episciences-cyan-03)] dark:bg-[var(--episciences-cyan-00)]/15 dark:text-[var(--episciences-cyan-00)]">
-              <ShieldCheck size={26} aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="home-methodology-title" className="font-heading text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-50">
-                {locale === 'fr'
-                  ? 'Disclaimer et renvoi vers la page méthodologies'
-                  : locale === 'es'
-                  ? 'Aviso legal y enlace a la metodología'
-                  : 'Disclaimer & Methodological Framework'}
-              </h2>
-              <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {locale === 'fr'
-                  ? 'Transparence des sources ouvertes, non-utilisation du facteur d’impact et respect des chartes DORA et CoARA'
-                  : locale === 'es'
-                  ? 'Transparencia de fuentes abiertas, no uso del factor de impacto y respeto a DORA y CoARA'
-                  : 'Open source transparency, non-use of impact factors, and full alignment with DORA and CoARA'}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href={`/${locale}/help`}
-            className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors whitespace-nowrap"
-          >
-            <span>{locale === 'fr' ? 'Consulter la méthodologie' : locale === 'es' ? 'Ver metodología' : 'View methodology'}</span>
-            <ExternalLink size={14} aria-hidden="true" />
-          </Link>
-        </div>
-
-        {/* Narrative & Methodology */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300 font-medium">
-          <p>{renderLinkedText(t.disclaimer.metricsP1)}</p>
-          <p>{renderLinkedText(t.disclaimer.metricsP2)}</p>
-        </div>
-
-        {/* Downloads Note */}
-        <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium border-t border-zinc-100 dark:border-zinc-800 pt-6">
-          <span className="font-bold text-zinc-800 dark:text-zinc-200">
-            {t.disclaimer.downloadsNoteTitle}{' '}
-          </span>
-          {t.disclaimer.downloadsNote}
-        </p>
-
-        {/* CCSD and Tutelles Logos */}
-        <div className="border-t border-zinc-100 dark:border-zinc-800 pt-8 space-y-6">
-          <div className="flex justify-center">
-            <a
-              href="https://www.ccsd.cnrs.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label={`CCSD - Centre pour la Communication Scientifique Directe (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
-            >
-              <Image
-                src="/ccsd-logo-light.svg"
-                alt="CCSD - Centre pour la Communication Scientifique Directe"
-                width={180}
-                height={50}
-                className="h-12 sm:h-14 w-auto dark:hidden"
-              />
-              <Image
-                src="/ccsd-logo-dark.svg"
-                alt="CCSD - Centre pour la Communication Scientifique Directe"
-                width={180}
-                height={50}
-                className="h-12 sm:h-14 w-auto hidden dark:block"
-              />
-            </a>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-            {/* MESRE */}
-            <a
-              href="https://www.enseignementsup-recherche.gouv.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label={`Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
-            >
-              <Image
-                src="/tutelles/mesre-light.png"
-                alt="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
-                width={180}
-                height={150}
-                className="h-16 sm:h-20 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/mesre-dark.png"
-                alt="Ministère de l'Enseignement Supérieur, de la Recherche et de l'Espace"
-                width={180}
-                height={150}
-                className="hidden h-16 sm:h-20 w-auto dark:block"
-              />
-            </a>
-
-            {/* CNRS */}
-            <a
-              href="https://www.cnrs.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label={`CNRS - Centre national de la recherche scientifique (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
-            >
-              <Image
-                src="/tutelles/cnrs-light.svg"
-                alt="CNRS - Centre national de la recherche scientifique"
-                width={100}
-                height={100}
-                className="h-9 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/cnrs-dark.svg"
-                alt="CNRS - Centre national de la recherche scientifique"
-                width={100}
-                height={100}
-                className="hidden h-9 w-auto dark:block"
-              />
-            </a>
-
-            {/* Inria */}
-            <a
-              href="https://www.inria.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label={`Inria - Institut national de recherche en sciences et technologies du numérique (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
-            >
-              <Image
-                src="/tutelles/inria-light.svg"
-                alt="Inria"
-                width={120}
-                height={35}
-                className="h-7 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/inria-dark.svg"
-                alt="Inria"
-                width={120}
-                height={35}
-                className="hidden h-7 w-auto dark:block"
-              />
-            </a>
-
-            {/* INRAE */}
-            <a
-              href="https://www.inrae.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-85 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md"
-              aria-label={`INRAE - Institut national de recherche pour l'agriculture, l'alimentation et l'environnement (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
-            >
-              <Image
-                src="/tutelles/inrae-light.png"
-                alt="INRAE"
-                width={120}
-                height={32}
-                className="h-6 w-auto dark:hidden"
-              />
-              <Image
-                src="/tutelles/inrae-dark.png"
-                alt="INRAE"
-                width={120}
-                height={32}
-                className="hidden h-6 w-auto dark:block"
-              />
-            </a>
-          </div>
-        </div>
-
-        {formattedDate && (
-          <p className="text-center text-xs font-medium text-zinc-600 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-            {t.footer.lastUpdated.replace('{date}', formattedDate)}
-          </p>
-        )}
       </section>
     </div>
   );
