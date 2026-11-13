@@ -8,18 +8,23 @@ import { getCountryName } from '@/lib/countryNames';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { usePublications } from '@/lib/publications-client';
 import FunderCofundingMatrix from './FunderCofundingMatrix';
-import FunderCofundingNetwork from './FunderCofundingNetwork';
-import FunderCofundingClusterNetwork from './FunderCofundingClusterNetwork';
-import FunderSankey from './FunderSankey';
-import CollaborationWeb from './CollaborationWeb';
-import InstitutionCofundingMatrix from './InstitutionCofundingMatrix';
 import CountryCollaborationNetwork from './CountryCollaborationNetwork';
-import CountryCollaborationMatrix from './CountryCollaborationMatrix';
 import CountryGeographicFlowMap from './CountryGeographicFlowMap';
-import MscCoOccurrenceNetwork from './MscCoOccurrenceNetwork';
 import MscCoOccurrenceMatrix from './MscCoOccurrenceMatrix';
 import TopicCoOccurrenceMatrix from './TopicCoOccurrenceMatrix';
-import TopicCoOccurrenceNetwork from './TopicCoOccurrenceNetwork';
+
+const NetworkViewSkeleton = () => (
+  <div className="h-[420px] rounded-3xl bg-zinc-50/30 dark:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800 animate-pulse" />
+);
+
+const FunderCofundingNetwork = dynamic(() => import('./FunderCofundingNetwork'), { ssr: false, loading: NetworkViewSkeleton });
+const FunderCofundingClusterNetwork = dynamic(() => import('./FunderCofundingClusterNetwork'), { ssr: false, loading: NetworkViewSkeleton });
+const FunderSankey = dynamic(() => import('./FunderSankey'), { ssr: false, loading: NetworkViewSkeleton });
+const CollaborationWeb = dynamic(() => import('./CollaborationWeb'), { ssr: false, loading: NetworkViewSkeleton });
+const InstitutionCofundingMatrix = dynamic(() => import('./InstitutionCofundingMatrix'), { ssr: false, loading: NetworkViewSkeleton });
+const CountryCollaborationMatrix = dynamic(() => import('./CountryCollaborationMatrix'), { ssr: false, loading: NetworkViewSkeleton });
+const MscCoOccurrenceNetwork = dynamic(() => import('./MscCoOccurrenceNetwork'), { ssr: false, loading: NetworkViewSkeleton });
+const TopicCoOccurrenceNetwork = dynamic(() => import('./TopicCoOccurrenceNetwork'), { ssr: false, loading: NetworkViewSkeleton });
 
 // react-simple-maps projects each Marker's [lng, lat] through d3-geo's
 // trigonometric math, which the JS spec allows to differ in its lowest bits

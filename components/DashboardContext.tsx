@@ -1,9 +1,10 @@
 'use client';
 
-import React, { createContext, use, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, use, useState, useEffect, useMemo, useCallback, useDeferredValue } from 'react';
 import { Publication, UsageSummary, FundersFile } from '@/lib/types';
 import { normalizeLicense } from '@/lib/licenses';
 import { getCountryName } from '@/lib/countryNames';
+import { getPublicationsClient } from '@/lib/publications-client';
 
 // Near-universal on this corpus (Episciences itself, plus OpenAIRE's catch-all
 // for an instance with no resolvable host) — excluded from the repository
@@ -154,12 +155,12 @@ function computePeerReviewStats(dataset: Publication[]): PeerReviewDelayStats {
   const averageMonths = Math.round((totalDays / valid.length / 30.4375) * 10) / 10;
 
   const rangeBins = [
-    { range: '< 3 mois', min: 0, max: 90 },
-    { range: '3-6 mois', min: 90, max: 180 },
-    { range: '6-12 mois', min: 180, max: 365 },
-    { range: '1-2 ans', min: 365, max: 730 },
-    { range: '> 2 ans', min: 730, max: Infinity },
-  ];
+    { range: 'lt3m', min: 0, max: 90 },
+    { range: 'range3to6m', min: 90, max: 180 },
+    { range: 'range6to12m', min: 180, max: 365 },
+    { range: 'range1to2y', min: 365, max: 730 },
+    { range: 'gt2y', min: 730, max: Infinity },
+  ] as const;
 
   const byRange = rangeBins.map(bin => {
     const count = valid.filter(v => v.days >= bin.min && v.days < bin.max).length;
@@ -196,45 +197,32 @@ function computePeerReviewStats(dataset: Publication[]): PeerReviewDelayStats {
   };
 }
 
-let cachedPublications: Publication[] | null = null;
-let fetchPromise: Promise<Publication[]> | null = null;
-
 export function DashboardProvider({ initialData, usageSummary, funders = {}, children }: DashboardProviderProps) {
   const [publications, setPublications] = useState<Publication[]>(() => {
     if (initialData && initialData.length > 0) return initialData;
-    if (cachedPublications) return cachedPublications;
     return [];
   });
   const [isLoading, setIsLoading] = useState<boolean>(() => {
-    return (!initialData || initialData.length === 0) && !cachedPublications;
+    return !initialData || initialData.length === 0;
   });
 
   useEffect(() => {
     if (publications.length > 0) return;
-    if (!fetchPromise) {
-      fetchPromise = fetch('/data/publications.json')
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then((data: Publication[]) => {
-          cachedPublications = data;
-          return data;
-        })
-        .catch(err => {
-          fetchPromise = null;
-          throw err;
-        });
-    }
-    fetchPromise
-      .then(data => {
+    let cancelled = false;
+    getPublicationsClient()
+      .then((data) => {
+        if (cancelled) return;
         setPublications(data);
         setIsLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
+        if (cancelled) return;
         console.error('Failed to load publications:', err);
         setIsLoading(false);
       });
+    return () => {
+      cancelled = true;
+    };
   }, [publications.length]);
 
   const [yearFilter, setYearFilter] = useState('all');
@@ -266,22 +254,26 @@ export function DashboardProvider({ initialData, usageSummary, funders = {}, chi
     return map;
   }, [publications]);
 
+  const deferredYearFilter = useDeferredValue(yearFilter);
+  const deferredJournalFilter = useDeferredValue(journalFilter);
+  const deferredInstitutionFilter = useDeferredValue(institutionFilter);
+
   const filteredData = useMemo(() => {
-    const selectedJournalName = journalFilter !== 'all' ? journalIdToName.get(journalFilter) : null;
+    const selectedJournalName = deferredJournalFilter !== 'all' ? journalIdToName.get(deferredJournalFilter) : null;
     return publications.filter(p => {
-      const yearMatch = yearFilter === 'all' || p.year.toString() === yearFilter;
+      const yearMatch = deferredYearFilter === 'all' || p.year.toString() === deferredYearFilter;
       const journalMatch =
-        journalFilter === 'all' ||
-        p.journal.code === journalFilter ||
-        p.journal.issn === journalFilter ||
-        p.journal.name === journalFilter ||
+        deferredJournalFilter === 'all' ||
+        p.journal.code === deferredJournalFilter ||
+        p.journal.issn === deferredJournalFilter ||
+        p.journal.name === deferredJournalFilter ||
         (selectedJournalName && p.journal.name?.replace(/\s+/g, ' ').trim() === selectedJournalName);
-      const institutionMatch = institutionFilter === 'all' || p.authors.some(a =>
-        a.institutions.some(inst => (inst.ror && inst.ror === institutionFilter) || inst.name === institutionFilter)
+      const institutionMatch = deferredInstitutionFilter === 'all' || p.authors.some(a =>
+        a.institutions.some(inst => (inst.ror && inst.ror === deferredInstitutionFilter) || inst.name === deferredInstitutionFilter)
       );
       return yearMatch && journalMatch && institutionMatch;
     });
-  }, [publications, yearFilter, journalFilter, institutionFilter, journalIdToName]);
+  }, [publications, deferredYearFilter, deferredJournalFilter, deferredInstitutionFilter, journalIdToName]);
 
   const stats = useMemo(() => ({
     totalPubs: filteredData.length,

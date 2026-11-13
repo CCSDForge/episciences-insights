@@ -100,6 +100,21 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
+/* Prevent scroll chaining behind native modal <dialog> */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Defer layout/paint for off-screen heavy sections */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
 /* Skip link for keyboard users */
 .skip-link {
   position: absolute;
@@ -172,6 +187,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Documentation & Help Section styles */
 .help-section-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
   border-radius: 1rem;
   background-color: #ffffff;
   padding: 1.5rem;

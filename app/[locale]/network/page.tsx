@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
-import { getPublications, getFunders } from '@/lib/data';
+import { getCorpusStats, getFunders } from '@/lib/data';
 import NetworkExplorer from '@/components/NetworkExplorer';
-import { Locale, translations } from '@/lib/i18n/translations';
+import { Locale } from '@/lib/i18n/translations';
+import { getDictionary } from '@/lib/i18n/getDictionary';
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'fr' }, { locale: 'es' }];
@@ -52,8 +53,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function LocaleNetworkPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const validLocale = (locale === 'fr' || locale === 'es' ? locale : 'en') as Locale;
-  const [publications, funders] = await Promise.all([getPublications(), getFunders()]);
-  const t = translations[validLocale];
+  const [t, corpusStats, funders] = await Promise.all([
+    getDictionary(validLocale),
+    Promise.resolve(getCorpusStats()),
+    getFunders(),
+  ]);
   const numLocale = validLocale === 'fr' ? 'fr-FR' : validLocale === 'es' ? 'es-ES' : 'en-US';
 
   return (
@@ -63,14 +67,14 @@ export default async function LocaleNetworkPage({ params }: { params: Promise<{ 
           href={`/${validLocale}/`}
           className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-[var(--primary-text)] dark:text-zinc-400 dark:hover:text-[var(--primary-accent)] transition-colors"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={14} aria-hidden="true" />
           {t.common.backToDashboard}
         </Link>
         <h1 className="mt-4 font-heading text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
           {t.header.networkExplorerBtn}
         </h1>
         <p className="mt-2 max-w-2xl text-sm font-medium text-zinc-600 dark:text-zinc-400">
-          {t.networkExplorer.subtitle.replace('{count}', publications.length.toLocaleString(numLocale))}
+          {t.networkExplorer.subtitle.replace('{count}', corpusStats.totalPublications.toLocaleString(numLocale))}
         </p>
       </header>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, use, useEffect, useSyncExternalStore, useState, useTransition } from 'react';
-import { Locale, Translations, translations } from './translations';
+import type { Locale, Translations } from './types';
 
 interface LanguageContextType {
   locale: Locale;
@@ -39,7 +39,6 @@ function getLocaleSnapshot(): Locale {
     if (saved === 'en' || saved === 'fr' || saved === 'es') {
       return saved;
     }
-    // Check browser preference
     if (typeof navigator !== 'undefined') {
       const browserLang = (navigator.language || '').toLowerCase();
       if (browserLang.startsWith('fr')) return 'fr';
@@ -56,13 +55,23 @@ function getServerSnapshot(): Locale {
   return 'en';
 }
 
-export function LanguageProvider({ children, initialLocale }: { children: React.ReactNode; initialLocale?: Locale }) {
-  const storeLocale = useSyncExternalStore(subscribeToLocale, getLocaleSnapshot, () => initialLocale || getServerSnapshot());
+interface LanguageProviderProps {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+  dictionary: Translations;
+}
+
+export function LanguageProvider({ children, initialLocale, dictionary }: LanguageProviderProps) {
+  const storeLocale = useSyncExternalStore(
+    subscribeToLocale,
+    getLocaleSnapshot,
+    () => initialLocale || getServerSnapshot()
+  );
   const locale = initialLocale || storeLocale;
   const [announcement, setAnnouncement] = useState<string>('');
   const [, startTransition] = useTransition();
 
-  // Sync <html lang="..."> attribute
+  // Keep <html lang="..."> synced on client-side route transitions
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = locale;
@@ -79,14 +88,12 @@ export function LanguageProvider({ children, initialLocale }: { children: React.
     }
 
     startTransition(() => {
-      setAnnouncement(translations[newLocale].common.languageAnnouncement);
+      setAnnouncement(dictionary.common.languageAnnouncement);
     });
   };
 
-  const t = translations[locale] || translations.en;
-
   return (
-    <LanguageContext value={{ locale, setLocale, t }}>
+    <LanguageContext value={{ locale, setLocale, t: dictionary }}>
       {children}
       {/* Screen reader live announcement region */}
       <div

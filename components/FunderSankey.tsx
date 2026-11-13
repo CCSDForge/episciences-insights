@@ -297,7 +297,13 @@ export default function FunderSankey({ data, funders }: FunderSankeyProps) {
       </div>
 
       <div className="overflow-x-auto border border-zinc-100 rounded-2xl dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-950/30 p-4">
-        <svg viewBox={`0 0 ${width} ${height}`} width="100%" style={{ minWidth: 720, height: 'auto' }}>
+        <svg
+          role="img"
+          aria-label={t.funderSankey.title}
+          viewBox={`0 0 ${width} ${height}`}
+          width="100%"
+          style={{ minWidth: 720, height: 'auto' }}
+        >
           <g>
             {graph.links.map((link, i) => {
               const source = link.source as unknown as { name: string; kind: NodeKind };

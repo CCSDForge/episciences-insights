@@ -38,9 +38,9 @@ export async function syncDois(options = {}) {
     indexCacheDays: options.indexCacheDays ?? 1,
   });
 
-  console.log('[Sync DOIs] Moissonnage des revues et articles depuis l\'API Episciences...');
+  console.log('[Sync DOIs] Harvesting journals and papers from the Episciences API...');
   const journals = await client.fetchJournals();
-  console.log(`[Sync DOIs] ${journals.length} revues trouvées.`);
+  console.log(`[Sync DOIs] Found ${journals.length} journals.`);
 
   // Map lowercase DOI -> original canonical DOI
   const doiMap = new Map();
@@ -90,14 +90,14 @@ export async function syncDois(options = {}) {
 
   fs.writeFileSync(csvPath, sortedDois.join('\n') + '\n', 'utf-8');
 
-  console.log(`[Sync DOIs] Total d'articles examinés : ${totalPapers}`);
-  console.log(`[Sync DOIs] DOIs uniques extraits : ${sortedDois.length}`);
+  console.log(`[Sync DOIs] Total papers scanned: ${totalPapers}`);
+  console.log(`[Sync DOIs] Unique DOIs extracted: ${sortedDois.length}`);
   if (existingDois.size > 0) {
-    console.log(`[Sync DOIs] Nouveaux DOIs ajoutés : ${newCount} (précédemment ${existingDois.size})`);
+    console.log(`[Sync DOIs] New DOIs added: ${newCount} (previously ${existingDois.size})`);
   } else {
-    console.log(`[Sync DOIs] Fichier créé avec ${sortedDois.length} DOIs`);
+    console.log(`[Sync DOIs] File created with ${sortedDois.length} DOIs`);
   }
-  console.log(`[Sync DOIs] Fichier sauvegardé : ${csvPath}`);
+  console.log(`[Sync DOIs] File saved: ${csvPath}`);
 
   return {
     totalDois: sortedDois.length,
@@ -114,7 +114,7 @@ const isMain = process.argv[1] && (
 
 if (isMain) {
   syncDois().catch((err) => {
-    console.error('[Sync DOIs] Erreur lors de la synchronisation :', err);
+    console.error('[Sync DOIs] Synchronization error:', err);
     process.exitCode = 1;
   });
 }

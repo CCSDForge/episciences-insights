@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { cache } from 'react';
 import { Publication, KpiFile, UsageSummary, TopPaper } from '@/lib/types';
 import { cleanDoi } from '@/lib/data';
 
@@ -90,7 +91,7 @@ function normalizeCountryKey(country: string): string | null {
   return COUNTRY_NAME_TO_ISO2[country] ?? null;
 }
 
-export async function getKpiSummary(publications: Publication[]): Promise<UsageSummary | null> {
+export const getKpiSummary = cache(async function getKpiSummary(publications: Publication[]): Promise<UsageSummary | null> {
   const filePath = path.join(process.cwd(), 'kpi_downloads.json');
   if (!fs.existsSync(filePath)) return null;
   try {
@@ -238,4 +239,4 @@ export async function getKpiSummary(publications: Publication[]): Promise<UsageS
     console.error("Failed to parse kpi_downloads.json", e);
     return null;
   }
-}
+});

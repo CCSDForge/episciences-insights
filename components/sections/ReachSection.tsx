@@ -421,7 +421,7 @@ export default function ReachSection() {
             activeView === 'institution-network' ? t.dashboard.institutionNetwork :
             t.dashboard.collaborationMatrix
           }
-          subtitle={`${filteredData.length.toLocaleString('en-US')} ${t.common.publications.toLowerCase()}`}
+          subtitle={`${filteredData.length.toLocaleString(t.localeTag)} ${t.common.publications.toLowerCase()}`}
         >
           {activeView === 'flows' && <CountryGeographicFlowMap data={filteredData} />}
           {activeView === 'country-network' && <CountryCollaborationNetwork data={filteredData} />}

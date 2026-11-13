@@ -20,22 +20,25 @@ import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import FunderStoryline from '@/components/FunderStoryline';
-import FunderCofundingNetwork from '@/components/FunderCofundingNetwork';
-import FunderCofundingMatrix from '@/components/FunderCofundingMatrix';
-import FunderCofundingClusterNetwork from '@/components/FunderCofundingClusterNetwork';
-import FunderSankey from '@/components/FunderSankey';
 import FullscreenModal from '@/components/FullscreenModal';
 import ChartExportMenu from '@/components/ChartExportMenu';
 import GlobalFilterBar from '@/components/GlobalFilterBar';
 import ViewSegmentedControl, { ViewOption } from '@/components/ViewSegmentedControl';
 
+const FunderViewSkeleton = () => (
+  <div className="h-[420px] rounded-3xl bg-zinc-50/30 dark:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800 animate-pulse" />
+);
+
+const FunderCofundingNetwork = dynamic(() => import('@/components/FunderCofundingNetwork'), { ssr: false, loading: FunderViewSkeleton });
+const FunderCofundingMatrix = dynamic(() => import('@/components/FunderCofundingMatrix'), { ssr: false, loading: FunderViewSkeleton });
+const FunderCofundingClusterNetwork = dynamic(() => import('@/components/FunderCofundingClusterNetwork'), { ssr: false, loading: FunderViewSkeleton });
+const FunderSankey = dynamic(() => import('@/components/FunderSankey'), { ssr: false, loading: FunderViewSkeleton });
+
 const FunderGeographicFlowMap = dynamic(
   () => import('@/components/FunderGeographicFlowMap'),
   {
     ssr: false,
-    loading: () => (
-      <div className="h-[420px] rounded-3xl bg-zinc-50/30 dark:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800 animate-pulse" />
-    ),
+    loading: FunderViewSkeleton,
   }
 );
 
@@ -64,8 +67,19 @@ export default function FundersSection() {
         setIsFunderOpen(false);
       }
     }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsFunderOpen(false);
+        funderButtonRef.current?.focus();
+      }
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isFunderOpen]);
 
   const groupedFunders = useMemo(() => {
@@ -319,8 +333,8 @@ export default function FundersSection() {
         <FullscreenModal
           isOpen={isFullscreen}
           onClose={() => setIsFullscreen(false)}
-          title={`Financeurs - ${FUNDER_VIEWS.find((v) => v.id === activeView)?.label || activeView}`}
-          subtitle={`${filteredData.length.toLocaleString('en-US')} ${t.common.publications.toLowerCase()}`}
+          title={`${t.common.funders} - ${FUNDER_VIEWS.find((v) => v.id === activeView)?.label || activeView}`}
+          subtitle={`${filteredData.length.toLocaleString(t.localeTag)} ${t.common.publications.toLowerCase()}`}
         >
           {activeView === 'network' && <FunderCofundingNetwork data={funderFilteredData} />}
           {activeView === 'matrix' && <FunderCofundingMatrix data={funderFilteredData} />}

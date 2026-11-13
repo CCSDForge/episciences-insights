@@ -145,13 +145,13 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
         </div>
         <div className="flex gap-4">
           <div className="flex-1 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
-            <p className="text-2xl sm:text-3xl font-black">{stats.totalRefs.toLocaleString()}</p>
+            <p className="text-2xl sm:text-3xl font-black">{stats.totalRefs.toLocaleString(t.localeTag)}</p>
             <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-1">
               {t.lineage.foundationalRefs}
             </p>
           </div>
           <div className="flex-1 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
-            <p className="text-2xl sm:text-3xl font-black">{stats.totalRelated.toLocaleString()}</p>
+            <p className="text-2xl sm:text-3xl font-black">{stats.totalRelated.toLocaleString(t.localeTag)}</p>
             <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-1">
               {t.lineage.scientificNeighbors}
             </p>

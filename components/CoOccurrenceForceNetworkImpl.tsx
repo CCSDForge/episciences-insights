@@ -211,7 +211,7 @@ export default function CoOccurrenceForceNetwork({
       {/* Graph — aspect-[4/3] matches the SVG viewBox (800x600) so widening
           the page grows the graph itself instead of just adding letterbox padding */}
       <div className="relative flex-1 aspect-[4/3] min-h-[500px] max-h-[750px] select-none bg-zinc-50/30 dark:bg-zinc-950/20 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
-        <svg viewBox="0 0 800 600" className="w-full h-full preserve-3d">
+        <svg role="img" aria-label={title} viewBox="0 0 800 600" className="w-full h-full preserve-3d">
           {/* Links */}
           {network.links.map((link, i) => {
             const src = network.positionMap[link.source];

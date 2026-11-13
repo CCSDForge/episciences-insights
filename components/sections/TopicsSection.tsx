@@ -249,7 +249,7 @@ export default function TopicsSection() {
             activeView === 'msc-network' ? t.dashboard.mscNetwork :
             t.dashboard.mscMatrix
           }
-          subtitle={`${filteredData.length.toLocaleString('en-US')} ${t.common.publications.toLowerCase()}`}
+          subtitle={`${filteredData.length.toLocaleString(t.localeTag)} ${t.common.publications.toLowerCase()}`}
         >
           {activeView === 'topics-network' && <TopicCoOccurrenceNetwork data={filteredData} />}
           {activeView === 'topics-matrix' && <TopicCoOccurrenceMatrix data={filteredData} />}

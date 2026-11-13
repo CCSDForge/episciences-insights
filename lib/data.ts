@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { cache } from 'react';
 import { Publication, FundersFile } from '@/lib/types';
 
 export function cleanDoi(doi: string): string {
@@ -19,7 +20,7 @@ function getLinkedOutputs(): LinkedOutputsFile {
   }
 }
 
-export async function getPublications(): Promise<Publication[]> {
+export const getPublications = cache(async (): Promise<Publication[]> => {
   const filePath = path.join(process.cwd(), 'public/data/publications.json');
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -43,9 +44,9 @@ export async function getPublications(): Promise<Publication[]> {
     console.error('Failed to parse publications.json', e);
     return [];
   }
-}
+});
 
-export async function getFunders(): Promise<FundersFile> {
+export const getFunders = cache(async (): Promise<FundersFile> => {
   const filePath = path.join(process.cwd(), 'public/data/funders.json');
   if (!fs.existsSync(filePath)) return {};
   try {
@@ -54,7 +55,7 @@ export async function getFunders(): Promise<FundersFile> {
     console.error('Failed to parse funders.json', e);
     return {};
   }
-}
+});
 
 export function getLastUpdated(): string | null {
   const filePath = path.join(process.cwd(), 'public/data/publications.json');
@@ -75,7 +76,7 @@ export interface CorpusStats {
   collectedAt?: string;
 }
 
-export function getCorpusStats(): CorpusStats {
+export const getCorpusStats = cache(function getCorpusStats(): CorpusStats {
   const filePath = path.join(process.cwd(), 'public/data/corpus-stats.json');
   if (fs.existsSync(filePath)) {
     try {
@@ -89,6 +90,6 @@ export function getCorpusStats(): CorpusStats {
     totalHostedJournals: 47,
     activeJournals: 41,
   };
-}
+});
 
 

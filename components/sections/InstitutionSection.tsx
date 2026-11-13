@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Building2,
   Users,
@@ -14,13 +15,18 @@ import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
 import ChartExportMenu from '@/components/ChartExportMenu';
 import CountryCollaborationNetwork from '@/components/CountryCollaborationNetwork';
-import CountryCollaborationMatrix from '@/components/CountryCollaborationMatrix';
-import CountryGeographicFlowMap from '@/components/CountryGeographicFlowMap';
 import TopicTreeMap from '@/components/TopicTreeMap';
-import TopicCoOccurrenceNetwork from '@/components/TopicCoOccurrenceNetwork';
-import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import FunderStoryline from '@/components/FunderStoryline';
 import GlobalFilterBar from '@/components/GlobalFilterBar';
+
+const SectionViewSkeleton = () => (
+  <div className="h-[360px] rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 animate-pulse" />
+);
+
+const CountryCollaborationMatrix = dynamic(() => import('@/components/CountryCollaborationMatrix'), { ssr: false, loading: SectionViewSkeleton });
+const CountryGeographicFlowMap = dynamic(() => import('@/components/CountryGeographicFlowMap'), { ssr: false, loading: SectionViewSkeleton });
+const TopicCoOccurrenceNetwork = dynamic(() => import('@/components/TopicCoOccurrenceNetwork'), { ssr: false, loading: SectionViewSkeleton });
+const MscCoOccurrenceNetwork = dynamic(() => import('@/components/MscCoOccurrenceNetwork'), { ssr: false, loading: SectionViewSkeleton });
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getCountryName } from '@/lib/countryNames';
 
@@ -39,7 +45,7 @@ export default function InstitutionSection() {
   const topicsRef = useRef<HTMLDivElement>(null);
   const fundersRef = useRef<HTMLDivElement>(null);
 
-  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  const formatNum = (n: number) => new Intl.NumberFormat(t.localeTag).format(n);
 
   // Currently selected institution object
   const currentInstitution = useMemo(() => {

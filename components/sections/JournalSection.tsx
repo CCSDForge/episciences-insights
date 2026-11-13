@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import {
   BookOpen,
   Eye,
@@ -15,11 +16,16 @@ import ChartExportMenu from '@/components/ChartExportMenu';
 import WorldMap from '@/components/WorldMap';
 import CountryInstitutionsExplorer from '@/components/CountryInstitutionsExplorer';
 import TopicTreeMap from '@/components/TopicTreeMap';
-import TopicCoOccurrenceNetwork from '@/components/TopicCoOccurrenceNetwork';
-import MscCoOccurrenceNetwork from '@/components/MscCoOccurrenceNetwork';
 import FunderStoryline from '@/components/FunderStoryline';
 import OverlayRepositorySpectrum from '@/components/OverlayRepositorySpectrum';
 import GlobalFilterBar from '@/components/GlobalFilterBar';
+
+const TopicViewSkeleton = () => (
+  <div className="h-[360px] rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 animate-pulse" />
+);
+
+const TopicCoOccurrenceNetwork = dynamic(() => import('@/components/TopicCoOccurrenceNetwork'), { ssr: false, loading: TopicViewSkeleton });
+const MscCoOccurrenceNetwork = dynamic(() => import('@/components/MscCoOccurrenceNetwork'), { ssr: false, loading: TopicViewSkeleton });
 import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getCountryName } from '@/lib/countryNames';
 
@@ -38,7 +44,7 @@ export default function JournalSection() {
   const topicsRef = useRef<HTMLDivElement>(null);
   const fundersRef = useRef<HTMLDivElement>(null);
 
-  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  const formatNum = (n: number) => new Intl.NumberFormat(t.localeTag).format(n);
 
   // Resolve current journal name
   const currentJournalName = useMemo(() => {

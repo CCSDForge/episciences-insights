@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useId } from 'react';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, RotateCcw, Filter, Search, Check, X } from 'lucide-react';
 import { useDashboard } from '@/components/DashboardContext';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
-
-const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
 interface FilterSelectProps {
   id: string;
@@ -59,8 +57,11 @@ function InstitutionCombobox() {
   const INITIAL_LIMIT = 100;
   const STEP = 100;
   const [displayLimit, setDisplayLimit] = useState(INITIAL_LIMIT);
+  const listboxId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const formatNum = (n: number) => new Intl.NumberFormat(t.localeTag).format(n);
 
   const selectedInst = useMemo(() => {
     if (institutionFilter === 'all') return null;
@@ -83,14 +84,26 @@ function InstitutionCombobox() {
   const remainingCount = allMatchingInstitutions.length - visibleInstitutions.length;
 
   useEffect(() => {
+    if (!isOpen) return;
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      }
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -116,11 +129,13 @@ function InstitutionCombobox() {
       </label>
       <div className="relative flex-1">
         <button
+          ref={buttonRef}
           id="filter-institution-button"
           type="button"
           onClick={handleOpen}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
+          aria-controls={isOpen ? listboxId : undefined}
           aria-label={labelText}
           className="w-full flex items-center justify-between gap-2 rounded-xl border border-zinc-300 bg-white pl-3 pr-8 py-1.5 text-xs font-bold text-zinc-900 shadow-xs focus:ring-2 focus:ring-[var(--primary-focus)] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 outline-none transition-colors text-left truncate cursor-pointer"
         >
@@ -163,8 +178,13 @@ function InstitutionCombobox() {
               )}
             </div>
 
+            {/* Live result count for screen readers */}
+            <div className="sr-only" role="status" aria-live="polite">
+              {searchTerm.trim() ? `${allMatchingInstitutions.length}` : ''}
+            </div>
+
             {/* List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div id={listboxId} role="listbox" aria-label={labelText} className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
               <button
                 type="button"
                 onClick={() => handleSelect('all')}
@@ -247,6 +267,7 @@ function InstitutionCombobox() {
 
 export default function GlobalFilterBar() {
   const { t, locale } = useTranslation();
+  const formatNum = (n: number) => new Intl.NumberFormat(t.localeTag).format(n);
   const pathname = usePathname();
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
   const isHelp = pathname?.includes(`/${locale}/help`);

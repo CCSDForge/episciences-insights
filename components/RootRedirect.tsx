@@ -33,9 +33,9 @@ export default function RootRedirect({ targetPath = '' }: { targetPath?: string 
           Redirecting... <a href={targetPath ? `/en/${targetPath}/` : '/en/'} className="text-teal-600 underline font-bold">Click here if you are not redirected</a>.
         </p>
       </noscript>
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
-        <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">Loading Episciences Insights...</p>
+      <div className="flex flex-col items-center gap-3" role="status" aria-live="polite">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" aria-hidden="true" />
+        <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Loading Episciences Insights...</p>
       </div>
     </div>
   );

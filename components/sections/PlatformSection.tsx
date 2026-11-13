@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Globe,
   Clock,
@@ -15,15 +16,20 @@ import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { useDashboard } from '@/components/DashboardContext';
 import ChartContainer from '@/components/ChartContainer';
 import ChartExportMenu from '@/components/ChartExportMenu';
-import TopicTreeMap from '@/components/TopicTreeMap';
 import SdgRadar from '@/components/SdgRadar';
 import FunderCofundingNetwork from '@/components/FunderCofundingNetwork';
-import FunderSankey from '@/components/FunderSankey';
-import CountryGeographicFlowMap from '@/components/CountryGeographicFlowMap';
-import ResearchLineage from '@/components/ResearchLineage';
-import NetworkExplorer from '@/components/NetworkExplorer';
 import FullscreenModal from '@/components/FullscreenModal';
 import GlobalFilterBar from '@/components/GlobalFilterBar';
+
+const ChartSkeleton = () => (
+  <div className="h-[380px] rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 animate-pulse" />
+);
+
+const TopicTreeMap = dynamic(() => import('@/components/TopicTreeMap'), { ssr: false, loading: ChartSkeleton });
+const FunderSankey = dynamic(() => import('@/components/FunderSankey'), { ssr: false, loading: ChartSkeleton });
+const CountryGeographicFlowMap = dynamic(() => import('@/components/CountryGeographicFlowMap'), { ssr: false, loading: ChartSkeleton });
+const ResearchLineage = dynamic(() => import('@/components/ResearchLineage'), { ssr: false, loading: ChartSkeleton });
+const NetworkExplorer = dynamic(() => import('@/components/NetworkExplorer'), { ssr: false, loading: ChartSkeleton });
 import {
   BarChart,
   Bar,
@@ -52,15 +58,21 @@ export default function PlatformSection() {
   const networksRef = useRef<HTMLDivElement>(null);
   const impactRef = useRef<HTMLDivElement>(null);
 
+  const formatDelayRange = (key: string) => {
+    const ranges = t.platformSection.delayRanges;
+    return ranges[key as keyof typeof ranges] ?? key;
+  };
+
   const peerReviewBinsData = useMemo(() => {
+    const ranges = t.platformSection.delayRanges;
     return (peerReviewStats.byRange || []).map((r) => ({
-      range: r.range,
+      range: ranges[r.range as keyof typeof ranges] ?? r.range,
       count: r.count,
       percentage: `${r.percentage}%`,
     }));
-  }, [peerReviewStats]);
+  }, [peerReviewStats, t.platformSection.delayRanges]);
 
-  const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  const formatNum = (n: number) => new Intl.NumberFormat(t.localeTag).format(n);
 
   // Annual publication volume evolution
   const yearlyPubsData = useMemo(() => {
@@ -264,9 +276,9 @@ export default function PlatformSection() {
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {peerReviewStats.byRange.map((bin) => (
                 <div key={bin.range} className="rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 p-3.5 text-center ring-1 ring-zinc-200/50 dark:ring-zinc-700/50">
-                  <div className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">{bin.range}</div>
+                  <div className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">{formatDelayRange(bin.range)}</div>
                   <div className="text-base font-black text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-01)] mt-1">{bin.percentage}%</div>
-                  <div className="text-[10px] text-zinc-400 mt-0.5">{t.platformSection.articlesCount.replace('{count}', formatNum(bin.count))}</div>
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{t.platformSection.articlesCount.replace('{count}', formatNum(bin.count))}</div>
                 </div>
               ))}
             </div>

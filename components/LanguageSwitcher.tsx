@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useSyncExternalStore } from 'react';
+import React, { useState, useRef, useEffect, useId, useSyncExternalStore } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Languages, ChevronDown, Check } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
@@ -41,9 +41,12 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
   const pathname = usePathname();
   const router = useRouter();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const listboxId = useId();
 
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listboxRef = useRef<HTMLDivElement>(null);
 
   const currentOption = LANGUAGE_OPTIONS.find((opt) => opt.value === locale) || LANGUAGE_OPTIONS[0];
 
@@ -60,19 +63,60 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
   };
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    const rafId = requestAnimationFrame(() => {
+      const options = Array.from(
+        listboxRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []
+      );
+      const selected = options.find((el) => el.getAttribute('aria-selected') === 'true');
+      (selected || options[0])?.focus();
+    });
+
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
+
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape' && isOpen) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+        triggerRef.current?.focus();
+        return;
+      }
+
+      const options = Array.from(
+        listboxRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []
+      );
+      if (options.length === 0) return;
+
+      const currentIndex = options.indexOf(document.activeElement as HTMLButtonElement);
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        const nextIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+        options[nextIndex]?.focus();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+        options[prevIndex]?.focus();
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        options[0]?.focus();
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        options[options.length - 1]?.focus();
+      } else if (event.key === 'Tab') {
         setIsOpen(false);
       }
     }
+
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
+      cancelAnimationFrame(rafId);
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -87,10 +131,12 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
   return (
     <div ref={containerRef} className={`relative inline-block text-left ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        aria-controls={isOpen ? listboxId : undefined}
         aria-label={t.common.selectLanguage}
         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-focus)] ${
           isOpen
@@ -102,13 +148,15 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
         <span className="font-extrabold uppercase">{currentOption.shortLabel}</span>
         <ChevronDown
           size={12}
-          className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-zinc-600 dark:text-zinc-200' : ''}`}
+          className={`text-zinc-500 dark:text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-zinc-600 dark:text-zinc-200' : ''}`}
           aria-hidden="true"
         />
       </button>
 
       {isOpen && (
         <div
+          ref={listboxRef}
+          id={listboxId}
           role="listbox"
           aria-label={t.common.selectLanguage}
           className="absolute right-0 z-50 mt-1.5 w-36 origin-top-right rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 animate-in fade-in zoom-in-95 duration-150"
@@ -120,9 +168,10 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
                 key={option.value}
                 type="button"
                 role="option"
+                lang={option.value}
                 aria-selected={isSelected}
                 onClick={() => changeLocale(option.value)}
-                className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition-colors cursor-pointer ${
+                className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-focus)] ${
                   isSelected
                     ? 'bg-[var(--episciences-cyan-00)]/15 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] font-extrabold'
                     : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -130,7 +179,7 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
               >
                 <span>{option.label}</span>
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[10px] uppercase font-mono text-zinc-400">{option.shortLabel}</span>
+                  <span className="text-[10px] uppercase font-mono text-zinc-500 dark:text-zinc-400">{option.shortLabel}</span>
                   {isSelected && <Check size={13} className="text-[var(--primary-text)] shrink-0" aria-hidden="true" />}
                 </span>
               </button>
