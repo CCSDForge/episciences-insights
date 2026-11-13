@@ -61,9 +61,9 @@ interface ToggleOption<T extends string> {
 }
 
 function ViewToggle<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: ToggleOption<T>[] }) {
-  const { locale } = useTranslation();
+  const { t } = useTranslation();
   return (
-    <div role="group" aria-label={locale === 'fr' ? 'Mode de visualisation' : locale === 'es' ? 'Modo de visualización' : 'View mode toggle'} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+    <div role="group" aria-label={t.networkExplorer.viewModeAria} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -92,7 +92,7 @@ export default function NetworkExplorer({ data: initialData, funders }: NetworkE
 }
 
 function NetworkExplorerContent({ data, funders }: { data: Publication[]; funders: FundersFile }) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const [yearFilter, setYearFilter] = useState('all');
   const [journalFilter, setJournalFilter] = useState('all');
   const [funderView, setFunderView] = useState<FunderView>('matrix');
@@ -103,7 +103,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
   const [mscView, setMscView] = useState<MscView>('matrix');
   const [topicView, setTopicView] = useState<TopicView>('matrix');
 
-  const numLocale = locale === 'fr' ? 'fr-FR' : locale === 'es' ? 'es-ES' : 'en-US';
+  const numLocale = t.localeTag;
 
   const years = useMemo(
     () => Array.from(new Set(data.map((p) => p.year.toString()))).sort().reverse(),
@@ -182,7 +182,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
 
   return (
     <div className="space-y-16">
-      <section aria-label="Filters" className="flex flex-wrap items-end gap-8 rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+      <section aria-label="Filters" className="flex flex-wrap items-end gap-8 rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
         <div className="flex flex-col gap-3">
           <label htmlFor="network-filter-year" className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
             {t.common.year}

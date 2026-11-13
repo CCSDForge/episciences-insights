@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import HomePageClient from '@/components/HomePageClient';
+import { translations, Locale } from '@/lib/i18n/translations';
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'fr' }, { locale: 'es' }];
@@ -8,22 +9,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://insights.episciences.org';
-
-  const title = locale === 'fr'
-    ? 'Episciences Insights - Synthèse & Tableau de bord de la recherche'
-    : locale === 'es'
-    ? 'Episciences Insights - Resumen y Panel de Investigación'
-    : 'Episciences Insights - Open Access Research & Impact Dashboard';
-
-  const description = locale === 'fr'
-    ? 'Visualisation de l’impact des publications en libre accès diamant d’Episciences : usages, rayonnement mondial, ODD de l’ONU, financements et science ouverte.'
-    : locale === 'es'
-    ? 'Visualización del impacto de las publicaciones de acceso abierto diamante de Episciences.'
-    : 'Visualizing scientific research impact, readership, funding, and open science indicators for Episciences diamond open-access publications.';
+  const validLocale = (locale === 'fr' || locale === 'es' ? locale : 'en') as Locale;
+  const t = translations[validLocale];
 
   return {
-    title,
-    description,
+    title: t.homePage.metaTitle,
+    description: t.homePage.metaDescription,
     alternates: {
       canonical: `${siteUrl}/${locale}/`,
       languages: {

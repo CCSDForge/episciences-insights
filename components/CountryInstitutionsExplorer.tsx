@@ -178,7 +178,7 @@ export default function CountryInstitutionsExplorer({
   selectedCountry: externalSelectedCountry,
   onSelectCountry: externalOnSelectCountry,
 }: CountryInstitutionsExplorerProps) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const [internalCountry, setInternalCountry] = useState<string>('FR');
   const [viewMode, setViewMode] = useState<'treemap' | 'bars'>('treemap');
   const [limit, setLimit] = useState<15 | 30 | 50>(30);
@@ -272,7 +272,7 @@ export default function CountryInstitutionsExplorer({
   const chartAreaRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div id="country-affiliations-explorer" className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8 scroll-mt-6">
+    <div id="country-affiliations-explorer" className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 space-y-8 scroll-mt-6">
       {/* Header with Title & Country Selector */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-zinc-100 pb-6 dark:border-zinc-800">
         <div className="flex flex-col">
@@ -294,11 +294,11 @@ export default function CountryInstitutionsExplorer({
         {/* View Mode & Country Selector dropdown */}
         <div className="flex flex-wrap items-center gap-3">
           {/* View Mode Toggle */}
-          <div role="group" aria-label={locale === 'fr' ? "Mode d'affichage" : locale === 'es' ? "Modo de visualización" : "View mode"} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+          <div role="group" aria-label={t.countryInstitutions.viewModeAria} className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
             <button
               type="button"
               onClick={() => setViewMode('treemap')}
-              aria-label="Treemap view"
+              aria-label={t.countryInstitutions.treemapAria}
               aria-pressed={viewMode === 'treemap'}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 viewMode === 'treemap'
@@ -311,7 +311,7 @@ export default function CountryInstitutionsExplorer({
             <button
               type="button"
               onClick={() => setViewMode('bars')}
-              aria-label="Bar chart view"
+              aria-label={t.countryInstitutions.barChartAria}
               aria-pressed={viewMode === 'bars'}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 viewMode === 'bars'
@@ -541,13 +541,16 @@ export default function CountryInstitutionsExplorer({
       {/* Top Institutions Grid Cards */}
       <div className="space-y-4">
         <h4 className="text-sm font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">
-          Ranked Institutions in {activeCountryName} ({Math.min(limit, institutions.length)} of {institutions.length})
+          {t.countryInstitutions.rankedInstitutionsHeading
+            .replace('{country}', activeCountryName)
+            .replace('{shown}', String(Math.min(limit, institutions.length)))
+            .replace('{total}', String(institutions.length))}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {institutions.slice(0, limit).map((inst, idx) => {
             const badgeColor = COMMUNITY_COLORS[idx % COMMUNITY_COLORS.length];
             const badgeTextColor = getContrastTextColor(badgeColor);
-            const rankLabel = `${locale === 'fr' ? 'Rang' : locale === 'es' ? 'Rango' : 'Rank'} ${idx + 1}`;
+            const rankLabel = `${t.countryInstitutions.rank} ${idx + 1}`;
             return (
               <div
                 key={inst.ror || inst.name}

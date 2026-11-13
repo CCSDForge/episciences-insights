@@ -27,17 +27,12 @@ interface ResearchLineageProps {
 }
 
 export default function ResearchLineage({ data }: ResearchLineageProps) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const [selectedDoi, setSelectedDoi] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterArtifactsOnly, setFilterArtifactsOnly] = useState(false);
 
-  const newTabSuffix =
-    locale === 'fr'
-      ? 'ouvre un nouvel onglet'
-      : locale === 'es'
-      ? 'abre en una nueva pestaña'
-      : 'opens in a new tab';
+  const newTabSuffix = t.common.opensInNewTab;
 
   const stats = useMemo(() => {
     let totalRefs = 0;
@@ -136,7 +131,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
   return (
     <div className="space-y-10">
       {/* Introduction Header Banner */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center bg-gradient-to-br from-[#0aa0be] via-[#005fb9] to-[#00005f] p-8 sm:p-10 rounded-3xl text-white shadow-xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center bg-gradient-to-br from-[#0aa0be] via-[#005fb9] to-[#00005f] p-8 sm:p-10 rounded-3xl text-white">
         <div className="lg:col-span-2 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-widest">
             <History size={12} /> {t.lineage.heritage}
@@ -353,7 +348,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
           {selectedPaper ? (
             <div className="space-y-6 animate-in fade-in duration-300">
               {/* 1. Core Publication Card (The Centerpiece) */}
-              <div className="relative p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border-2 border-[#0aa0be] dark:border-[#57bec3]/60 shadow-lg">
+              <div className="relative p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border-2 border-[#0aa0be] dark:border-[#57bec3]/60">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#005fb9]/10 dark:bg-[#57bec3]/15 text-[#005fb9] dark:text-[#57bec3] text-[10px] font-black uppercase tracking-widest">
                     <span>{t.lineage.selectedPublication}</span>
@@ -425,7 +420,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                     href={getDoiUrl(selectedPaper.doi)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${t.lineage.viewArticle} (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
+                    aria-label={`${t.lineage.viewArticle} ${newTabSuffix}`}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#005fb9] hover:bg-[#0aa0be] text-white font-bold transition-colors shrink-0 shadow-sm"
                   >
                     <span>{t.lineage.viewArticle}</span>
@@ -534,7 +529,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                             href={link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label={`${t.lineage.relatedWorkIndex} #${idx + 1}: ${t.lineage.consultOnOpenAlex} (${newTabSuffix})`}
+                            aria-label={`${t.lineage.relatedWorkIndex} #${idx + 1}: ${t.lineage.consultOnOpenAlex} ${newTabSuffix}`}
                             className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-[#0aa0be] hover:bg-cyan-50/50 dark:hover:bg-cyan-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 transition-all group"
                           >
                             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
@@ -632,7 +627,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label={`${t.lineage.viewArtifact}: ${label} (${newTabSuffix})`}
+                                    aria-label={`${t.lineage.viewArtifact}: ${label} ${newTabSuffix}`}
                                     className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-amber-500 hover:bg-amber-50/30 dark:hover:bg-amber-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 transition-all group"
                                   >
                                     <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate pr-2 font-mono">
@@ -669,7 +664,7 @@ export default function ResearchLineage({ data }: ResearchLineageProps) {
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label={`${t.lineage.viewArtifact}: ${label} (${newTabSuffix})`}
+                                    aria-label={`${t.lineage.viewArtifact}: ${label} ${newTabSuffix}`}
                                     className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0aa0be] focus-visible:ring-offset-2 transition-all group"
                                   >
                                     <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate pr-2 font-mono">

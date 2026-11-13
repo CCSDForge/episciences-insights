@@ -7,6 +7,7 @@ import {
 import ChartContainer from '@/components/ChartContainer';
 import { SDG } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { Locale } from '@/lib/i18n/translations';
 
 interface SdgRadarProps {
   data: SDG[];
@@ -72,6 +73,18 @@ const UN_SDG_NAMES_ES: Record<number, string> = {
   17: "Alianzas para lograr los objetivos",
 };
 
+const UN_SDG_NAMES: Record<Locale, Record<number, string>> = {
+  fr: UN_SDG_NAMES_FR,
+  en: UN_SDG_NAMES_EN,
+  es: UN_SDG_NAMES_ES,
+};
+
+const SDG_PREFIX: Record<Locale, string> = {
+  fr: 'ODD',
+  en: 'SDG',
+  es: 'ODS',
+};
+
 function LegendCard({
   sdg,
   isHovered,
@@ -132,8 +145,8 @@ export default function SdgRadar({ data }: SdgRadarProps) {
   const [hoveredSdg, setHoveredSdg] = useState<string | null>(null);
 
   const { radarData, sdgMapping } = useMemo(() => {
-    const names = locale === 'fr' ? UN_SDG_NAMES_FR : locale === 'es' ? UN_SDG_NAMES_ES : UN_SDG_NAMES_EN;
-    const prefix = locale === 'fr' ? 'ODD' : locale === 'es' ? 'ODS' : 'SDG';
+    const names = UN_SDG_NAMES[locale];
+    const prefix = SDG_PREFIX[locale];
     const sdgMap: Record<string, { full: string; short: string; score: number }> = {};
 
     for (let i = 1; i <= 17; i++) {

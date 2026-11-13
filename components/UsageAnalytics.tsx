@@ -15,7 +15,7 @@ import { getCountryName } from '@/lib/countryNames';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 export default function UsageAnalytics() {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const { state, data } = useDashboard();
   const { journalFilter, yearFilter } = state;
   const { usageSummary } = data;
@@ -153,7 +153,7 @@ export default function UsageAnalytics() {
               <span className="text-sm font-black text-amber-900 dark:text-amber-100">{t.usage.filteredAnalytics}</span>
               <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter">
                 {t.usage.showingStats
-                  .replace('{year}', yearFilter === 'all' ? (locale === 'fr' ? 'cumulées' : locale === 'es' ? 'acumuladas' : 'cumulative') : yearFilter)
+                  .replace('{year}', yearFilter === 'all' ? t.usage.cumulativeStats : yearFilter)
                   .replace('{journal}', journalFilter === 'all' ? t.usage.allJournals : journalFilter)}
               </p>
             </div>
@@ -168,7 +168,7 @@ export default function UsageAnalytics() {
 
       {/* Hero Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800" role="region" aria-label="Usage Pulse Trends">
+        <div className="lg:col-span-2 rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800" role="region" aria-label="Usage Pulse Trends">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
@@ -238,7 +238,7 @@ export default function UsageAnalytics() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 flex flex-col">
+        <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 flex flex-col">
           <h3 className="text-xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading mb-2">{t.usage.usageImpact}</h3>
           <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-8">
             {yearFilter === 'all' ? t.usage.cumulative : yearFilter} {t.usage.isolatedMetrics}
@@ -279,7 +279,7 @@ export default function UsageAnalytics() {
       </div>
 
       {/* Global Audience */}
-      <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+      <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
         <div className="mb-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h3 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">{t.usage.globalReadership}</h3>
@@ -317,7 +317,7 @@ export default function UsageAnalytics() {
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2">
           {geoData.slice(0, 24).map((country) => (
-            <div key={country.name} title={country.name} className="flex flex-col items-center p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700 hover:bg-white dark:hover:bg-zinc-800 transition-colors shadow-sm">
+            <div key={country.name} title={country.name} className="flex flex-col items-center p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
               <span className="text-[10px] font-black text-zinc-400 uppercase mb-1 text-center truncate max-w-full">{country.name ? getCountryName(country.name) : '??'}</span>
               <span className="text-sm font-black text-zinc-900 dark:text-zinc-100">{formatNum(country.value)}</span>
             </div>
@@ -327,7 +327,7 @@ export default function UsageAnalytics() {
 
       {/* Top Performing Papers - Only shown if a journal is selected */}
       {rvcode && usageSummary.journalTopPapers[rvcode] && (
-        <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+        <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Star className="h-6 w-6 text-[var(--episciences-cyan-02)]" aria-hidden="true" />
@@ -349,7 +349,7 @@ export default function UsageAnalytics() {
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {usageSummary.journalTopPapers[rvcode!].map((paper: TopPaper, idx: number) => (
-              <div key={paper.doi} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-6 ring-1 ring-zinc-200 transition-all hover:bg-white hover:shadow-xl hover:ring-[var(--episciences-cyan-01)]/50 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-[var(--episciences-cyan-01)]/50">
+              <div key={paper.doi} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-50/50 p-6 ring-1 ring-zinc-200 transition-all hover:bg-white hover:ring-[var(--episciences-cyan-01)]/50 dark:bg-zinc-800/30 dark:ring-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:ring-[var(--episciences-cyan-01)]/50">
                 <div className="mb-4 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-900 text-[10px] font-black text-white dark:bg-zinc-50 dark:text-zinc-900 font-sans">
@@ -369,7 +369,7 @@ export default function UsageAnalytics() {
                     href={`https://doi.org/${paper.doi}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    aria-label={`DOI: ${paper.doi} (${locale === 'fr' ? 'ouvre un nouvel onglet' : locale === 'es' ? 'abre en una nueva pestaña' : 'opens in a new tab'})`}
+                    aria-label={`DOI: ${paper.doi} ${t.common.opensInNewTab}`}
                     className="text-[10px] font-mono font-bold text-blue-600 hover:underline truncate max-w-[180px]"
                   >
                     {paper.doi}

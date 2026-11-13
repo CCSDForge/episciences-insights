@@ -16,15 +16,14 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
     if (!lastUpdated) return null;
     const date = new Date(lastUpdated);
     if (isNaN(date.getTime())) return null;
-    const dateLocale = locale === 'fr' ? 'fr-FR' : locale === 'es' ? 'es-ES' : 'en-US';
-    return new Intl.DateTimeFormat(dateLocale, {
+    return new Intl.DateTimeFormat(t.localeTag, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     }).format(date);
-  }, [lastUpdated, locale]);
+  }, [lastUpdated, t.localeTag]);
 
-  const newTabNotice = locale === 'fr' ? '(ouvre un nouvel onglet)' : locale === 'es' ? '(abre una nueva pestaña)' : '(opens in a new tab)';
+  const newTabNotice = t.common.opensInNewTab;
 
   return (
     <footer className="mt-20 border-t border-zinc-200 py-12 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">

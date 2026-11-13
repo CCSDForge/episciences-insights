@@ -11,7 +11,7 @@ interface CollaborationWebProps {
 }
 
 export default function CollaborationWeb({ data }: CollaborationWebProps) {
-  const { locale } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <CoOccurrenceNetwork
@@ -25,19 +25,13 @@ export default function CollaborationWeb({ data }: CollaborationWebProps) {
         return Array.from(seen.values());
       }}
       icon={<Network size={24} />}
-      title={locale === 'fr' ? 'Rayonnement mondial' : locale === 'es' ? 'Alcance global' : 'Global Reach'}
-      subtitle={locale === 'fr' ? 'Carte des synergies institutionnelles' : locale === 'es' ? 'Mapa de sinergias institucionales' : 'Institutional Synergy Map'}
-      entityLabelPlural={locale === 'fr' ? 'Institutions' : locale === 'es' ? 'Instituciones' : 'Institutions'}
-      metaLabel={locale === 'fr' ? 'Région' : locale === 'es' ? 'Región' : 'Region'}
+      title={t.collaborationWeb.title}
+      subtitle={t.collaborationWeb.subtitle}
+      entityLabelPlural={t.collaborationWeb.entityLabelPlural}
+      metaLabel={t.collaborationWeb.metaLabel}
       colorTheme="blue"
       tooltipId="collab-tooltip"
-      emptyMessage={
-        locale === 'fr'
-          ? 'Données de collaboration indisponibles pour cette sélection'
-          : locale === 'es'
-          ? 'Datos de colaboración no disponibles para esta selección'
-          : 'Collaborative data unavailable for this selection'
-      }
+      emptyMessage={t.collaborationWeb.emptyMessage}
     />
   );
 }

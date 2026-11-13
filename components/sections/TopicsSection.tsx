@@ -26,7 +26,7 @@ import ViewSegmentedControl, { ViewOption } from '@/components/ViewSegmentedCont
 type TopicsView = 'overview' | 'topics-network' | 'topics-matrix' | 'msc-network' | 'msc-matrix';
 
 export default function TopicsSection() {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const { state, actions, data } = useDashboard();
   const { topicDomainFilter } = state;
   const { setTopicDomainFilter } = actions;
@@ -87,7 +87,7 @@ export default function TopicsSection() {
               {t.dashboard.topicsDesc}
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40 shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40">
             <span>{t.dashboard.topicsSource}</span>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function TopicsSection() {
       {/* View: Overview (Treemap + SDGs) */}
       {activeView === 'overview' && (
         <div className="space-y-10 animate-in fade-in duration-300">
-          <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
             <div className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 border-b border-zinc-100 pb-8 dark:border-zinc-800">
               <div className="flex flex-col">
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
@@ -162,18 +162,14 @@ export default function TopicsSection() {
           </div>
 
           {/* SDG Radar Chart */}
-          <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-6 dark:border-zinc-800">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
                   {t.header.sdgTitle}
                 </h2>
                 <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mt-1">
-                  {locale === 'fr'
-                    ? "Alignement avec les 17 Objectifs de Développement Durable de l'ONU"
-                    : locale === 'es'
-                    ? "Alineación con los 17 Objetivos de Desarrollo Sostenible de la ONU"
-                    : "Alignment with the 17 UN Sustainable Development Goals"}
+                  {t.header.sdgSubtitle}
                 </p>
               </div>
               <ChartExportMenu

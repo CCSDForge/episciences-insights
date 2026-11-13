@@ -1,6 +1,7 @@
 export type Locale = 'en' | 'fr' | 'es';
 
 export interface Translations {
+  localeTag: string;
   common: {
     language: string;
     selectLanguage: string;
@@ -53,6 +54,8 @@ export interface Translations {
     showing: string;
     of: string;
     backToDashboard: string;
+    opensInNewTab: string;
+    articles: string;
   };
   header: {
     tag: string;
@@ -62,6 +65,7 @@ export interface Translations {
     overlayJournals: string;
     diamondDashboard: string;
     sdgTitle: string;
+    sdgSubtitle: string;
     of17: string;
     abstractViews: string;
     globalCoverage: string;
@@ -141,6 +145,8 @@ export interface Translations {
     platformTitle: string;
     platformBadge: string;
     platformDesc: string;
+    metaTitle: string;
+    metaDescription: string;
   };
   filters: {
     filtersAria: string;
@@ -446,6 +452,7 @@ export interface Translations {
     allJournals: string;
     globalPulse: string;
     journalPulse: string;
+    cumulativeStats: string;
   };
   countryInstitutions: {
     title: string;
@@ -457,6 +464,11 @@ export interface Translations {
     identifiedInstitutions: string;
     limit: string;
     noAffiliation: string;
+    viewModeAria: string;
+    rank: string;
+    treemapAria: string;
+    barChartAria: string;
+    rankedInstitutionsHeading: string;
   };
   funderSankey: {
     title: string;
@@ -537,6 +549,24 @@ export interface Translations {
     showingPubsCount: string;
     reachScopedNotice: string;
     countryScopedNotice: string;
+    viewModeAria: string;
+  };
+  collaborationWeb: {
+    title: string;
+    subtitle: string;
+    entityLabelPlural: string;
+    metaLabel: string;
+    emptyMessage: string;
+  };
+  repositorySpectrum: {
+    ariaLabel: string;
+    articles: string;
+    officialWebsiteOf: string;
+    halDesc: string;
+    arxivDesc: string;
+    zenodoDesc: string;
+    darusDesc: string;
+    defaultDesc: string;
   };
   export: {
     exportButton: string;
@@ -560,6 +590,7 @@ export interface Translations {
 
 export const translations: Record<Locale, Translations> = {
   en: {
+      "localeTag": "en-US",
       "common": {
           "language": "Language",
           "selectLanguage": "Select language",
@@ -611,7 +642,9 @@ export const translations: Record<Locale, Translations> = {
           "views": "views",
           "showing": "Showing",
           "of": "of",
-          "backToDashboard": "Back to Dashboard"
+          "backToDashboard": "Back to Dashboard",
+          "opensInNewTab": "(opens in a new tab)",
+          "articles": "articles"
       },
       "header": {
           "tag": "Scientific Impact Platform",
@@ -621,6 +654,7 @@ export const translations: Record<Locale, Translations> = {
           "overlayJournals": "Overlay journals",
           "diamondDashboard": "Diamond Open Access Dashboard",
           "sdgTitle": "SDGs (Sustainable Development)",
+          "sdgSubtitle": "Alignment with the 17 UN Sustainable Development Goals",
           "of17": "of 17",
           "abstractViews": "Abstract Views",
           "globalCoverage": "Global Coverage",
@@ -699,7 +733,9 @@ export const translations: Record<Locale, Translations> = {
           "institutionsDesc": "Measure your institution’s footprint on Episciences: co-authorship networks, hosting journals, topics, and funding bodies.",
           "platformTitle": "Platform Data",
           "platformBadge": "Global Impact & Stakeholders",
-          "platformDesc": "Global platform metrics: publication volume, peer-review timelines, international collaboration networks, and UN SDGs."
+          "platformDesc": "Global platform metrics: publication volume, peer-review timelines, international collaboration networks, and UN SDGs.",
+          "metaTitle": "Episciences Insights - Open Access Research & Impact Dashboard",
+          "metaDescription": "Visualizing scientific research impact, readership, funding, and open science indicators for Episciences diamond open-access publications."
       },
       "filters": {
           "filtersAria": "Global corpus filters",
@@ -1004,7 +1040,8 @@ export const translations: Record<Locale, Translations> = {
           "papersTracked": "papers tracked",
           "allJournals": "all journals",
           "globalPulse": "Global Usage Pulse",
-          "journalPulse": "Journal Usage Pulse"
+          "journalPulse": "Journal Usage Pulse",
+          "cumulativeStats": "cumulative"
       },
       "countryInstitutions": {
           "title": "Top Affiliations by Country",
@@ -1015,7 +1052,12 @@ export const translations: Record<Locale, Translations> = {
           "publications": "Publications:",
           "identifiedInstitutions": "Identified Institutions:",
           "limit": "Limit:",
-          "noAffiliation": "No affiliation data available for {country} with current filters"
+          "noAffiliation": "No affiliation data available for {country} with current filters",
+          "viewModeAria": "View mode",
+          "rank": "Rank",
+          "treemapAria": "Treemap view",
+          "barChartAria": "Bar chart view",
+          "rankedInstitutionsHeading": "Ranked Institutions in {country} ({shown} of {total})"
       },
       "funderSankey": {
           "title": "Funder Flow Sankey",
@@ -1095,7 +1137,8 @@ export const translations: Record<Locale, Translations> = {
           "topicsHeading": "Research Topics Co-occurrence",
           "showingPubsCount": "{shown} of {total} publications",
           "reachScopedNotice": "Showing institutions with a co-author in {country} - {shown} of {total} publications.",
-          "countryScopedNotice": "Showing collaboration ties involving {country} - {shown} of {total} publications."
+          "countryScopedNotice": "Showing collaboration ties involving {country} - {shown} of {total} publications.",
+          "viewModeAria": "View mode toggle"
       },
       "export": {
           "exportButton": "Export",
@@ -1114,9 +1157,27 @@ export const translations: Record<Locale, Translations> = {
           "success": "Export downloaded successfully",
           "error": "Export failed",
           "noSvgFound": "No visual chart found to export"
+      },
+      "collaborationWeb": {
+          "title": "Global Reach",
+          "subtitle": "Institutional Synergy Map",
+          "entityLabelPlural": "Institutions",
+          "metaLabel": "Region",
+          "emptyMessage": "Collaborative data unavailable for this selection"
+      },
+      "repositorySpectrum": {
+          "ariaLabel": "Distribution of source repositories",
+          "articles": "articles",
+          "officialWebsiteOf": "Official website of",
+          "halDesc": "National multidisciplinary repository (CCSD)",
+          "arxivDesc": "Preprint server (Maths, Physics, CS)",
+          "zenodoDesc": "Open research repository (CERN / OpenAIRE)",
+          "darusDesc": "Institutional Dataverse repository",
+          "defaultDesc": "Partner open science repository"
       }
   },
   fr: {
+      "localeTag": "fr-FR",
       "common": {
           "language": "Langue",
           "selectLanguage": "Choisir la langue",
@@ -1168,7 +1229,9 @@ export const translations: Record<Locale, Translations> = {
           "views": "vues",
           "showing": "Affichage de",
           "of": "sur",
-          "backToDashboard": "Retour au tableau de bord"
+          "backToDashboard": "Retour au tableau de bord",
+          "opensInNewTab": "(ouvre un nouvel onglet)",
+          "articles": "articles"
       },
       "header": {
           "tag": "Plateforme d'impact scientifique",
@@ -1178,6 +1241,7 @@ export const translations: Record<Locale, Translations> = {
           "overlayJournals": "Revues overlay",
           "diamondDashboard": "Tableau de bord libre accès diamant",
           "sdgTitle": "ODD (Développement durable)",
+          "sdgSubtitle": "Alignement avec les 17 Objectifs de Développement Durable de l'ONU",
           "of17": "sur 17",
           "abstractViews": "Vues de résumés",
           "globalCoverage": "Couverture mondiale",
@@ -1256,7 +1320,9 @@ export const translations: Record<Locale, Translations> = {
           "institutionsDesc": "Mesurez la production de votre établissement sur Episciences : réseaux de co-autorat, revues hébergeant vos articles et financeurs.",
           "platformTitle": "Données de la plateforme",
           "platformBadge": "Impact Global & Tutelles",
-          "platformDesc": "Bilan global de la plateforme : évolution des publications, délais d’évaluation par les pairs, réseaux de coopération et ODD."
+          "platformDesc": "Bilan global de la plateforme : évolution des publications, délais d’évaluation par les pairs, réseaux de coopération et ODD.",
+          "metaTitle": "Episciences Insights - Synthèse & Tableau de bord de la recherche",
+          "metaDescription": "Visualisation de l’impact des publications en libre accès diamant d’Episciences : usages, rayonnement mondial, ODD de l’ONU, financements et science ouverte."
       },
       "filters": {
           "filtersAria": "Filtres globaux du corpus",
@@ -1561,7 +1627,8 @@ export const translations: Record<Locale, Translations> = {
           "papersTracked": "articles suivis",
           "allJournals": "toutes les revues",
           "globalPulse": "Dynamique d'usage globale",
-          "journalPulse": "Dynamique d'usage de la revue"
+          "journalPulse": "Dynamique d'usage de la revue",
+          "cumulativeStats": "cumulées"
       },
       "countryInstitutions": {
           "title": "Principales affiliations par pays",
@@ -1572,7 +1639,12 @@ export const translations: Record<Locale, Translations> = {
           "publications": "Publications :",
           "identifiedInstitutions": "Institutions identifiées :",
           "limit": "Limite :",
-          "noAffiliation": "Aucune donnée d'affiliation disponible pour {country} avec les filtres actuels"
+          "noAffiliation": "Aucune donnée d'affiliation disponible pour {country} avec les filtres actuels",
+          "viewModeAria": "Mode d'affichage",
+          "rank": "Rang",
+          "treemapAria": "Vue en treemap",
+          "barChartAria": "Vue en diagramme à barres",
+          "rankedInstitutionsHeading": "Institutions classées en {country} ({shown} sur {total})"
       },
       "funderSankey": {
           "title": "Diagramme Sankey des flux de financement",
@@ -1652,7 +1724,8 @@ export const translations: Record<Locale, Translations> = {
           "topicsHeading": "Co-occurrences thématiques de recherche",
           "showingPubsCount": "{shown} sur {total} publications",
           "reachScopedNotice": "Affichage des institutions avec un co-auteur en {country} - {shown} sur {total} publications.",
-          "countryScopedNotice": "Affichage des collaborations impliquant {country} - {shown} sur {total} publications."
+          "countryScopedNotice": "Affichage des collaborations impliquant {country} - {shown} sur {total} publications.",
+          "viewModeAria": "Mode de visualisation"
       },
       "export": {
           "exportButton": "Exporter",
@@ -1671,9 +1744,27 @@ export const translations: Record<Locale, Translations> = {
           "success": "Export téléchargé avec succès",
           "error": "Échec de l'export",
           "noSvgFound": "Aucun graphique visuel détecté pour l'export"
+      },
+      "collaborationWeb": {
+          "title": "Rayonnement mondial",
+          "subtitle": "Carte des synergies institutionnelles",
+          "entityLabelPlural": "Institutions",
+          "metaLabel": "Région",
+          "emptyMessage": "Données de collaboration indisponibles pour cette sélection"
+      },
+      "repositorySpectrum": {
+          "ariaLabel": "Répartition des entrepôts sources",
+          "articles": "articles",
+          "officialWebsiteOf": "Site officiel de",
+          "halDesc": "Archive ouverte pluridisciplinaire (CCSD)",
+          "arxivDesc": "Serveur de preprints (Maths, Physique, Info)",
+          "zenodoDesc": "Entrepôt de recherche ouvert (CERN / OpenAIRE)",
+          "darusDesc": "Entrepôt Dataverse institutionnel",
+          "defaultDesc": "Entrepôt partenaire de science ouverte"
       }
   },
   es: {
+      "localeTag": "es-ES",
       "common": {
           "language": "Idioma",
           "selectLanguage": "Seleccionar idioma",
@@ -1725,7 +1816,9 @@ export const translations: Record<Locale, Translations> = {
           "views": "vistas",
           "showing": "Mostrando",
           "of": "de",
-          "backToDashboard": "Volver al panel"
+          "backToDashboard": "Volver al panel",
+          "opensInNewTab": "(abre en una nueva pestaña)",
+          "articles": "artículos"
       },
       "header": {
           "tag": "Plataforma de impacto científico",
@@ -1735,6 +1828,7 @@ export const translations: Record<Locale, Translations> = {
           "overlayJournals": "Revistas overlay",
           "diamondDashboard": "Panel de control de acceso abierto diamante",
           "sdgTitle": "ODS (Desarrollo Sostenible)",
+          "sdgSubtitle": "Alineación con los 17 Objetivos de Desarrollo Sostenible de la ONU",
           "of17": "de 17",
           "abstractViews": "Vistas de resúmenes",
           "globalCoverage": "Cobertura global",
@@ -1813,7 +1907,9 @@ export const translations: Record<Locale, Translations> = {
           "institutionsDesc": "Mida la producción de su institución en Episciences: redes de coautoría, revistas receptoras y entidades financiadoras.",
           "platformTitle": "Datos de la plataforma",
           "platformBadge": "Impacto Global y Tutelas",
-          "platformDesc": "Balance global de la plataforma: evolución de publicaciones, tiempos de revisión por pares, redes de cooperación y ODS."
+          "platformDesc": "Balance global de la plataforma: evolución de publicaciones, tiempos de revisión por pares, redes de cooperación y ODS.",
+          "metaTitle": "Episciences Insights - Resumen y Panel de Investigación",
+          "metaDescription": "Visualización del impacto de las publicaciones de acceso abierto diamante de Episciences."
       },
       "filters": {
           "filtersAria": "Filtros globales del corpus",
@@ -2118,7 +2214,8 @@ export const translations: Record<Locale, Translations> = {
           "papersTracked": "artículos seguidos",
           "allJournals": "todas las revistas",
           "globalPulse": "Dinámica de uso global",
-          "journalPulse": "Dinámica de uso de la revista"
+          "journalPulse": "Dinámica de uso de la revista",
+          "cumulativeStats": "acumuladas"
       },
       "countryInstitutions": {
           "title": "Principales afiliaciones por país",
@@ -2129,7 +2226,12 @@ export const translations: Record<Locale, Translations> = {
           "publications": "Publicaciones:",
           "identifiedInstitutions": "Instituciones identificadas:",
           "limit": "Límite:",
-          "noAffiliation": "No hay datos de afiliación disponibles para {country} con los filtros actuales"
+          "noAffiliation": "No hay datos de afiliación disponibles para {country} con los filtros actuales",
+          "viewModeAria": "Modo de visualización",
+          "rank": "Rango",
+          "treemapAria": "Vista de treemap",
+          "barChartAria": "Vista de gráfico de barras",
+          "rankedInstitutionsHeading": "Instituciones clasificadas en {country} ({shown} de {total})"
       },
       "funderSankey": {
           "title": "Diagrama Sankey de flujos de financiación",
@@ -2209,7 +2311,8 @@ export const translations: Record<Locale, Translations> = {
           "topicsHeading": "Coocurrencia temática de investigación",
           "showingPubsCount": "{shown} de {total} publicaciones",
           "reachScopedNotice": "Mostrando instituciones con un coautor en {country} - {shown} de {total} publicaciones.",
-          "countryScopedNotice": "Mostrando vínculos de colaboración que involucran a {country} - {shown} de {total} publicaciones."
+          "countryScopedNotice": "Mostrando vínculos de colaboración que involucran a {country} - {shown} de {total} publicaciones.",
+          "viewModeAria": "Modo de visualización"
       },
       "export": {
           "exportButton": "Exportar",
@@ -2228,6 +2331,23 @@ export const translations: Record<Locale, Translations> = {
           "success": "Exportación descargada con éxito",
           "error": "Error en la exportación",
           "noSvgFound": "No se detectó ningún gráfico visual para exportar"
+      },
+      "collaborationWeb": {
+          "title": "Alcance global",
+          "subtitle": "Mapa de sinergias institucionales",
+          "entityLabelPlural": "Instituciones",
+          "metaLabel": "Región",
+          "emptyMessage": "Datos de colaboración no disponibles para esta selección"
+      },
+      "repositorySpectrum": {
+          "ariaLabel": "Distribución de repositorios fuentes",
+          "articles": "artículos",
+          "officialWebsiteOf": "Sitio web oficial de",
+          "halDesc": "Archivo abierto multidisciplinario (CCSD)",
+          "arxivDesc": "Servidor de preprints (Matemáticas, Física, CS)",
+          "zenodoDesc": "Repositorio de investigación abierta (CERN / OpenAIRE)",
+          "darusDesc": "Repositorio Dataverse institucional",
+          "defaultDesc": "Repositorio asociado de ciencia abierta"
       }
-  },
+  }
 };

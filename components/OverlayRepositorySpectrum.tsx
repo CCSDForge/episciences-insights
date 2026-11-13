@@ -12,15 +12,15 @@ interface OverlayRepositorySpectrumProps {
 
 const TOOLTIP_ID = 'overlay-repo-spectrum-tooltip';
 
+type RepoDescKey = 'halDesc' | 'arxivDesc' | 'zenodoDesc' | 'darusDesc';
+
 const REPO_META: Record<
   string,
   {
     color: string;
     ringColor: string;
     bgTint: string;
-    descFr: string;
-    descEn: string;
-    descEs: string;
+    descKey: RepoDescKey;
     url?: string;
   }
 > = {
@@ -28,51 +28,45 @@ const REPO_META: Record<
     color: '#ff5722', // Orange CCSD vif et lumineux
     ringColor: 'ring-orange-500/40',
     bgTint: 'bg-orange-500/5 dark:bg-orange-500/15',
-    descFr: 'Archive ouverte pluridisciplinaire (CCSD)',
-    descEn: 'National multidisciplinary repository (CCSD)',
-    descEs: 'Archivo abierto multidisciplinario (CCSD)',
+    descKey: 'halDesc',
     url: 'https://hal.science',
   },
   arXiv: {
     color: '#dc2626', // Rouge vif carmin (red-600) éclatant sur fond sombre
     ringColor: 'ring-red-500/40',
     bgTint: 'bg-red-500/5 dark:bg-red-500/15',
-    descFr: 'Serveur de preprints (Maths, Physique, Info)',
-    descEn: 'Preprint server (Maths, Physics, CS)',
-    descEs: 'Servidor de preprints (Matemáticas, Física, CS)',
+    descKey: 'arxivDesc',
     url: 'https://arxiv.org',
   },
   Zenodo: {
     color: '#0284c7', // Bleu Zenodo CERN éclatant (sky-600)
     ringColor: 'ring-sky-500/40',
     bgTint: 'bg-sky-500/5 dark:bg-sky-500/15',
-    descFr: 'Entrepôt de recherche ouvert (CERN / OpenAIRE)',
-    descEn: 'Open research repository (CERN / OpenAIRE)',
-    descEs: 'Repositorio de investigación abierta (CERN / OpenAIRE)',
+    descKey: 'zenodoDesc',
     url: 'https://zenodo.org',
   },
   DaRUS: {
     color: '#7c3aed', // Violet lumineux (violet-600)
     ringColor: 'ring-purple-500/40',
     bgTint: 'bg-purple-500/5 dark:bg-purple-500/15',
-    descFr: 'Entrepôt Dataverse institutionnel',
-    descEn: 'Institutional Dataverse repository',
-    descEs: 'Repositorio Dataverse institucional',
+    descKey: 'darusDesc',
     url: 'https://darus.uni-stuttgart.de',
   },
 };
 
-const DEFAULT_META = {
+const DEFAULT_META: {
+  color: string;
+  ringColor: string;
+  bgTint: string;
+  descKey?: RepoDescKey;
+} = {
   color: '#0aa0be', // Cyan 01 Episciences
   ringColor: 'ring-[var(--episciences-cyan-01)]/40',
   bgTint: 'bg-[var(--episciences-cyan-00)]/15',
-  descFr: 'Entrepôt partenaire de science ouverte',
-  descEn: 'Partner open science repository',
-  descEs: 'Repositorio asociado de ciencia abierta',
 };
 
 export default function OverlayRepositorySpectrum({ repositories, total }: OverlayRepositorySpectrumProps) {
-  const { locale } = useTranslation();
+  const { t } = useTranslation();
 
   const formatNum = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 
@@ -85,16 +79,14 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
       <div
         className="flex items-center gap-1.5 w-full p-1.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/90 ring-1 ring-zinc-300 dark:ring-zinc-600 shadow-inner"
         role="progressbar"
-        aria-label={locale === 'fr' ? 'Répartition des entrepôts sources' : locale === 'es' ? 'Distribución de repositorios fuentes' : 'Distribution of source repositories'}
+        aria-label={t.repositorySpectrum.ariaLabel}
         aria-valuemin={0}
         aria-valuemax={100}
       >
         {repositories.map((repo) => {
           const meta = REPO_META[repo.name] || DEFAULT_META;
           const pct = (repo.count / total) * 100;
-          const label = `${repo.name} : ${formatNum(repo.count)} ${
-            locale === 'fr' ? 'articles' : locale === 'es' ? 'artículos' : 'articles'
-          } (${pct.toFixed(1)}%)`;
+          const label = `${repo.name} : ${formatNum(repo.count)} ${t.repositorySpectrum.articles} (${pct.toFixed(1)}%)`;
 
           return (
             <div
@@ -117,13 +109,12 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
         {repositories.map((repo) => {
           const meta = REPO_META[repo.name] || DEFAULT_META;
           const pct = (repo.count / total) * 100;
-          const desc =
-            locale === 'fr' ? meta.descFr : locale === 'es' ? meta.descEs : meta.descEn;
+          const desc = meta.descKey ? t.repositorySpectrum[meta.descKey] : t.repositorySpectrum.defaultDesc;
 
           return (
             <div
               key={repo.name}
-              className={`rounded-2xl p-4 ring-1 transition-all hover:shadow-md ${meta.ringColor} ${meta.bgTint} flex flex-col justify-between`}
+              className={`rounded-2xl p-4 ring-1 transition-all ${meta.ringColor} ${meta.bgTint} flex flex-col justify-between`}
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -143,7 +134,7 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-1"
-                      aria-label={`Site officiel de ${repo.name}`}
+                      aria-label={`${t.repositorySpectrum.officialWebsiteOf} ${repo.name}`}
                     >
                       <ExternalLink size={13} />
                     </a>
@@ -164,7 +155,7 @@ export default function OverlayRepositorySpectrum({ repositories, total }: Overl
                 <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                   {formatNum(repo.count)}{' '}
                   <span className="text-[10px] text-zinc-400 font-normal">
-                    {locale === 'fr' ? 'articles' : locale === 'es' ? 'artículos' : 'articles'}
+                    {t.repositorySpectrum.articles}
                   </span>
                 </div>
               </div>
