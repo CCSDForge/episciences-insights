@@ -20,10 +20,20 @@ function getLinkedOutputs(): LinkedOutputsFile {
   }
 }
 
+const devCache = globalThis as typeof globalThis & {
+  __epiPubsCache?: { mtimeMs: number; data: Publication[] };
+  __epiFundersCache?: { mtimeMs: number; data: FundersFile };
+};
+
 export const getPublications = cache(async (): Promise<Publication[]> => {
   const filePath = path.join(process.cwd(), 'public/data/publications.json');
   if (!fs.existsSync(filePath)) return [];
   try {
+    const mtimeMs = fs.statSync(filePath).mtimeMs;
+    if (devCache.__epiPubsCache?.mtimeMs === mtimeMs) {
+      return devCache.__epiPubsCache.data;
+    }
+
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const publications: Publication[] = JSON.parse(fileContent);
 
@@ -39,6 +49,7 @@ export const getPublications = cache(async (): Promise<Publication[]> => {
       }
     }
 
+    devCache.__epiPubsCache = { mtimeMs, data: publications };
     return publications;
   } catch (e) {
     console.error('Failed to parse publications.json', e);
@@ -50,7 +61,14 @@ export const getFunders = cache(async (): Promise<FundersFile> => {
   const filePath = path.join(process.cwd(), 'public/data/funders.json');
   if (!fs.existsSync(filePath)) return {};
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const mtimeMs = fs.statSync(filePath).mtimeMs;
+    if (devCache.__epiFundersCache?.mtimeMs === mtimeMs) {
+      return devCache.__epiFundersCache.data;
+    }
+
+    const funders = JSON.parse(fs.readFileSync(filePath, 'utf8')) as FundersFile;
+    devCache.__epiFundersCache = { mtimeMs, data: funders };
+    return funders;
   } catch (e) {
     console.error('Failed to parse funders.json', e);
     return {};

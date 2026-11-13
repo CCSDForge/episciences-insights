@@ -91,10 +91,19 @@ function normalizeCountryKey(country: string): string | null {
   return COUNTRY_NAME_TO_ISO2[country] ?? null;
 }
 
+const devKpiCache = globalThis as typeof globalThis & {
+  __epiKpiCache?: { mtimeMs: number; data: UsageSummary };
+};
+
 export const getKpiSummary = cache(async function getKpiSummary(publications: Publication[]): Promise<UsageSummary | null> {
   const filePath = path.join(process.cwd(), 'kpi_downloads.json');
   if (!fs.existsSync(filePath)) return null;
   try {
+    const mtimeMs = fs.statSync(filePath).mtimeMs;
+    if (devKpiCache.__epiKpiCache?.mtimeMs === mtimeMs) {
+      return devKpiCache.__epiKpiCache.data;
+    }
+
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const kpi: KpiFile = JSON.parse(fileContent);
 
@@ -224,7 +233,7 @@ export const getKpiSummary = cache(async function getKpiSummary(publications: Pu
       });
     }
 
-    return {
+    const summary: UsageSummary = {
       yearlySummary,
       journalYearlySummary,
       journalCountrySummary,
@@ -235,6 +244,8 @@ export const getKpiSummary = cache(async function getKpiSummary(publications: Pu
       generatedAt: kpi.generated_at,
       currentYear
     };
+    devKpiCache.__epiKpiCache = { mtimeMs, data: summary };
+    return summary;
   } catch (e) {
     console.error("Failed to parse kpi_downloads.json", e);
     return null;
