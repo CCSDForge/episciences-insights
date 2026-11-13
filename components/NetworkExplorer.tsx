@@ -7,6 +7,8 @@ import { Publication, FundersFile } from '@/lib/types';
 import { getCountryName } from '@/lib/countryNames';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { usePublications } from '@/lib/publications-client';
+import FullscreenModal from './FullscreenModal';
+import { PanelFullscreenProvider } from './PanelFullscreenContext';
 import FunderCofundingMatrix from './FunderCofundingMatrix';
 import CountryCollaborationNetwork from './CountryCollaborationNetwork';
 import CountryGeographicFlowMap from './CountryGeographicFlowMap';
@@ -96,6 +98,17 @@ export default function NetworkExplorer({ data: initialData, funders }: NetworkE
   return <NetworkExplorerContent data={data} funders={funders} />;
 }
 
+type FullscreenTarget =
+  | 'reach'
+  | 'countryFlow'
+  | 'countryCollab'
+  | 'topics'
+  | 'funders'
+  | 'funderSankey'
+  | 'funderFlow'
+  | 'msc'
+  | null;
+
 function NetworkExplorerContent({ data, funders }: { data: Publication[]; funders: FundersFile }) {
   const { t } = useTranslation();
   const [yearFilter, setYearFilter] = useState('all');
@@ -107,6 +120,7 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
   const [countryFilter, setCountryFilter] = useState('all');
   const [mscView, setMscView] = useState<MscView>('matrix');
   const [topicView, setTopicView] = useState<TopicView>('matrix');
+  const [fullscreenTarget, setFullscreenTarget] = useState<FullscreenTarget>(null);
 
   const numLocale = t.localeTag;
 
@@ -265,9 +279,11 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
               .replace('{total}', filteredData.length.toLocaleString(numLocale))}
           </p>
         )}
-        {reachView === 'network'
-          ? <CollaborationWeb data={reachScopedData} />
-          : <InstitutionCofundingMatrix data={reachScopedData} />}
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('reach')} label={t.common.fullscreen}>
+          {reachView === 'network'
+            ? <CollaborationWeb data={reachScopedData} />
+            : <InstitutionCofundingMatrix data={reachScopedData} />}
+        </PanelFullscreenProvider>
       </section>
 
       {/* 2. Country Collaboration & Geographic Flow Map */}
@@ -306,10 +322,14 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
               .replace('{total}', filteredData.length.toLocaleString(numLocale))}
           </p>
         )}
-        <CountryGeographicFlowMap data={countryScopedData} />
-        {countryView === 'network'
-          ? <CountryCollaborationNetwork data={countryScopedData} />
-          : <CountryCollaborationMatrix data={countryScopedData} />}
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('countryFlow')} label={t.common.fullscreen}>
+          <CountryGeographicFlowMap data={countryScopedData} />
+        </PanelFullscreenProvider>
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('countryCollab')} label={t.common.fullscreen}>
+          {countryView === 'network'
+            ? <CountryCollaborationNetwork data={countryScopedData} />
+            : <CountryCollaborationMatrix data={countryScopedData} />}
+        </PanelFullscreenProvider>
       </section>
 
       {/* 3. Research Topics Co-occurrence */}
@@ -325,9 +345,11 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
             ]}
           />
         </div>
-        {topicView === 'matrix'
-          ? <TopicCoOccurrenceMatrix data={filteredData} />
-          : <TopicCoOccurrenceNetwork data={filteredData} />}
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('topics')} label={t.common.fullscreen}>
+          {topicView === 'matrix'
+            ? <TopicCoOccurrenceMatrix data={filteredData} />
+            : <TopicCoOccurrenceNetwork data={filteredData} />}
+        </PanelFullscreenProvider>
       </section>
 
       {/* 4. Funder Co-funding */}
@@ -344,16 +366,22 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
             ]}
           />
         </div>
-        {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
-        {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
-        {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('funders')} label={t.common.fullscreen}>
+          {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
+          {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
+          {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
+        </PanelFullscreenProvider>
       </section>
 
       {/* 5. Funder Geography */}
       <section aria-labelledby="funder-geography-heading" className="space-y-6">
         <h2 id="funder-geography-heading" className="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-800 dark:text-zinc-200">{t.networkExplorer.funderGeoHeading}</h2>
-        <FunderSankey data={filteredData} funders={funders} />
-        <FunderGeographicFlowMap data={filteredData} funders={funders} />
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('funderSankey')} label={t.common.fullscreen}>
+          <FunderSankey data={filteredData} funders={funders} />
+        </PanelFullscreenProvider>
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('funderFlow')} label={t.common.fullscreen}>
+          <FunderGeographicFlowMap data={filteredData} funders={funders} />
+        </PanelFullscreenProvider>
       </section>
 
       {/* 6. MSC 2020 Classification */}
@@ -369,10 +397,45 @@ function NetworkExplorerContent({ data, funders }: { data: Publication[]; funder
             ]}
           />
         </div>
-        {mscView === 'network'
-          ? <MscCoOccurrenceNetwork data={filteredData} />
-          : <MscCoOccurrenceMatrix data={filteredData} />}
+        <PanelFullscreenProvider onFullscreen={() => setFullscreenTarget('msc')} label={t.common.fullscreen}>
+          {mscView === 'network'
+            ? <MscCoOccurrenceNetwork data={filteredData} />
+            : <MscCoOccurrenceMatrix data={filteredData} />}
+        </PanelFullscreenProvider>
       </section>
+
+      {fullscreenTarget && (
+        <FullscreenModal
+          isOpen={true}
+          onClose={() => setFullscreenTarget(null)}
+          title={
+            fullscreenTarget === 'reach' ? t.networkExplorer.reachHeading :
+            fullscreenTarget === 'countryFlow' ? t.dashboard.geographicFlows :
+            fullscreenTarget === 'countryCollab' ? t.networkExplorer.countryCollabHeading :
+            fullscreenTarget === 'topics' ? t.networkExplorer.topicsHeading :
+            fullscreenTarget === 'funders' ? t.networkExplorer.funderHeading :
+            fullscreenTarget === 'funderSankey' ? t.funderSankey.title :
+            fullscreenTarget === 'funderFlow' ? t.networkExplorer.funderGeoHeading :
+            t.networkExplorer.mscHeading
+          }
+          subtitle={`${filteredData.length.toLocaleString(numLocale)} ${t.common.publications.toLowerCase()}`}
+        >
+          {fullscreenTarget === 'reach' && (reachView === 'network' ? <CollaborationWeb data={reachScopedData} /> : <InstitutionCofundingMatrix data={reachScopedData} />)}
+          {fullscreenTarget === 'countryFlow' && <CountryGeographicFlowMap data={countryScopedData} />}
+          {fullscreenTarget === 'countryCollab' && (countryView === 'network' ? <CountryCollaborationNetwork data={countryScopedData} /> : <CountryCollaborationMatrix data={countryScopedData} />)}
+          {fullscreenTarget === 'topics' && (topicView === 'matrix' ? <TopicCoOccurrenceMatrix data={filteredData} /> : <TopicCoOccurrenceNetwork data={filteredData} />)}
+          {fullscreenTarget === 'funders' && (
+            <>
+              {funderView === 'matrix' && <FunderCofundingMatrix data={filteredData} />}
+              {funderView === 'network' && <FunderCofundingNetwork data={filteredData} />}
+              {funderView === 'cluster' && <FunderCofundingClusterNetwork data={filteredData} />}
+            </>
+          )}
+          {fullscreenTarget === 'funderSankey' && <FunderSankey data={filteredData} funders={funders} />}
+          {fullscreenTarget === 'funderFlow' && <FunderGeographicFlowMap data={filteredData} funders={funders} />}
+          {fullscreenTarget === 'msc' && (mscView === 'network' ? <MscCoOccurrenceNetwork data={filteredData} /> : <MscCoOccurrenceMatrix data={filteredData} />)}
+        </FullscreenModal>
+      )}
     </div>
   );
 }

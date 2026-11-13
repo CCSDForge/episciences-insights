@@ -8,6 +8,7 @@ import { Publication, FundersFile } from '@/lib/types';
 import { getCountryName } from '@/lib/countryNames';
 import { getDomainColor } from '@/lib/domainColors';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { PanelFullscreenButton } from './PanelFullscreenContext';
 
 interface FunderSankeyProps {
   data: Publication[];
@@ -280,19 +281,22 @@ export default function FunderSankey({ data, funders }: FunderSankeyProps) {
             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">{t.funderSankey.subtitle}</p>
           </div>
         </div>
-        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
-          {([15, 25, 40] as TopN[]).map((n) => (
-            <button
-              key={n}
-              onClick={() => setTopN(n)}
-              aria-label={`Show top ${n} funders`}
-              className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all first:rounded-l-lg last:rounded-r-lg border-r last:border-r-0 border-zinc-200 dark:border-zinc-600 ${
-                topN === n ? 'bg-white dark:bg-zinc-700 shadow-sm text-teal-700 dark:text-teal-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-              }`}
-            >
-              Top {n}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl shadow-inner">
+            {([15, 25, 40] as TopN[]).map((n) => (
+              <button
+                key={n}
+                onClick={() => setTopN(n)}
+                aria-label={`Show top ${n} funders`}
+                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all first:rounded-l-lg last:rounded-r-lg border-r last:border-r-0 border-zinc-200 dark:border-zinc-600 ${
+                  topN === n ? 'bg-white dark:bg-zinc-700 shadow-sm text-teal-700 dark:text-teal-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                }`}
+              >
+                Top {n}
+              </button>
+            ))}
+          </div>
+          <PanelFullscreenButton />
         </div>
       </div>
 

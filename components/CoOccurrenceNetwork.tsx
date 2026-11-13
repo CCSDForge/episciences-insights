@@ -6,6 +6,7 @@ import { Info } from 'lucide-react';
 import { NetworkGraph, NetworkNode } from './NetworkGraph';
 import { COLOR_RAMPS, rampStep } from '@/lib/colorRamps';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { PanelFullscreenButton } from './PanelFullscreenContext';
 
 export interface CoOccurrenceEntity {
   id: string;
@@ -198,11 +199,14 @@ export default function CoOccurrenceNetwork({
         {/* Sidebar */}
         <div className="lg:w-[380px] flex flex-col gap-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className={`p-2.5 text-white rounded-xl shadow-lg ${theme.iconBg}`}>
-                {icon}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`p-2.5 text-white rounded-xl shadow-lg shrink-0 ${theme.iconBg}`}>
+                  {icon}
+                </div>
+                <h4 className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-50 font-heading">{title}</h4>
               </div>
-              <h4 className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-50 font-heading">{title}</h4>
+              <PanelFullscreenButton />
             </div>
             <p className="text-xs font-bold text-zinc-400 uppercase tracking-[0.2em]">{subtitle}</p>
           </div>

@@ -6,6 +6,7 @@ import { Publication } from '@/lib/types';
 import { COLOR_RAMPS, rampStep } from '@/lib/colorRamps';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import ChartExportMenu from '@/components/ChartExportMenu';
+import { PanelFullscreenButton } from './PanelFullscreenContext';
 
 type TopN = 15 | 25 | 40;
 
@@ -190,6 +191,7 @@ export default function CoOccurrenceMatrix({
             filename={`episciences-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-top${topN}`}
             csvColumns={csvColumns}
           />
+          <PanelFullscreenButton />
         </div>
       </div>
 

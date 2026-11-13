@@ -13,6 +13,7 @@ import { ISO_NUMERIC_TO_ALPHA2 } from '@/lib/isoNumericToAlpha2';
 import NodeCountSlider from './NodeCountSlider';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 import { WORLD_GEO_URL } from '@/lib/geo';
+import { PanelFullscreenButton } from './PanelFullscreenContext';
 
 interface CountryGeographicFlowMapProps {
   data: Publication[];
@@ -188,11 +189,14 @@ export default function CountryGeographicFlowMap({ data }: CountryGeographicFlow
 
       <div className="lg:w-[320px] flex flex-col gap-6">
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 text-white rounded-xl shadow-lg bg-blue-600 shadow-blue-600/20">
-              <Route size={24} />
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2.5 text-white rounded-xl shadow-lg bg-blue-600 shadow-blue-600/20 shrink-0">
+                <Route size={24} />
+              </div>
+              <h4 className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-50 font-heading">{t.flowMap.countryTitle}</h4>
             </div>
-            <h4 className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-50 font-heading">{t.flowMap.countryTitle}</h4>
+            <PanelFullscreenButton />
           </div>
           <p className="text-xs font-bold text-zinc-400 uppercase tracking-[0.2em]">{t.flowMap.countrySubtitle}</p>
         </div>
