@@ -206,7 +206,7 @@ export default function CoOccurrenceForceNetwork({
   const hoveredNode = hoveredNodeId ? network.positionMap[hoveredNodeId] : null;
 
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-8 items-stretch justify-between p-8 bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-xl overflow-hidden">
+    <div className="w-full flex flex-col lg:flex-row gap-8 items-stretch justify-between p-8 bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 overflow-hidden">
 
       {/* Graph — aspect-[4/3] matches the SVG viewBox (800x600) so widening
           the page grows the graph itself instead of just adding letterbox padding */}
@@ -360,15 +360,15 @@ export default function CoOccurrenceForceNetwork({
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <div className="p-4 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+          <div className="p-4 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60">
             <p className={`text-2xl font-black ${theme.statColor}`}>{network.totalEntities}</p>
             <p className="text-[9px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.coOccurrence.totalEntities.replace('{entityLabelPlural}', entityLabelPlural)}</p>
           </div>
-          <div className="p-4 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+          <div className="p-4 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60">
             <p className={`text-2xl font-black ${theme.statColor}`}>{network.totalConnections}</p>
             <p className="text-[9px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.coOccurrence.totalConnections}</p>
           </div>
-          <div className="p-4 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+          <div className="p-4 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60">
             <p className={`text-2xl font-black ${theme.statColor}`}>{network.communityCount}</p>
             <p className="text-[9px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.coOccurrence.clusters}</p>
           </div>

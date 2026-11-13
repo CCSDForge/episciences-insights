@@ -26,7 +26,7 @@ export default function HelpSection({ locale, data }: HelpSectionProps) {
       </div>
 
       {/* Header académique */}
-      <header className="rounded-2xl bg-gradient-to-br from-white via-zinc-50 to-[var(--episciences-cyan-00)]/10 p-8 sm:p-10 shadow-xs ring-1 ring-zinc-200 dark:from-zinc-900 dark:via-zinc-900 dark:to-[var(--episciences-cyan-00)]/10 dark:ring-zinc-800">
+      <header className="rounded-2xl bg-gradient-to-br from-white via-zinc-50 to-[var(--episciences-cyan-00)]/10 p-8 sm:p-10 ring-1 ring-zinc-200 dark:from-zinc-900 dark:via-zinc-900 dark:to-[var(--episciences-cyan-00)]/10 dark:ring-zinc-800">
         <div className="space-y-4 max-w-4xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[var(--episciences-cyan-00)]/20 text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] border border-[var(--episciences-cyan-01)]/30">
             <BookOpen size={13} aria-hidden="true" />
@@ -62,7 +62,7 @@ export default function HelpSection({ locale, data }: HelpSectionProps) {
       {frontmatter.tocItems && frontmatter.tocItems.length > 0 && (
         <nav
           aria-label={frontmatter.tocTitle}
-          className="rounded-2xl bg-white p-6 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
+          className="rounded-2xl bg-white p-6 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
         >
           <h2 className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-4 flex items-center gap-2">
             <Layers size={14} aria-hidden="true" />

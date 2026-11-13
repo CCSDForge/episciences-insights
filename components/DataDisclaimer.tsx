@@ -11,7 +11,7 @@ export default function DataDisclaimer() {
   return (
     <section className="mt-16 rounded-3xl bg-zinc-100/50 p-8 dark:bg-zinc-900/50 ring-1 ring-zinc-200 dark:ring-zinc-800">
       <div className="flex flex-col md:flex-row gap-6 items-start">
-        <div className="rounded-2xl bg-white dark:bg-zinc-800 p-3 shadow-sm shrink-0">
+        <div className="rounded-2xl bg-white dark:bg-zinc-800 p-3 ring-1 ring-zinc-200 dark:ring-zinc-700 shrink-0">
           <Globe className="h-6 w-6 text-zinc-400" />
         </div>
         <div className="space-y-4">

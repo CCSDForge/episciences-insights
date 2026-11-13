@@ -269,7 +269,7 @@ export default function FunderSankey({ data, funders }: FunderSankeyProps) {
   const maxDepth = Math.max(...graph.nodes.map((n) => n.depth || 0));
 
   return (
-    <div className="w-full bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-xl p-8">
+    <div className="w-full bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 p-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-6 dark:border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="p-2.5 text-white rounded-2xl shadow-lg bg-teal-600 shadow-teal-600/20">

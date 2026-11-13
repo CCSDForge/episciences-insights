@@ -307,10 +307,7 @@ export default function ChartExportMenu({
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
                     <ImageIcon size={14} aria-hidden="true" />
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-bold">{t.export.png}</span>
-                    <span className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-tight">{t.export.pngDesc}</span>
-                  </div>
+                  <span className="font-bold min-w-0">{t.export.png}</span>
                 </button>
 
                 <button
@@ -323,10 +320,7 @@ export default function ChartExportMenu({
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
                     <Code size={14} aria-hidden="true" />
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-bold">{t.export.svg}</span>
-                    <span className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-tight">{t.export.svgDesc}</span>
-                  </div>
+                  <span className="font-bold min-w-0">{t.export.svg}</span>
                 </button>
               </div>
             </div>

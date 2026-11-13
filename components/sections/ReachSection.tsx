@@ -86,7 +86,7 @@ export default function ReachSection() {
               {t.dashboard.reachDesc}
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40 shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40">
             <span>{t.dashboard.reachSource}</span>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function ReachSection() {
         <div className="space-y-12 animate-in fade-in duration-300">
           {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="rounded-2xl bg-white p-6 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+            <div className="rounded-2xl bg-white p-6 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-widest text-zinc-400">
                   {t.dashboard.affiliatedCountries}
@@ -125,7 +125,7 @@ export default function ReachSection() {
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white p-6 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+            <div className="rounded-2xl bg-white p-6 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-widest text-zinc-400">
                   {t.dashboard.affiliatedInstitutions}
@@ -144,7 +144,7 @@ export default function ReachSection() {
           </div>
 
           {/* World Map */}
-          <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 overflow-hidden">
+          <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800 overflow-hidden">
             <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
@@ -181,7 +181,7 @@ export default function ReachSection() {
           </div>
 
           {/* Top Contributing Countries */}
-          <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
             <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-zinc-100 pb-6 dark:border-zinc-800">
               <div className="flex flex-col">
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
@@ -254,7 +254,7 @@ export default function ReachSection() {
                   <div
                     key={country.code}
                     onClick={() => setSelectedCountry(country.code)}
-                    className={`flex flex-col justify-between p-4 rounded-xl border transition-all shadow-xs group cursor-pointer ${
+                    className={`flex flex-col justify-between p-4 rounded-xl border transition-all group cursor-pointer ${
                       isSelected
                         ? 'bg-[var(--episciences-cyan-00)]/15 border-[var(--episciences-cyan-01)] ring-2 ring-[var(--episciences-cyan-01)]/30 dark:bg-[var(--episciences-cyan-00)]/20'
                         : 'bg-zinc-50/60 dark:bg-zinc-800/40 border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
@@ -298,7 +298,7 @@ export default function ReachSection() {
           />
 
           {/* Top Contributing Institutions */}
-          <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
             <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-zinc-100 pb-6 dark:border-zinc-800">
               <div className="flex flex-col">
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">

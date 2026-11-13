@@ -88,7 +88,7 @@ export default function FunderGeographicFlowMap({ data, funders }: FunderGeograp
   }
 
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-8 items-stretch justify-between p-8 bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-xl overflow-hidden">
+    <div className="w-full flex flex-col lg:flex-row gap-8 items-stretch justify-between p-8 bg-white dark:bg-zinc-900 rounded-3xl ring-1 ring-zinc-200 dark:ring-zinc-800 overflow-hidden">
       <div className="relative flex-1 aspect-[16/9] min-h-[420px] select-none bg-zinc-50/30 dark:bg-zinc-950/20 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
         <ComposableMap
           projectionConfig={{ rotate: [-10, 0, 0], scale: 145 }}
@@ -165,11 +165,11 @@ export default function FunderGeographicFlowMap({ data, funders }: FunderGeograp
         />
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+          <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60">
             <p className="text-3xl font-black text-teal-600 dark:text-teal-400">{nodes.length}</p>
             <p className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.flowMap.fundersShown}</p>
           </div>
-          <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 shadow-xs">
+          <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60">
             <p className="text-3xl font-black text-teal-600 dark:text-teal-400">{links.length}</p>
             <p className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest mt-1">{t.flowMap.fundingTies}</p>
           </div>

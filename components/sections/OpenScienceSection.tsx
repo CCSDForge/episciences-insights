@@ -34,7 +34,7 @@ export default function OpenScienceSection() {
               {t.lineage.description}
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40 shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-bold text-[var(--episciences-cyan-04)] dark:text-[var(--episciences-cyan-00)] shrink-0 bg-white/95 dark:bg-zinc-900/90 px-3 py-1.5 rounded-xl border border-[var(--episciences-cyan-01)]/40 dark:border-[var(--episciences-cyan-00)]/40">
             <span>{t.lineage.source}</span>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function OpenScienceSection() {
       {/* Open Science KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* 1. Open Repositories */}
-        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xs ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
+        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
           <div className="flex items-center gap-2 mb-3 text-zinc-500 dark:text-zinc-400">
             <Archive size={16} className="text-[var(--episciences-cyan-03)] dark:text-[var(--episciences-cyan-00)]" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider">{t.dashboard.kpiRepositoriesTitle}</span>
@@ -60,7 +60,7 @@ export default function OpenScienceSection() {
         </div>
 
         {/* 2. Open Licenses */}
-        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xs ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
+        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
           <div className="flex items-center gap-2 mb-3 text-zinc-500 dark:text-zinc-400">
             <Scale size={16} className="text-[#0aa0be] dark:text-[#57bec3]" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider">{t.dashboard.licensingTitle}</span>
@@ -74,7 +74,7 @@ export default function OpenScienceSection() {
         </div>
 
         {/* 3. Linked Datasets (Scholix) */}
-        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xs ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
+        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
           <div className="flex items-center gap-2 mb-3 text-zinc-500 dark:text-zinc-400">
             <Database size={16} className="text-amber-700 dark:text-amber-400" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider">{t.dashboard.kpiDatasetsTitle}</span>
@@ -93,7 +93,7 @@ export default function OpenScienceSection() {
         </div>
 
         {/* 4. Linked Software (Scholix) */}
-        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xs ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
+        <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 ring-1 ring-zinc-200 dark:ring-zinc-800 transition-colors">
           <div className="flex items-center gap-2 mb-3 text-zinc-500 dark:text-zinc-400">
             <Code2 size={16} className="text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider">{t.dashboard.kpiSoftwareTitle}</span>
@@ -113,7 +113,7 @@ export default function OpenScienceSection() {
       </div>
 
       {/* Licensing Spectrum Card */}
-      <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+      <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-zinc-100 pb-6 dark:border-zinc-800">
           <div className="flex items-center gap-3">
             <div className="p-2.5 text-white rounded-xl shadow-md bg-[var(--episciences-cyan-03)] dark:bg-[var(--episciences-cyan-00)] dark:text-[var(--ccsd-bleu-00)]">
@@ -168,7 +168,7 @@ export default function OpenScienceSection() {
       </div>
 
       {/* Research Lineage Explorer */}
-      <div className="rounded-2xl bg-white p-8 shadow-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+      <div className="rounded-2xl bg-white p-8 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
         <h2 className="mb-8 text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
           {t.lineage.title}
         </h2>
