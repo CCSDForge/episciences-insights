@@ -87,6 +87,36 @@ describe('OpenAireClient', () => {
     expect(await client.fetchByDoi('10.46298/notfound')).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(3);
   });
+
+  it('retries on 429 Too Many Requests and returns null on network error or non-OK status', async () => {
+    vi.useFakeTimers();
+    const tokenManager = { getAccessToken: vi.fn(async () => null), clearTokenCache: vi.fn() };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false, status: 429, headers: makeHeaders({ 'Retry-After': 1 }) })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: makeHeaders({ 'x-ratelimit-limit': 100, 'x-ratelimit-used': 10 }),
+        json: async () => ({ results: [{ id: 'oa-retried' }] }),
+      })
+      .mockRejectedValueOnce(new Error('ECONNRESET'))
+      .mockResolvedValueOnce({ ok: false, status: 500, headers: makeHeaders() });
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const client = new OpenAireClient(tokenManager, { cacheDir: tmpDir });
+    client.minDelayMs = 0;
+    client.currentDelayMs = 0;
+
+    const p = client.fetchByDoi('10.46298/retry');
+    await vi.runAllTimersAsync();
+    expect(await p).toEqual({ id: 'oa-retried' });
+    expect(await client.fetchByDoi('10.46298/neterr')).toBeNull();
+    expect(await client.fetchByDoi('10.46298/err500')).toBeNull();
+    vi.useRealTimers();
+  });
 });
 
 describe('EpisciencesClient', () => {
@@ -128,6 +158,47 @@ describe('EpisciencesClient', () => {
     const map = await client.buildDoiToDocidMap();
     expect(map.get('10.46298/dmtcs.42')).toBe(42);
     expect(map.size).toBe(1);
+  });
+
+  it('slices by year[] and deduplicates docids when a journal exceeds one page (hasNext)', async () => {
+    const fetchMock = vi.fn(async (url) => {
+      if (!url.includes('year[]=')) {
+        return {
+          ok: true,
+          json: async () => ({
+            'hydra:member': [{ docid: 1, doi: '10.46298/dmtcs.1' }],
+            'hydra:totalItems': 2,
+            'hydra:view': { 'hydra:next': '/api/papers/?page=2' },
+          }),
+        };
+      }
+      if (url.includes('year[]=2024') && url.includes('page=1')) {
+        return {
+          ok: true,
+          json: async () => ({
+            'hydra:member': [{ docid: 1, doi: '10.46298/dmtcs.1' }],
+            'hydra:view': { 'hydra:next': '/api/papers/?year[]=2024&page=2' },
+          }),
+        };
+      }
+      if (url.includes('year[]=2024') && url.includes('page=2')) {
+        return {
+          ok: true,
+          json: async () => ({
+            'hydra:member': [
+              { docid: 1, doi: '10.46298/dmtcs.1' }, // overlap deduplicated
+              { docid: 2, doi: '10.46298/dmtcs.2' },
+            ],
+          }),
+        };
+      }
+      return { ok: true, json: async () => ({ 'hydra:member': [] }) };
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new EpisciencesClient({ cacheDir: tmpDir, delayMs: 0 });
+    const papers = await client.fetchJournalPapers('dmtcs');
+    expect(papers.map((p) => p.docid)).toEqual([1, 2]);
   });
 
   it('throws if API returns fewer papers than hydra:totalItems', async () => {

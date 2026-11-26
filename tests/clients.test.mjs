@@ -154,6 +154,25 @@ describe('OpenAlexClient', () => {
     // 400 returns undefined
     expect(await client.fetchByDoi('10.46298/bad')).toBeUndefined();
   });
+
+  it('retries on 429/500 and network errors before succeeding or giving up', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('network blip'))
+      .mockResolvedValueOnce({ ok: false, status: 503, headers: { get: () => '1' } })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'W-OK' }) });
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const client = new OpenAlexClient({ cacheDir: tmpDir, delayMs: 0 });
+    const promise = client.fetchByDoi('10.46298/flaky');
+    await vi.runAllTimersAsync();
+    expect(await promise).toEqual({ id: 'W-OK' });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    vi.useRealTimers();
+  });
 });
 
 describe('OpenAlexFundersClient', () => {
