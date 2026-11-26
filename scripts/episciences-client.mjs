@@ -3,6 +3,12 @@ import path from 'node:path';
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Server-side maximum for /papers/ (larger values are clamped to 1000).
+const PAPERS_PAGE_SIZE = 1000;
+// Lower bound of the `year[]` slicing (oldest Episciences-hosted back
+// catalogue starts in the late 1990s; the totalItems check flags any gap).
+const PAPERS_FIRST_YEAR = 1990;
+
 /**
  * Client for the Episciences platform's own API (api.episciences.org),
  * fully public, no authentication required.
@@ -88,15 +94,60 @@ export class EpisciencesClient {
     const cached = this._readCache(filePath, this.indexCacheDurationMs);
     if (cached) return cached;
 
-    await this._waitForRateLimit();
-    const res = await fetch(`${this.baseUrl}/papers/?rvcode=${encodeURIComponent(rvcode)}&pagination=false`, { headers: { Accept: 'application/json' } });
-    if (!res.ok) {
-      console.error(`[Episciences] /papers/?rvcode=${rvcode} HTTP ${res.status}`);
-      return [];
+    // The API silently caps every response at 1000 items, even with
+    // `pagination=false` (DMTCS and LMCS both exceed that). Plain Hydra
+    // paging is not a fix either: /papers/ has no `order` parameter and its
+    // server-side ordering is unstable, so consecutive pages overlap (LMCS:
+    // 7 rows repeated, 7 papers never returned). Journals that don't fit in
+    // one page are therefore sliced by `year[]` (largest slice today: 181),
+    // deduplicated by docid and checked against `hydra:totalItems`. Any
+    // failure throws instead of returning a partial list: a truncated index
+    // would silently drop DOIs from publications.csv.
+    const first = await this._fetchPapersPage(rvcode, 1);
+    let papers = first.members;
+    const totalItems = first.totalItems;
+
+    if (first.hasNext) {
+      const byDocid = new Map();
+      const lastYear = new Date().getFullYear() + 1;
+      for (let year = PAPERS_FIRST_YEAR; year <= lastYear; year++) {
+        for (const p of await this._fetchAllPages(rvcode, `&year[]=${year}`)) byDocid.set(p.docid, p);
+      }
+      papers = [...byDocid.values()];
     }
+
+    if (typeof totalItems === 'number' && papers.length !== totalItems) {
+      throw new Error(`Episciences /papers/?rvcode=${rvcode}: got ${papers.length} papers, API announced ${totalItems}`);
+    }
+
+    this._writeCache(filePath, JSON.stringify(papers, null, 2));
+    return papers;
+  }
+
+  async _fetchPapersPage(rvcode, page, extraQuery = '') {
+    await this._waitForRateLimit();
+    const query = `rvcode=${encodeURIComponent(rvcode)}${extraQuery}&itemsPerPage=${PAPERS_PAGE_SIZE}&page=${page}`;
+    const res = await fetch(`${this.baseUrl}/papers/?${query}`, { headers: { Accept: 'application/ld+json' } });
+    if (!res.ok) throw new Error(`Episciences /papers/?${query} HTTP ${res.status}`);
     const data = await res.json();
-    this._writeCache(filePath, JSON.stringify(data, null, 2));
-    return data;
+    const members = data['hydra:member'];
+    if (!Array.isArray(members)) throw new Error(`Episciences /papers/?${query}: unexpected response shape`);
+    return {
+      members,
+      totalItems: data['hydra:totalItems'],
+      hasNext: Boolean(data['hydra:view']?.['hydra:next']) && members.length > 0,
+    };
+  }
+
+  // Only used for year slices, which stay far below one page; the loop is
+  // a safety net, and the caller's totalItems check catches any overlap.
+  async _fetchAllPages(rvcode, extraQuery) {
+    const all = [];
+    for (let page = 1; ; page++) {
+      const { members, hasNext } = await this._fetchPapersPage(rvcode, page, extraQuery);
+      all.push(...members);
+      if (!hasNext) return all;
+    }
   }
 
   /**
@@ -108,7 +159,15 @@ export class EpisciencesClient {
     const journals = await this.fetchJournals();
     const map = new Map();
     for (const journal of journals) {
-      const papers = await this.fetchJournalPapers(journal.code);
+      let papers;
+      try {
+        papers = await this.fetchJournalPapers(journal.code);
+      } catch (err) {
+        // One failing journal should not empty the whole map: its DOIs
+        // fall back to `resolveDocid()` at collection time.
+        console.error(`[Episciences] Skipping ${journal.code} in DOI -> docid map: ${err.message}`);
+        continue;
+      }
       for (const p of papers) {
         if (p.doi) map.set(p.doi.toLowerCase(), p.docid);
       }

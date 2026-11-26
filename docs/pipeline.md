@@ -38,7 +38,10 @@ Episciences Insights aggregates metadata across open science infrastructures, ha
 ```bash
 npm run sync:dois
 ```
-Harvests published DOIs directly from `api.episciences.org` into `publications.csv`.
+Harvests published DOIs directly from `api.episciences.org` into `publications.csv`. Also run automatically at the start of `npm run collect` (skip with `--no-sync` or `SKIP_DOI_SYNC=true`).
+
+- **Complete journal listings:** `/papers/` silently caps every response at 1000 items, even with `pagination=false` ([episciences-api#204](https://github.com/CCSDForge/episciences-api/issues/204)), and its page order is unstable, so consecutive pages overlap ([episciences-api#155](https://github.com/CCSDForge/episciences-api/issues/155)). Journals above 1000 papers (DMTCS, LMCS) are therefore fetched by `year[]` slices, deduplicated by `docid`, and checked against `hydra:totalItems`. Any mismatch or HTTP error aborts the sync instead of writing a partial list (`scripts/episciences-client.mjs`).
+- **Shrink guard:** the CSV is rewritten from the API listing, so the sync refuses to overwrite it when more than 2% of the existing DOIs would disappear; `npm run collect` then continues with the existing CSV. Force a legitimate large removal with `--allow-shrink` or `SYNC_ALLOW_SHRINK=true`; tune the threshold with `SYNC_MAX_REMOVED_RATIO`.
 
 ### 2. Run Main Data Collection
 ```bash
@@ -88,6 +91,8 @@ EPISCIENCES_API_URL=https://api.episciences.org/api
 # Concurrency and Cache Settings
 CONCURRENCY=8
 SKIP_DOI_SYNC=false
+SYNC_ALLOW_SHRINK=false
+SYNC_MAX_REMOVED_RATIO=0.02
 DOI_CSV_PATH=./publications.csv
 DATA_OUTPUT_PATH=./public/data/publications.json
 CACHE_DIRECTORY=./.cache

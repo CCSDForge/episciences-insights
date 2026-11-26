@@ -5,6 +5,10 @@ import { EpisciencesClient } from './episciences-client.mjs';
 
 dotenv.config({ path: '.env.local' });
 
+// Maximum share of existing DOIs a sync may drop before it refuses to
+// overwrite the CSV (override with SYNC_MAX_REMOVED_RATIO).
+const DEFAULT_MAX_REMOVED_RATIO = 0.02;
+
 /**
  * Normalizes a DOI string: trims whitespace and strips leading URL prefixes.
  *
@@ -28,6 +32,8 @@ export function cleanDoi(doi) {
  * @param {string} [options.cacheDir] Local cache directory
  * @param {number} [options.indexCacheDays] Cache duration in days for journals/papers index
  * @param {EpisciencesClient} [options.episciencesClient] Pre-instantiated client
+ * @param {boolean} [options.allowShrink] Overwrite even if many existing DOIs would be removed
+ * @param {number} [options.maxRemovedRatio] Share of existing DOIs that may be removed (default 0.02)
  * @returns {Promise<{ totalDois: number, newCount: number, csvPath: string, dois: string[] }>}
  */
 export async function syncDois(options = {}) {
@@ -78,6 +84,29 @@ export async function syncDois(options = {}) {
     if (!existingDois.has(lower)) {
       newCount++;
     }
+  }
+
+  // The CSV is rewritten wholesale from the API listing, so a truncated
+  // listing (e.g. the 1000-item cap that once dropped 1954 DMTCS/LMCS DOIs)
+  // would silently shrink the corpus. Count the DOIs that would disappear,
+  // not the net total, so new papers cannot mask a loss, and refuse to write
+  // above the threshold. A legitimate large removal can be forced.
+  const removedDois = [...existingDois].filter((lower) => !doiMap.has(lower));
+  if (removedDois.length > 0) {
+    const maxRemovedRatio = Number(options.maxRemovedRatio ?? process.env.SYNC_MAX_REMOVED_RATIO ?? DEFAULT_MAX_REMOVED_RATIO);
+    const allowShrink = options.allowShrink
+      ?? (process.env.SYNC_ALLOW_SHRINK === 'true' || process.argv.includes('--allow-shrink'));
+    const removedRatio = removedDois.length / existingDois.size;
+    const sample = removedDois.slice(0, 5).join(', ');
+    if (removedRatio > maxRemovedRatio && !allowShrink) {
+      throw new Error(
+        `Refusing to overwrite ${csvPath}: ${removedDois.length}/${existingDois.size} existing DOIs ` +
+        `(${(removedRatio * 100).toFixed(1)}%) are missing from the API listing, above the ` +
+        `${(maxRemovedRatio * 100).toFixed(1)}% threshold (e.g. ${sample}). ` +
+        'If this removal is legitimate, rerun with --allow-shrink or SYNC_ALLOW_SHRINK=true.'
+      );
+    }
+    console.warn(`[Sync DOIs] ${removedDois.length} DOIs no longer listed by the API will be removed (e.g. ${sample}).`);
   }
 
   // Sort alphabetically for clean and deterministic diffs
