@@ -82,4 +82,4 @@ For scientific methodology, indicators computation, and open datasets downloads,
 
 - **Source Code**: [GNU General Public License v3.0 (GPL v3)](https://www.gnu.org/licenses/gpl-3.0)
 - **Consolidated Datasets**: [Creative Commons Attribution 4.0 International (CC-BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
-- **Scientific Metadata**: Aggregated from [Episciences](https://www.episciences.org), [OpenAlex](https://openalex.org), [OpenAIRE](https://explore.openaire.eu), [zbMATH Open](https://zbmath.org), and [ROR](https://ror.org).
+- **Metadata**: Aggregated from [Episciences](https://www.episciences.org), [OpenAlex](https://openalex.org), [OpenAIRE](https://explore.openaire.eu), [zbMATH Open](https://zbmath.org), and [ROR](https://ror.org).
