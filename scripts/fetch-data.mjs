@@ -184,10 +184,11 @@ async function run() {
   fs.writeFileSync(statsOutputPath, JSON.stringify(corpusStats, null, 2));
   console.log(`  Corpus stats written   : ${statsOutputPath}`);
 
+  const pct = (n) => (results.length > 0 ? ((100 * n) / results.length).toFixed(1) : '0.0');
   compressData();
   console.log(`  Not found in OpenAlex  : ${notFoundInOpenAlex}`);
-  console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${((100 * foundInOpenAire) / results.length).toFixed(1)}%)`);
-  console.log(`  Enriched by Episciences: ${foundInEpisciences} (${((100 * foundInEpisciences) / results.length).toFixed(1)}%)`);
+  console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${pct(foundInOpenAire)}%)`);
+  console.log(`  Enriched by Episciences: ${foundInEpisciences} (${pct(foundInEpisciences)}%)`);
   console.log(`  Transient failures     : ${transientFailures}`);
   console.log(`  Funders resolved       : ${Object.keys(funders).length} written to ${FUNDERS_OUTPUT_PATH}`);
 }

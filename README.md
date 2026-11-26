@@ -1,5 +1,7 @@
 # Episciences Insights
 
+[![CI](https://img.shields.io/github/actions/workflow/status/CCSDForge/episciences-insights/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/CCSDForge/episciences-insights/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/CCSDForge/episciences-insights?branch=main&style=flat-square&logo=codecov&logoColor=white)](https://codecov.io/gh/CCSDForge/episciences-insights)
 [![Next.js 16](https://img.shields.io/badge/Next.js_16-black?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript_5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)

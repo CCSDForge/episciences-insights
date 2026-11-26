@@ -35,7 +35,7 @@ export class EpisciencesClient {
     this.indexCacheDurationMs = (Number(options.indexCacheDays) || 1) * 24 * 60 * 60 * 1000;
     this.exportCacheDurationMs = (Number(options.exportCacheDays) || 30) * 24 * 60 * 60 * 1000;
     this.notFoundCacheDurationMs = (Number(options.notFoundCacheHours) || 24) * 60 * 60 * 1000;
-    this.delayMs = Number(options.delayMs) || 300;
+    this.delayMs = options.delayMs !== undefined ? Number(options.delayMs) : 300;
     this.lastRequestTime = 0;
     this.rateLimitQueue = Promise.resolve();
 

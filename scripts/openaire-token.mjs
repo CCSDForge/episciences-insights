@@ -70,6 +70,7 @@ export class OpenAireTokenManager {
       const ttlSec = Math.max(60, expiresInSec - 120);
       const expiresAt = Date.now() + ttlSec * 1000;
 
+      fs.mkdirSync(path.dirname(this.tokenFilePath), { recursive: true });
       fs.writeFileSync(this.tokenFilePath, JSON.stringify({ access_token: token, expires_at: expiresAt }, null, 2));
       console.log(`[OpenAIRE AAI] New token acquired, valid for ${ttlSec}s`);
       return token;
