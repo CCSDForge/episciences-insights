@@ -6,6 +6,9 @@ import { COLOR_RAMPS, rampStep } from '@/lib/colorRamps';
 import { getCountryName } from '@/lib/countryNames';
 import { getDomainColor } from '@/lib/domainColors';
 import { getHelpPageData } from '@/lib/help';
+import { ISO_NUMERIC_TO_ALPHA2 } from '@/lib/isoNumericToAlpha2';
+import { WORLD_GEO_URL } from '@/lib/geo';
+import { baseMetadata } from '@/lib/metadata';
 
 describe('cleanDoi', () => {
   it('strips doi.org prefix, trims leading/trailing whitespace, and lowercases', () => {
@@ -88,4 +91,21 @@ describe('getHelpPageData', () => {
       expect(data.html).toContain('rel="noopener noreferrer"');
     }
   );
+});
+
+describe('static constants (ISO_NUMERIC_TO_ALPHA2, WORLD_GEO_URL, baseMetadata)', () => {
+  it('maps ISO numeric codes to valid 2-letter alpha-2 codes recognized by getCountryName', () => {
+    expect(ISO_NUMERIC_TO_ALPHA2['250']).toBe('FR');
+    expect(ISO_NUMERIC_TO_ALPHA2['840']).toBe('US');
+    for (const alpha2 of Object.values(ISO_NUMERIC_TO_ALPHA2)) {
+      expect(alpha2).toMatch(/^[A-Z]{2}$/);
+      expect(getCountryName(alpha2)).not.toBe(alpha2);
+    }
+  });
+
+  it('exposes local world-atlas URL and base metadata', () => {
+    expect(WORLD_GEO_URL).toBe('/geo/countries-110m.json');
+    expect(baseMetadata.title).toBe('Episciences Insights');
+    expect(baseMetadata.metadataBase).toBeInstanceOf(URL);
+  });
 });
