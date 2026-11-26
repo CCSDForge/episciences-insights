@@ -18,7 +18,7 @@ export class OpenAlexFundersClient {
     this.apiKey = options.apiKey || process.env.OPENALEX_API_KEY || '';
     this.cacheDir = path.resolve(options.cacheDir || './.cache/openalex-funders');
     this.cacheDurationMs = (Number(options.cacheDays) || 30) * 24 * 60 * 60 * 1000;
-    this.delayMs = Number(options.delayMs) || 150;
+    this.delayMs = options.delayMs !== undefined ? Number(options.delayMs) : 150;
 
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });

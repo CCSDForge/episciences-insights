@@ -96,7 +96,7 @@ export class OpenAireClient {
    * if the DOI is not indexed by OpenAIRE / the request ultimately failed.
    */
   async fetchByDoi(doi) {
-    const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//, '').trim();
+    const cleanDoi = doi.trim().replace(/^https?:\/\/doi\.org\//i, '').trim();
     const filePath = this._cacheFilePath(cleanDoi);
 
     const cached = this._readCache(filePath);

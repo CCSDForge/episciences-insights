@@ -39,5 +39,30 @@ jobs:
       - name: Unit tests with coverage
         run: npm run test:coverage
 
+      - name: Publish coverage summary
+        if: always() && hashFiles('coverage/coverage-summary.json') != ''
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const { total } = JSON.parse(fs.readFileSync("coverage/coverage-summary.json", "utf8"));
+            const rows = [
+              "### Test Coverage (`lib/` + `scripts/`)",
+              "",
+              "| Metric | Covered | Total | % |",
+              "| :--- | ---: | ---: | ---: |",
+              ...["lines", "statements", "branches", "functions"].map((k) =>
+                `| ${k} | ${total[k].covered} | ${total[k].total} | **${total[k].pct}%** |`
+              ),
+            ];
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rows.join("\n") + "\n");
+          '
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
       - name: Build static export
         run: npm run build

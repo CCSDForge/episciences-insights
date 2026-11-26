@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import type { Locale } from '@/lib/i18n/translations';
 
 export interface HelpTocItem {
@@ -40,11 +40,11 @@ export function getHelpPageData(
   const totalJournals = String(stats?.totalHostedJournals ?? 47);
 
   const resolvedContent = content
-    .replace('{publicationsCount}', totalPubsFormatted)
-    .replace('{journalsCount}', totalJournals);
+    .replaceAll('{publicationsCount}', totalPubsFormatted)
+    .replaceAll('{journalsCount}', totalJournals);
 
-  // Configure marked with section card splitting and accessible links
-  marked.use({
+  // Use an isolated Marked instance to avoid mutating the global singleton on every call
+  const markedInstance = new Marked({
     renderer: {
       heading({ tokens, depth }) {
         const text = this.parser.parseInline(tokens);
@@ -66,7 +66,7 @@ export function getHelpPageData(
     },
   });
 
-  let html = marked.parse(resolvedContent) as string;
+  let html = markedInstance.parse(resolvedContent) as string;
   if (html.startsWith('</section>')) {
     html = html.replace('</section>', '') + '</section>';
   }

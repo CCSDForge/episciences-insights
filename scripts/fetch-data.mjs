@@ -24,17 +24,14 @@ const LOG_DIR = path.resolve('./logs');
 const CACHE_DURATION_DAYS = Number(process.env.CACHE_DURATION_DAYS) || 30;
 const CONCURRENCY = Math.max(1, Number(process.env.CONCURRENCY) || 8);
 
-if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
-const outputDir = path.dirname(OUTPUT_PATH);
-if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
-
 const NOT_FOUND_LOG = path.join(LOG_DIR, 'not-found.log');
 
 function logNotFound(source, doi) {
+  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
   fs.appendFileSync(NOT_FOUND_LOG, `${new Date().toISOString()} - [${source}] Not Found - ${doi}\n`);
 }
 
-async function pMap(items, mapper, concurrency = 8) {
+export async function pMap(items, mapper, concurrency = 8) {
   const results = new Array(items.length);
   let currentIndex = 0;
 
@@ -50,7 +47,11 @@ async function pMap(items, mapper, concurrency = 8) {
   return results;
 }
 
-async function run() {
+export async function run() {
+  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
+  const outputDir = path.dirname(OUTPUT_PATH);
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
   const episciencesClient = new EpisciencesClient({
     cacheDir: path.join(CACHE_DIR, 'episciences'),
     exportCacheDays: CACHE_DURATION_DAYS,
@@ -184,12 +185,20 @@ async function run() {
   fs.writeFileSync(statsOutputPath, JSON.stringify(corpusStats, null, 2));
   console.log(`  Corpus stats written   : ${statsOutputPath}`);
 
+  const pct = (n) => (results.length > 0 ? ((100 * n) / results.length).toFixed(1) : '0.0');
   compressData();
   console.log(`  Not found in OpenAlex  : ${notFoundInOpenAlex}`);
-  console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${((100 * foundInOpenAire) / results.length).toFixed(1)}%)`);
-  console.log(`  Enriched by Episciences: ${foundInEpisciences} (${((100 * foundInEpisciences) / results.length).toFixed(1)}%)`);
+  console.log(`  Enriched by OpenAIRE   : ${foundInOpenAire} (${pct(foundInOpenAire)}%)`);
+  console.log(`  Enriched by Episciences: ${foundInEpisciences} (${pct(foundInEpisciences)}%)`);
   console.log(`  Transient failures     : ${transientFailures}`);
   console.log(`  Funders resolved       : ${Object.keys(funders).length} written to ${FUNDERS_OUTPUT_PATH}`);
 }
 
-run();
+const isMain = process.argv[1] && (
+  process.argv[1] === import.meta.filename ||
+  path.resolve(process.argv[1]) === path.resolve(import.meta.filename)
+);
+
+if (isMain) {
+  run();
+}
