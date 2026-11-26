@@ -15,6 +15,11 @@ export default defineConfig({
       reporter: ['text', 'lcov', 'json-summary'],
       include: ['lib/**/*.{ts,tsx}', 'scripts/**/*.mjs'],
       exclude: ['lib/types.ts', 'lib/i18n/**'],
+      thresholds: {
+        lines: 85,
+        functions: 85,
+        statements: 85,
+      },
     },
   },
 });
