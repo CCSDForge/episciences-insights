@@ -56,7 +56,7 @@
     "happy-dom": "^21.0.4",
     "knip": "^6.48.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "typescript": "^7",
     "vite": "^8.4.0",
     "vitest": "^5.1.2",
     "world-atlas": "^2.0.2"
