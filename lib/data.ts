@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { Publication, FundersFile } from '@/lib/types';
 
 export function cleanDoi(doi: string): string {
-  return (doi || '').replace(/^https?:\/\/doi\.org\//i, '').toLowerCase().trim();
+  return (doi || '').trim().replace(/^https?:\/\/doi\.org\//i, '').toLowerCase();
 }
 
 type LinkedOutputsFile = Record<string, { datasets: { pid: string; url?: string }[]; software: { pid: string; url?: string }[] }>;
