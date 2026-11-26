@@ -20,7 +20,7 @@ export class RorClient {
   constructor(options = {}) {
     this.cacheDir = path.resolve(options.cacheDir || './.cache/ror');
     this.cacheDurationMs = (Number(options.cacheDays) || 30) * 24 * 60 * 60 * 1000;
-    this.delayMs = Number(options.delayMs) || 150;
+    this.delayMs = options.delayMs !== undefined ? Number(options.delayMs) : 150;
 
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });

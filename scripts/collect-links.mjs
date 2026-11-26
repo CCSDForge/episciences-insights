@@ -118,7 +118,7 @@ async function run() {
   let failed = 0;
 
   for (let i = 0; i < publications.length; i++) {
-    const doi = String(publications[i].doi || '').replace(/^https?:\/\/doi\.org\//, '');
+    const doi = String(publications[i].doi || '').trim().replace(/^https?:\/\/doi\.org\//i, '').toLowerCase();
     if (!doi) continue;
 
     // Sequential, not Promise.all: the two calls would otherwise both read

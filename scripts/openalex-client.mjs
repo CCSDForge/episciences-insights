@@ -14,7 +14,7 @@ export class OpenAlexClient {
     this.cacheDir = path.resolve(options.cacheDir || './.cache/openalex');
     this.cacheDurationMs = (Number(options.cacheDays) || 30) * 24 * 60 * 60 * 1000;
     this.notFoundCacheDurationMs = (Number(options.notFoundCacheHours) || 24) * 60 * 60 * 1000;
-    this.delayMs = Number(options.delayMs) || 200;
+    this.delayMs = options.delayMs !== undefined ? Number(options.delayMs) : 200;
     this.onNotFound = options.onNotFound || (() => {});
     this.lastRequestTime = 0;
     this.rateLimitQueue = Promise.resolve();
@@ -70,7 +70,7 @@ export class OpenAlexClient {
    * `undefined` on a transient failure (never cached).
    */
   async fetchByDoi(doi) {
-    const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//, '').trim();
+    const cleanDoi = doi.trim().replace(/^https?:\/\/doi\.org\//i, '').trim();
     const filePath = this._cacheFilePath(cleanDoi);
 
     const cached = this._readCache(filePath);
