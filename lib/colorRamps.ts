@@ -9,8 +9,6 @@ export const COLOR_RAMPS = {
   indigo: ['#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1', '#4f46e5', '#3730a3'],
 } as const;
 
-export type ColorTheme = keyof typeof COLOR_RAMPS;
-
 // Qualitative palette for community/cluster membership (Louvain output) —
 // unlike COLOR_RAMPS this encodes *category*, not magnitude, so hue varies
 // rather than lightness. Cycles via modulo past its length; Louvain on a
@@ -20,12 +18,6 @@ export const COMMUNITY_COLORS = [
   '#0d9488', '#2563eb', '#db2777', '#ea580c', '#7c3aed',
   '#0891b2', '#65a30d', '#c026d3', '#4f46e5', '#ca8a04',
 ] as const;
-
-// Neutral "no value" mark — swapped per prefers-color-scheme (see the
-// .matrix-cell / --cell-light,--cell-dark pattern in globals.css) rather
-// than drawn from the ramp itself, since "zero" isn't a light magnitude,
-// it's the absence of one.
-export const NO_VALUE_COLOR = { light: '#f4f4f5', dark: '#27272a' };
 
 /**
  * Maps a value to a color step on the given ramp. Co-occurrence counts are

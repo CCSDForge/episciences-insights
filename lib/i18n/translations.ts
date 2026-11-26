@@ -1,1 +1,1 @@
-export type { Locale, Translations } from './types';
+export type { Locale } from './types';

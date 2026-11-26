@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "knip": "knip",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -19,7 +20,6 @@
     "compress": "node scripts/compress-data.mjs"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
     "d3-force": "^3.0.0",
     "d3-geo": "^3.1.1",
     "d3-sankey": "^0.12.3",
@@ -35,8 +35,7 @@
     "react-dom": "19.2.4",
     "react-simple-maps": "^3.0.0",
     "react-tooltip": "^5.30.0",
-    "recharts": "^3.8.1",
-    "tailwind-merge": "^3.5.0"
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -44,6 +43,7 @@
     "@types/d3-geo": "^3.1.1",
     "@types/d3-sankey": "^0.12.5",
     "@types/d3-scale": "^4.0.9",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -51,6 +51,7 @@
     "dotenv": "^17.4.0",
     "eslint": "^9",
     "eslint-config-next": "^16.4.5",
+    "knip": "^6.48.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.4.0",
