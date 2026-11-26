@@ -24,26 +24,17 @@ const LINKS_URL = process.env.OPENAIRE_LINKS_URL || 'https://api.openaire.eu/gra
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
-
-function cacheFilePath(doi, targetType) {
-  return path.join(CACHE_DIR, `${doi.replace(/[^a-z0-9]/gi, '_')}_${targetType}.json`);
-}
-
-// This sub-resource (research-products/links) appears to carry a tighter
-// quota than the main research-products endpoint used elsewhere in the
-// pipeline — a live run hit HTTP 429 well within the budget that's fine for
-// openaire-client.mjs. Same backoff shape as that client (Retry-After header
-// with an attempt-scaled fallback, up to 4 tries), plus a base delay that
-// ratchets up once a 429 is seen and only relaxes after a sustained run of
-// clean responses, so the rest of a long collection run doesn't keep
-// slamming into the same limit every request.
 const MIN_DELAY_MS = 600;
 const MAX_DELAY_MS = 10000;
 let currentDelayMs = MIN_DELAY_MS;
 let cleanResponsesSinceBackoff = 0;
 
-async function fetchLinks(doi, targetType) {
+function cacheFilePath(doi, targetType) {
+  return path.join(CACHE_DIR, `${doi.replace(/[^a-z0-9]/gi, '_')}_${targetType}.json`);
+}
+
+export async function fetchLinks(doi, targetType) {
+  if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
   const filePath = cacheFilePath(doi, targetType);
   if (fs.existsSync(filePath)) {
     try {
@@ -103,7 +94,7 @@ async function fetchLinks(doi, targetType) {
   return undefined;
 }
 
-async function run() {
+export async function run() {
   if (!fs.existsSync(PUBLICATIONS_PATH)) {
     console.error(`[ERROR] ${PUBLICATIONS_PATH} not found — run "npm run collect" first.`);
     process.exitCode = 1;
@@ -148,4 +139,11 @@ async function run() {
   }
 }
 
-run();
+const isMain = process.argv[1] && (
+  process.argv[1] === import.meta.filename ||
+  path.resolve(process.argv[1]) === path.resolve(import.meta.filename)
+);
+
+if (isMain) {
+  run();
+}

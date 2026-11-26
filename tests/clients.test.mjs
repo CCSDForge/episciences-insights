@@ -105,6 +105,32 @@ describe('RorClient', () => {
     });
     expect(await client.matchAffiliation('Unknown Org')).toBeNull();
   });
+
+  it('retries on 500 and network errors before succeeding or giving up', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('timeout'))
+      .mockResolvedValueOnce({ ok: false, status: 502, headers: { get: () => '1' } })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          names: [{ value: 'Inria', types: ['ror_display'] }],
+          locations: [{ geonames_details: { country_code: 'FR', country_name: 'France', lat: 48.8, lng: 2.1 } }],
+        }),
+      });
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const client = new RorClient({ cacheDir: tmpDir, delayMs: 0 });
+    const p = client.fetchById('02kvxyf05');
+    await vi.runAllTimersAsync();
+    expect(await p).toMatchObject({ name: 'Inria', country_code: 'FR' });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    vi.useRealTimers();
+  });
 });
 
 describe('OpenAlexClient', () => {
@@ -219,6 +245,30 @@ describe('OpenAlexFundersClient', () => {
     expect(await client.fetchById('F000')).toBeNull();
     expect(await client.fetchById('F000')).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries on 429/500 and network errors and returns undefined on 400', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('reset'))
+      .mockResolvedValueOnce({ ok: false, status: 429, headers: { get: () => '1' } })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ display_name: 'CNRS', country_code: 'FR', ids: {} }),
+      })
+      .mockResolvedValueOnce({ ok: false, status: 400, headers: { get: () => null } });
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const client = new OpenAlexFundersClient({ cacheDir: tmpDir, delayMs: 0 });
+    const p = client.fetchById('F123');
+    await vi.runAllTimersAsync();
+    expect(await p).toEqual({ display_name: 'CNRS', country_code: 'FR', ror: null });
+    vi.useRealTimers();
+    expect(await client.fetchById('Fbad')).toBeUndefined();
   });
 });
 
