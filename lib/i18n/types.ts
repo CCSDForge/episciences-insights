@@ -110,6 +110,7 @@ export interface Translations {
     lastUpdated: string;
     methodologyLink: string;
     sourceCode: string;
+    documentation: string;
   };
   theme: {
     changeTheme: string;

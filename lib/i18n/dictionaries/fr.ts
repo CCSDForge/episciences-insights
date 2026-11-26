@@ -109,7 +109,8 @@ const dict: Translations = {
           "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
           "lastUpdated": "Dernière mise à jour des données : {date}",
           "methodologyLink": "Précautions de lecture et méthodologie",
-          "sourceCode": "Code source et dépôt"
+          "sourceCode": "Code source et dépôt",
+          "documentation": "Documentation"
       },
       "theme": {
           "changeTheme": "Changer le thème d'affichage",

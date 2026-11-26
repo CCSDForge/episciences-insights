@@ -24,6 +24,8 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
   }, [lastUpdated, t.localeTag]);
 
   const newTabNotice = t.common.opensInNewTab;
+  // doc.episciences.org has no Spanish version: fall back to English.
+  const docLocale = locale === 'fr' ? 'fr' : 'en';
 
   return (
     <footer className="mt-20 border-t border-zinc-200 py-12 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
@@ -167,6 +169,18 @@ export default function PageFooter({ lastUpdated }: PageFooterProps) {
         >
           {t.footer.methodologyLink}
         </Link>
+        <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-600">•</span>
+        {/* The documentation only exists in French and English: the Spanish
+            locale points to the English version (hrefLang="en" on the link). */}
+        <a
+          href={`https://doc.episciences.org/${docLocale}/insights/`}
+          hrefLang={docLocale}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-zinc-600 hover:text-[var(--episciences-cyan-03)] dark:text-zinc-400 dark:hover:text-[var(--episciences-cyan-00)] underline underline-offset-4 transition-colors font-medium"
+        >
+          {t.footer.documentation}
+        </a>
         <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-600">•</span>
         <a
           href="https://github.com/CCSDForge/episciences-insights"
