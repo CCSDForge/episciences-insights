@@ -98,7 +98,7 @@ const dict: Translations = {
           "downloadsDesc": "Consultations directement sur les sites des revues"
       },
       "disclaimer": {
-          "title": "Précision des données & Sources",
+          "title": "Précision des données et sources",
           "metricsP1": "Les indicateurs scientifiques et relations visualisés dans ce tableau de bord sont alimentés par les API [OpenAlex](https://openalex.org), [OpenAIRE Graph](https://graph.openaire.eu), [Episciences](https://www.episciences.org), [zbMATH Open](https://zbmath.org) et [ROR](https://ror.org). Veuillez noter qu'aucun jeu de données ne constitue un catalogue exhaustif absolu des publications d'Episciences : des délais d'indexation peuvent survenir, et la couverture d'un article par les sources externes n'est pas garantie (les indicateurs de science ouverte et classifications thématiques ne sont disponibles que lorsqu'un enregistrement correspondant existe).",
           "metricsP2": "Certaines métadonnées (notamment les thématiques de recherche, l'alignement avec les ODD et les travaux connexes) sont générées par les modèles automatisés d'[OpenAlex](https://openalex.org). Les codes de financement, entrepôts d'hébergement, licences, indicateurs d'impact des citations et affiliations aux infrastructures de recherche proviennent d'[OpenAIRE Graph](https://graph.openaire.eu). Les classifications mathématiques (MSC 2020) proviennent de [zbMATH Open](https://zbmath.org). L'identification, la géolocalisation et la désambiguïsation des institutions de recherche et des financeurs s'appuient sur l'API [ROR (Research Organization Registry)](https://ror.org). [Episciences](https://www.episciences.org) s'investit continuellement pour affiner, vérifier et enrichir ces données afin d'offrir une vision toujours plus fidèle de son impact scientifique.",
           "downloadsNoteTitle": "Statistiques de téléchargement",
@@ -108,8 +108,8 @@ const dict: Translations = {
           "license": "CC-BY 2026 CCSD - Episciences - Open Source (GPL v3)",
           "source": "Données automatiquement agrégées depuis les API OpenAlex, OpenAIRE Graph, Episciences, zbMATH Open et ROR",
           "lastUpdated": "Dernière mise à jour des données : {date}",
-          "methodologyLink": "Disclaimer & Cadre méthodologique",
-          "sourceCode": "Code source & dépôt"
+          "methodologyLink": "Précautions de lecture et méthodologie",
+          "sourceCode": "Code source et dépôt"
       },
       "theme": {
           "changeTheme": "Changer le thème d'affichage",
